@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
@@ -70,22 +69,6 @@ namespace DDay.iCal.DataTypes
         public override string ToString()
         {
             return Value.OriginalString;
-        }
-
-        #endregion
-
-        #region Operators
-
-        /// <summary>
-        /// FIXME: create a TypeConverter from string to URI so strings will automatically
-        /// be converted to URI objects when using late-binding means of setting the value.
-        /// i.e. reflection - PropertyInfo.SetValue(...).
-        /// </summary>
-        /// <param name="txt"></param>
-        /// <returns></returns>
-        static public implicit operator URI(string txt)
-        {
-            return new URI(txt);
         }
 
         #endregion

@@ -31,7 +31,10 @@ iana_comp[iCalObject o] { ComponentBase c; }: BEGIN COLON n:IANA_TOKEN {c = o.iC
 x_comp[iCalObject o] { ComponentBase c; }: BEGIN COLON n:X_NAME {c = o.iCalendar.Create(o, n.getText());} CRLF (calendarline[c])+ END COLON X_NAME CRLF { c.OnLoad(EventArgs.Empty); };
 
 // iCalendar Properties
-calprops[iCalendar iCal]: calprop[iCal] (calprop[iCal])+;
+calprops[iCalendar iCal]
+:
+    calprop[iCal] (calprop[iCal])+
+;
 calprop[iCalObject o]: prodid[o] | version[o] | calscale[o] | method[o] | iana_prop[o] | x_prop[o];
 prodid[iCalObject o] {Property p; string v;}: n:PRODID { p = new Property(o); } (SEMICOLON xparam[p])* COLON v=text {p.Name = n.getText(); p.Value = v; p.AddToParent(); } CRLF;
 version[iCalObject o] {Property p; string v;}: n:VERSION { p = new Property(o); } (SEMICOLON xparam[p])* COLON v=version_number {p.Name = n.getText(); p.Value = v; p.AddToParent(); } CRLF;
@@ -79,7 +82,7 @@ class iCalLexer extends Lexer;
 options
 {
     k=3; // k=2 for CRLF, k=3 to handle LINEFOLDER        
-    charVocabulary = '\u0000'..'\ufffe';
+    charVocabulary = '\u0000'..'\uffff';
 }
 tokens
 {
@@ -97,8 +100,7 @@ LF: '\u000a' {$setType(Token.SKIP);};
 protected ALPHA: '\u0041'..'\u005a' | '\u0061'..'\u007a';
 protected DIGIT: '\u0030'..'\u0039';
 protected DASH: '\u002d';
-SPECIAL: '\u0021' | '\u0023'..'\u002b' | '\u003c' | '\u003e'..'\u0040' | '\u005b' | '\u005d'..'\u0060' | '\u007b'..'\u00ff';
-UNICODE: '\u0100'..'\uFFFE';
+SPECIAL: '\u0021' | '\u0023'..'\u002b' | '\u003c' | '\u003e'..'\u0040' | '\u005b' | '\u005d'..'\u0060' | '\u007b'..'\uffff';
 SPACE: '\u0020';
 HTAB: '\u0009';
 COLON: '\u003a';
@@ -118,7 +120,7 @@ IANA_TOKEN: (ALPHA | DIGIT | DASH)+
     if (int.TryParse(s, out val))
         $setType(NUMBER);
     else if (s.Length > 2)
-    {
+    {    
         switch (s.Substring(0,2))
         {
             case "X-": $setType(X_NAME); break;

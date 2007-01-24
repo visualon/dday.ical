@@ -45,9 +45,13 @@
     <DocumentationFile>bin\Release\DDay.iCal.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="antlr.astframe, Version=2.7.6.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\antlr-2.7.6\antlr.astframe.dll</HintPath>
+    </Reference>
     <Reference Include="antlr.runtime, Version=2.7.6.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\antlr.runtime.dll</HintPath>
+      <HintPath>..\..\antlr-2.7.6\antlr.runtime.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -164,7 +168,7 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy "$(ProjectDir)Xml\ChangeLog.xml" "C:\Inetpub\wwwroot\DDay\Xml"
+copy "$(ProjectDir)Xml\Bugs.xml" "C:\Inetpub\wwwroot\DDay\Xml"</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -39,8 +39,7 @@ namespace DDay.iCal.DataTypes
         public ArrayList ByWeekNo = new ArrayList();
         public ArrayList ByMonth = new ArrayList();
         public ArrayList BySetPos = new ArrayList();
-        public DayOfWeek Wkst = DayOfWeek.Monday;
-        public List<Date_Time> StaticOccurrences = new List<Date_Time>();
+        public DayOfWeek Wkst = DayOfWeek.Monday;        
         #endregion
 
         #region Private Fields
@@ -139,11 +138,7 @@ namespace DDay.iCal.DataTypes
                 // Parse the frequency type
                 r.Frequency = (FrequencyType)Enum.Parse(typeof(FrequencyType), match.Groups[1].Value);
 
-                // NOTE: fixed a bug where the group 2 match
-                // resulted in an empty string, which caused
-                // an error.
-                if (match.Groups[2].Success &&
-                    match.Groups[2].Length > 0)
+                if (match.Groups[2].Success)
                 {
                     string[] keywordPairs = match.Groups[2].Value.Split(';');
                     foreach (string keywordPair in keywordPairs)
@@ -315,16 +310,6 @@ namespace DDay.iCal.DataTypes
             CheckRange("BYSETPOS", r.BySetPos, -366, 366);
             return true;
         }
-
-        /// <summary>
-        /// Returns a typed copy of the object.
-        /// </summary>
-        /// <returns>A typed copy of the object.</returns>
-        public Recur Copy()
-        {
-            return (Recur)base.Copy();
-        }
-
         #endregion
 
         #region Static Methods
@@ -681,22 +666,14 @@ namespace DDay.iCal.DataTypes
         public List<Date_Time> Evaluate(Date_Time StartDate, Date_Time FromDate, Date_Time ToDate)
         {
             List<Date_Time> DateTimes = new List<Date_Time>();
-            DateTimes.AddRange(StaticOccurrences);
 
-            // If the Recur is restricted by COUNT, we need to evaluate just
-            // after any static occurrences so it's correctly restricted to a
-            // certain number. NOTE: fixes bug #13 and bug #16
+            // If the Recur is restricted by COUNT, we need to evaluate from the first occurrence
+            // so it's correctly restricted to a certain number.
+            // NOTE: fixes bug #13
             if (Count > 0)
-            {
                 FromDate = StartDate;
-                foreach (Date_Time dt in StaticOccurrences)
-                {
-                    if (FromDate < dt)
-                        FromDate = dt.AddSeconds(1);                    
-                }
-            }
 
-            // Handle "UNTIL" values that are date-only. If we didn't change values here, "UNTIL" would
+            // Handle "UNTIL" values that are date-only. Without changing values here, "UNTIL" will
             // exclude the day it specifies, instead of the inclusive behaviour it should exhibit.
             if (Until != null && !Until.HasTime)
                 Until.Value = new DateTime(Until.Year, Until.Month, Until.Day, 23, 59, 59, Until.Value.Kind);
@@ -723,15 +700,8 @@ namespace DDay.iCal.DataTypes
             // Fill in missing, necessary ByXXX values
             r.EnsureByXXXValues(StartDate);
                         
-            // Get the occurrences
-            foreach (Date_Time occurrence in r.GetOccurrences(FromDate.Copy(), ToDate, r.Count))
-            {
-                // NOTE:
-                // Used to be DateTime.AddRange(r.GetOccurrences(FromDate.Copy(), ToDate, r.Count))
-                // By doing it this way, fixes bug #19.
-                if (!DateTimes.Contains(occurrence))
-                    DateTimes.Add(occurrence);
-            }            
+            // Get the occurrences            
+            DateTimes = r.GetOccurrences(FromDate.Copy(), ToDate, r.Count);            
 
             // Limit the count of returned recurrences
             if (Count != int.MinValue &&
@@ -910,13 +880,10 @@ namespace DDay.iCal.DataTypes
                     // Account for negative days of month (count backwards from the end of the month)
                     // NOTE: fixes RRULE18 evaluation
                     if (Day > 0)
-                        // Changed from DateTimeKind.Local to StartDate.Kind
-                        // NOTE: fixes bug #20
-                        dt = new Date_Time(new DateTime(Year, Month, Day, Hour, Minute, Second, StartDate.Kind));
+                        dt = new Date_Time(new DateTime(Year, Month, Day, Hour, Minute, Second, DateTimeKind.Local));
                     else
-                        dt = new Date_Time(new DateTime(Year, Month, 1, Hour, Minute, Second, StartDate.Kind).AddMonths(1).AddDays(Day));
+                        dt = new Date_Time(new DateTime(Year, Month, 1, Hour, Minute, Second, DateTimeKind.Local).AddMonths(1).AddDays(Day));
 
-                    // Inherit time zone info, etc. from the start date
                     dt.MergeWith(StartDate);
                     return dt;
                 }

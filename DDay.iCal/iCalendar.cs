@@ -184,28 +184,15 @@ namespace DDay.iCal
             else if (type == typeof(Todo) || type.IsSubclassOf(typeof(Todo))) Todos.Remove((Todo)child);
         }
 
-        /// <summary>
-        /// Resolves each UID in the UniqueComponents list
-        /// to a valid UID.  When the UIDs are updated, each
-        /// UniqueComponentList that contains the UniqueComponent
-        /// will be updated as well.
-        /// </summary>
         public override void OnLoad(EventArgs e)
         {
-            UniqueComponents.ResolveUIDs();
+            Events.ResolveUIDs();
+            Todos.ResolveUIDs();
+            Journals.ResolveUIDs();
 
             base.OnLoad(e);            
         }
 
-        /// <summary>
-        /// Creates a typed copy of the iCalendar.
-        /// </summary>
-        /// <returns>An iCalendar object.</returns>
-        public iCalendar Copy()
-        {
-            return (iCalendar)base.Copy();
-        }
-        
         #endregion
 
         #region Private Fields

@@ -102,18 +102,6 @@ namespace DDay.iCal.Objects
 
         #endregion
 
-        #region Protected Properties
-
-        virtual protected List<object> SerializedItems
-        {
-            get
-            {
-                return new List<object>();
-            }
-        }
-
-        #endregion
-
         #region Constructors
 
         internal iCalObject() { }
@@ -135,7 +123,7 @@ namespace DDay.iCal.Objects
 
         #endregion
 
-        #region Public Overridable Methods
+        #region Public Methods
 
         /// <summary>
         /// Adds an <see cref="iCalObject"/>-based object as a child
@@ -290,92 +278,6 @@ namespace DDay.iCal.Objects
         {
             if (this.Load != null)
                 this.Load(this, e);
-        }
-
-        /// <summary>
-        /// Creates a copy of the <see cref="iCalObject"/>.
-        /// </summary>
-        /// <returns>The copy of the <see cref="iCalObject"/>.</returns>
-        public iCalObject Copy() { return Copy(Parent); }
-        virtual public iCalObject Copy(iCalObject parent)
-        {
-            iCalObject obj = null;
-            Type type = GetType();
-            ConstructorInfo[] constructors = type.GetConstructors();
-            foreach (ConstructorInfo ci in constructors)
-            {
-                // Try to find a constructor with the following signature:
-                // .ctor(iCalObject parent, string name)
-                ParameterInfo[] parms = ci.GetParameters();
-                if (parms.Length == 2 &&
-                    parms[0].ParameterType == typeof(iCalObject) &&
-                    parms[1].ParameterType == typeof(string))
-                {                    
-                    obj = (iCalObject)Activator.CreateInstance(type, parent, Name);
-                }
-            }
-            if (obj == null)
-            {
-                foreach (ConstructorInfo ci in constructors)
-                {
-                    // Try to find a constructor with the following signature:
-                    // .ctor(iCalObject parent)
-                    ParameterInfo[] parms = ci.GetParameters();
-                    if (parms.Length == 1 &&
-                        parms[0].ParameterType == typeof(iCalObject))
-                    {
-                        obj = (iCalObject)Activator.CreateInstance(type, parent);
-                    }
-                }
-            }
-            // No complex constructor was found, use the default constructor!
-            if (obj == null)
-                obj = (iCalObject)Activator.CreateInstance(type);
-
-            // Add properties
-            foreach (DictionaryEntry de in Properties)
-                ((Property)(de.Value)).Copy(obj);
-
-            // Add parameters
-            foreach (DictionaryEntry de in Parameters)
-                ((Parameter)(de.Value)).Copy(obj);
-
-            // Add each child
-            foreach (iCalObject child in Children)
-                child.Copy(obj);
-
-            //
-            // Get a list of serialized items,
-            // iterate through each, make a copy
-            // of each item, and assign it to our
-            // copied object.
-            //
-            List<object> items = SerializedItems;
-            foreach (object item in items)
-            {
-                FieldInfo field = null;
-                PropertyInfo prop = null;
-
-                if (item is FieldInfo)
-                    field = (FieldInfo)item;
-                else
-                    prop = (PropertyInfo)item;
-
-                // Get the item's value
-                object itemValue = (field == null) ? prop.GetValue(this, null) : field.GetValue(this);
-
-                // Make a copy of the item, if it's copyable.
-                if (itemValue is iCalObject)
-                    itemValue = ((iCalObject)itemValue).Copy(obj);
-                else { } // FIXME: make an exact copy, if possible.
-
-                // Set the item's value in our copied object
-                if (field == null)
-                    prop.SetValue(obj, itemValue, null);
-                else field.SetValue(obj, itemValue);
-            }
-
-            return obj;
         }
 
         #endregion

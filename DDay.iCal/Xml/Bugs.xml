@@ -114,47 +114,4 @@
             and cause the parser to hang.
         </summary>
     </bug>
-    <bug id="16" known="0.19" fixed="0.19">
-        <summary>
-            Recurring events, todos, and journals still don't always correctly limit
-            the number of recurrences when using the COUNT property.
-        </summary>
-        <details>
-            When the recurring item is evaluated, and the list of recurrences doesn't
-            include the original date/time of the event/todo/journal, the COUNT property
-            doesn't work correctly.  To solve this problem, a StaticOccurrences list
-            must be provided to each Recur object to allow a component to declare
-            its original occurence date/time.  This way, the COUNT should always work
-            as intended.
-        </details>
-    </bug>
-    <bug id="17" known="0.19" fixed="0.19">
-        <summary>
-            Time zone information is changed when finding information for a specific
-            time zone.
-        </summary>
-        <details>
-            Calling GetTimeZoneInfo() causes the DTStart property of the
-            time zone to change.
-        </details>
-    </bug>
-    <bug id="18" known="0.19" fixed="0.19">
-        <summary>
-            Some recurrence rules do not correctly ignore whitespace, causing
-            the program to throw an exception.
-        </summary>
-    </bug>
-    <bug id="19" known="0.19" fixed="0.19">
-        <summary>
-            Recurrence rules that restrict to a certain COUNT do not correctly
-            filter by unique occurrences.
-        </summary>
-    </bug>
-    <bug id="20" known="0.19" fixed="0.19">
-        <summary>
-            With certain events, event occurences are evaluated twice.
-            This is due to a differentiation between UTC and Local time
-            (i.e. DateTimeKind.Local and DateTimeKind.UTC).
-        </summary>
-    </bug>
 </bugs>

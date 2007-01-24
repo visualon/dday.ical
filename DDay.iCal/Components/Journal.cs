@@ -11,13 +11,39 @@ namespace DDay.iCal.Components
     /// <summary>
     /// A class that represents an RFC 2445 VJOURNAL component.
     /// </summary>
-    [DebuggerDisplay("{Summary}: {(Description.ToString().Length < 32) ? Description.ToString() : Description.ToString().Substring(0, 32)}")]
+    [DebuggerDisplay("{Summary}: {Description.ToString().Substring(0, 32)}")]
     public class Journal : RecurringComponent
     {
         #region Public Fields
-                             
+
         [Serialized]
-        public JournalStatus Status;        
+        public Binary[] Attach;
+        [Serialized]
+        public Cal_Address[] Attendee;
+        [Serialized]
+        public TextCollection[] Categories;
+        [Serialized]
+        public Text Class;
+        [Serialized]
+        public Text[] Comment;
+        [Serialized]
+        public Text[] Contact;
+        [Serialized, DefaultValueType("DATE-TIME")]
+        public Date_Time Created;
+        [Serialized]
+        public Text Description;
+        [Serialized]
+        public Cal_Address Organizer;
+        [Serialized]
+        public Text[] Related_To;
+        [Serialized]
+        public RequestStatus[] RequestStatus;
+        [Serialized]
+        public JournalStatus Status;
+        [Serialized]
+        public Text Summary;
+        [Serialized]
+        public URI URL;
 
         #endregion
 
@@ -27,8 +53,6 @@ namespace DDay.iCal.Components
         {
             Journal j = (Journal)iCal.Create(iCal, "VJOURNAL");
             j.UID = UniqueComponent.NewUID();
-            j.Created = DateTime.Now;
-            j.DTStamp = DateTime.Now;
 
             return j;
         }
@@ -40,32 +64,6 @@ namespace DDay.iCal.Components
         public Journal(iCalObject parent) : base(parent)
         {
             this.Name = "VJOURNAL";
-        }
-
-        #endregion
-
-        #region Overrides
-
-        /// <summary>
-        /// Returns a typed copy of the Journal object.
-        /// </summary>
-        /// <returns>A typed copy of the Journal object.</returns>
-        public Journal Copy()
-        {
-            return (Journal)base.Copy();
-        }
-
-        public override System.Collections.Generic.List<Period> Evaluate(Date_Time FromDate, Date_Time ToDate)
-        {
-            if (Start != null)
-            {
-                Period p = new Period(Start);
-                if (!Periods.Contains(p))
-                    Periods.Add(p);
-
-                return base.Evaluate(FromDate, ToDate);
-            }
-            return new System.Collections.Generic.List<Period>();
         }
 
         #endregion

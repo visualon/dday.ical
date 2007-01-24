@@ -28,7 +28,23 @@ namespace DDay.iCal.Components
     public class Event : RecurringComponent
     {
         #region Public Fields
-                
+
+        [Serialized]
+        public Binary[] Attach;
+        [Serialized]
+        public Cal_Address[] Attendee;
+        [Serialized]
+        public TextCollection[] Categories;
+        [Serialized]
+        public Text Class;
+        [Serialized]
+        public Text[] Comment;
+        [Serialized]
+        public Text[] Contact;
+        [Serialized, DefaultValueType("DATE-TIME")]
+        public Date_Time Created;
+        [Serialized]
+        public Text Description;
         [Serialized, DefaultValueType("DATE-TIME")]
         public Date_Time DTEnd;
         [Serialized, DefaultValue("P")]
@@ -36,13 +52,25 @@ namespace DDay.iCal.Components
         [Serialized]
         public Geo Geo;
         [Serialized]
-        public Text Location;        
+        public Text Location;
+        [Serialized]
+        public Cal_Address Organizer;
+        [Serialized]
+        public Integer Priority;
+        [Serialized]
+        public Text[] Related_To;
+        [Serialized]
+        public RequestStatus[] RequestStatus;
         [Serialized]
         public TextCollection[] Resources;        
         [Serialized, DefaultValue("TENTATIVE\r\n")]
-        public EventStatus Status;        
+        public EventStatus Status;
+        [Serialized]
+        public Text Summary;
         [Serialized, DefaultValue("OPAQUE\r\n")]
-        public Transparency Transp;        
+        public Transparency Transp;
+        [Serialized]
+        public URI URL;
 
         #endregion
          
@@ -95,8 +123,6 @@ namespace DDay.iCal.Components
         {
             Event evt = (Event)iCal.Create(iCal, "VEVENT");
             evt.UID = UniqueComponent.NewUID();
-            evt.Created = DateTime.Now;
-            evt.DTStamp = DateTime.Now;
 
             return evt;
         }
@@ -189,12 +215,7 @@ namespace DDay.iCal.Components
         {
             // Make sure Duration is not null by now
             if (Duration == null)
-            {
-                // If a DTEnd was not provided, set one!
-                if (DTEnd == null)
-                    DTEnd = DTStart.Copy();
                 Duration = DTEnd - DTStart;
-            }
 
             // Add the event itself, before recurrence rules are evaluated
             // NOTE: this fixes a bug where (if evaluated multiple times)
@@ -205,7 +226,7 @@ namespace DDay.iCal.Components
 
             // Evaluate recurrences normally
             base.Evaluate(FromDate, ToDate);
-
+                        
             // Ensure each period has a duration
             foreach(Period p in Periods)
             {
@@ -242,15 +263,6 @@ namespace DDay.iCal.Components
                 else if (DTEnd == null && Duration != null)                
                     DTEnd = DTStart + Duration;
             }
-        }
-
-        /// <summary>
-        /// Returns a typed copy of the Event object.
-        /// </summary>
-        /// <returns>A typed copy of the Event object.</returns>
-        public Event Copy()
-        {
-            return (Event)base.Copy();
         }
 
         #endregion        

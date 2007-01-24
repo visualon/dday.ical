@@ -126,8 +126,7 @@ namespace DDay.iCal.DataTypes
                 return Periods;
             
             foreach (object obj in Items)
-                if (!Periods.Contains(obj))
-                    Periods.Add(obj);                
+                Periods.Add(obj);                
 
             return Periods;
         }

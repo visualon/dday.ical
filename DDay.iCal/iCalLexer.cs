@@ -63,11 +63,10 @@ namespace DDay.iCal
 		public const int DIGIT = 27;
 		public const int DASH = 28;
 		public const int SPECIAL = 29;
-		public const int UNICODE = 30;
-		public const int SPACE = 31;
-		public const int HTAB = 32;
-		public const int SLASH = 33;
-		public const int LINEFOLDER = 34;
+		public const int SPACE = 30;
+		public const int HTAB = 31;
+		public const int SLASH = 32;
+		public const int LINEFOLDER = 33;
 		
 		public iCalLexer(Stream ins) : this(new ByteBuffer(ins))
 		{
@@ -211,10 +210,6 @@ tryAgain:
 							}
 							else if ((tokenSet_1_.member(cached_LA1))) {
 								mSPECIAL(true);
-								theRetToken = returnToken_;
-							}
-							else if (((cached_LA1 >= '\u0100' && cached_LA1 <= '\ufffe'))) {
-								mUNICODE(true);
 								theRetToken = returnToken_;
 							}
 							else if ((cached_LA1=='\\') && (true)) {
@@ -387,29 +382,15 @@ tryAgain:
 			break;
 		}
 		default:
-			if (((cached_LA1 >= '{' && cached_LA1 <= '\u00ff')))
+			if (((cached_LA1 >= '{' && cached_LA1 <= '\uffff')))
 			{
-				matchRange('\u007b','\u00ff');
+				matchRange('\u007b','\uffff');
 			}
 		else
 		{
 			throw new NoViableAltForCharException(cached_LA1, getFilename(), getLine(), getColumn());
 		}
 		break; }
-		if (_createToken && (null == _token) && (_ttype != Token.SKIP))
-		{
-			_token = makeToken(_ttype);
-			_token.setText(text.ToString(_begin, text.Length-_begin));
-		}
-		returnToken_ = _token;
-	}
-	
-	public void mUNICODE(bool _createToken) //throws RecognitionException, CharStreamException, TokenStreamException
-{
-		int _ttype; IToken _token=null; int _begin=text.Length;
-		_ttype = UNICODE;
-		
-		matchRange('\u0100','\uFFFE');
 		if (_createToken && (null == _token) && (_ttype != Token.SKIP))
 		{
 			_token = makeToken(_ttype);
@@ -633,7 +614,7 @@ tryAgain:
 		_ttype = IANA_TOKEN;
 		
 		{ // ( ... )+
-			int _cnt98=0;
+			int _cnt97=0;
 			for (;;)
 			{
 				switch ( cached_LA1 )
@@ -669,12 +650,12 @@ tryAgain:
 				}
 				default:
 				{
-					if (_cnt98 >= 1) { goto _loop98_breakloop; } else { throw new NoViableAltForCharException(cached_LA1, getFilename(), getLine(), getColumn());; }
+					if (_cnt97 >= 1) { goto _loop97_breakloop; } else { throw new NoViableAltForCharException(cached_LA1, getFilename(), getLine(), getColumn());; }
 				}
 				break; }
-				_cnt98++;
+				_cnt97++;
 			}
-_loop98_breakloop:			;
+_loop97_breakloop:			;
 		}    // ( ... )+
 		
 		string s = text.ToString(_begin, text.Length-_begin);
@@ -682,7 +663,7 @@ _loop98_breakloop:			;
 		if (int.TryParse(s, out val))
 		_ttype = NUMBER;
 		else if (s.Length > 2)
-		{
+		{    
 		switch (s.Substring(0,2))
 		{
 		case "X-": _ttype = X_NAME; break;
@@ -743,11 +724,11 @@ _loop98_breakloop:			;
 	public static readonly BitSet tokenSet_0_ = new BitSet(mk_tokenSet_0_());
 	private static long[] mk_tokenSet_1_()
 	{
-		long[] data = new long[1025];
+		long[] data = new long[2048];
 		data[0]=-3458746947404300288L;
 		data[1]=-576460744116142079L;
-		for (int i = 2; i<=3; i++) { data[i]=-1L; }
-		for (int i = 4; i<=1024; i++) { data[i]=0L; }
+		for (int i = 2; i<=1023; i++) { data[i]=-1L; }
+		for (int i = 1024; i<=2047; i++) { data[i]=0L; }
 		return data;
 	}
 	public static readonly BitSet tokenSet_1_ = new BitSet(mk_tokenSet_1_());

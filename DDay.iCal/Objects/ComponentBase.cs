@@ -1,11 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Text;
-using System.Reflection;
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
-using DDay.iCal.Serialization;
 
 namespace DDay.iCal.Objects
 {
@@ -18,8 +15,7 @@ namespace DDay.iCal.Objects
     {
         #region Constructors
 
-        public ComponentBase() : base() { }
-        public ComponentBase(iCalObject parent) : base(parent) { }
+        public ComponentBase(iCalObject parent) : base(parent) {}
         public ComponentBase(iCalObject parent, string name) : base(parent, name) { }
 
         #endregion
@@ -40,29 +36,6 @@ namespace DDay.iCal.Objects
                 case "STANDARD":
                     return new DDay.iCal.Components.TimeZone.TimeZoneInfo(name.ToUpper(), parent); break;
                 default: return new ComponentBase(parent, name); break;
-            }
-        }
-
-        #endregion
-
-        #region Overrides
-
-        protected override System.Collections.Generic.List<object> SerializedItems
-        {
-            get
-            {
-                //
-                // Get a list of all the public fields and properties
-                // that are marked as Serialized.
-                //
-                List<object> List = new List<object>();
-                foreach (FieldInfo fi in GetType().GetFields())
-                    if (fi.GetCustomAttributes(typeof(Serialized), true).Length > 0)
-                        List.Add(fi);
-                foreach (PropertyInfo pi in GetType().GetProperties())
-                    if (pi.GetCustomAttributes(typeof(Serialized), true).Length > 0)
-                        List.Add(pi);
-                return List;
             }
         }
 

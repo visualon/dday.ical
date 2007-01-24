@@ -67,7 +67,7 @@ namespace DDay.iCal.Test
             CompareCalendars(iCal1, iCal2);
         }
 
-        static public void CompareCalendars(iCalendar iCal1, iCalendar iCal2)
+        private void CompareCalendars(iCalendar iCal1, iCalendar iCal2)
         {
             Assert.IsTrue(object.Equals(iCal1.Method, iCal2.Method), "Methods do not match");
             Assert.IsTrue(object.Equals(iCal1.ProductID, iCal2.ProductID), "ProductIDs do not match");
@@ -84,7 +84,7 @@ namespace DDay.iCal.Test
                 CompareComponents(iCal1.Todos[i], iCal2.Todos[i]);
         }
 
-        static public void CompareComponents(ComponentBase cb1, ComponentBase cb2)
+        private void CompareComponents(ComponentBase cb1, ComponentBase cb2)
         {
             Type type = cb1.GetType();
             Assert.IsTrue(type == cb2.GetType(), "Types do not match");
@@ -118,7 +118,7 @@ namespace DDay.iCal.Test
             }
         }
 
-        static public void CompareArrays(Array a1, Array a2, string value)
+        private void CompareArrays(Array a1, Array a2, string value)
         {
             if (a1 == null &&
                 a2 == null)
@@ -227,12 +227,6 @@ namespace DDay.iCal.Test
         public void USHOLIDAYS()
         {
             SerializeTest("USHolidays.ics");
-        }
-
-        [Test, Category("Serialization")]
-        public void LANGUAGE1()
-        {
-            SerializeTest("Barça 2006 - 2007.ics");
         }
     }
 }

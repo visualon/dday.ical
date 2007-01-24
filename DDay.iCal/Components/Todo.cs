@@ -17,9 +17,25 @@ namespace DDay.iCal.Components
     public class Todo : RecurringComponent
     {
         #region Public Fields
-               
+       
+        [Serialized]
+        public Binary[] Attach;
+        [Serialized]
+        public Cal_Address[] Attendee;
+        [Serialized]
+        public TextCollection[] Categories;
+        [Serialized]
+        public Text Class;
+        [Serialized]
+        public Text[] Comment;
         [Serialized, DefaultValueType("DATE-TIME")]
-        public Date_Time Completed;        
+        public Date_Time Completed;
+        [Serialized]
+        public Text[] Contact;
+        [Serialized, DefaultValueType("DATE-TIME")]
+        public Date_Time Created;
+        [Serialized]
+        public Text Description;        
         [Serialized, DefaultValueType("DATE-TIME")]
         public Date_Time Due;
         [Serialized, DefaultValue("P")]
@@ -27,45 +43,25 @@ namespace DDay.iCal.Components
         [Serialized]
         public Geo Geo;
         [Serialized]
-        public Text Location;        
+        public Text Location;
         [Serialized]
-        public Integer PercentComplete;        
+        public Cal_Address Organizer;
         [Serialized]
-        public TextCollection[] Resources;        
-
-        #endregion
-
-        #region Private Fields
-
-        private bool m_Loaded = false;
-        private TodoStatus m_Status;
-
-        #endregion
-
-        #region Public Properties
-
+        public Integer PercentComplete;
+        [Serialized]
+        public Integer Priority;
+        [Serialized]
+        public Text[] RelatedTo;
+        [Serialized]
+        public RequestStatus[] RequestStatus;
+        [Serialized]
+        public TextCollection[] Resources;
         [Serialized, DefaultValue("NEEDS_ACTION\r\n")]
-        public TodoStatus Status
-        {
-            get { return m_Status; }
-            set
-            {
-                if (m_Status != value)
-                {
-                    // Automatically set/unset the Completed time, once the
-                    // component is fully loaded (When deserializing, it doesn't
-                    // automatically track the completed time).
-                    if (m_Loaded)
-                    {
-                        if (value == TodoStatus.COMPLETED)
-                            Completed = DateTime.Now;
-                        else Completed = null;
-                    }
-
-                    m_Status = value;
-                }
-            }
-        }
+        public TodoStatus Status;
+        [Serialized]
+        public Text Summary;
+        [Serialized]
+        public Uri Url;
 
         #endregion
 
@@ -85,8 +81,6 @@ namespace DDay.iCal.Components
         {
             Todo t = (Todo)iCal.Create(iCal, "VTODO");
             t.UID = UniqueComponent.NewUID();
-            t.Created = DateTime.Now;
-            t.DTStamp = DateTime.Now;
 
             return t;
         }
@@ -106,8 +100,7 @@ namespace DDay.iCal.Components
         {
             if (Status == TodoStatus.COMPLETED)
             {
-                if (Completed == null ||
-                    Completed > currDt)
+                if (Completed == null)
                     return true;
 
                 foreach (Period p in Periods)
@@ -115,7 +108,7 @@ namespace DDay.iCal.Components
                     if (p.StartTime > Completed && // The item has recurred after it was completed
                         currDt >= p.StartTime)     // and the current date is after or on the recurrence date.
                         return false;
-                }                
+                }
                 return true;
             }
             return false;
@@ -166,7 +159,6 @@ namespace DDay.iCal.Components
         public override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            m_Loaded = true;
 
             // Automatically determine Duration from Due, or Due from Duration
             if (DTStart != null)
@@ -176,15 +168,6 @@ namespace DDay.iCal.Components
                 else if (Due == null && Duration != null)
                     Due = DTStart + Duration;                
             }
-        }
-
-        /// <summary>
-        /// Returns a typed copy of the Todo object.
-        /// </summary>
-        /// <returns>A typed copy of the Todo object.</returns>
-        public Todo Copy()
-        {
-            return (Todo)base.Copy();
         }
 
         #endregion

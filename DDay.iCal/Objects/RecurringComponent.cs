@@ -24,7 +24,6 @@ namespace DDay.iCal.Objects
         [Serialized, DefaultValueType("DATE-TIME")] public Date_Time DTStart;        
         public Date_Time EvalStart;        
         public Date_Time EvalEnd;
-        public Date_Time Until;
         [Serialized]
         public RDate[] ExDate;
         [Serialized]
@@ -79,10 +78,12 @@ namespace DDay.iCal.Objects
 
         #region Constructors
 
-        public RecurringComponent() : base() { Initialize(); }
-        public RecurringComponent(iCalObject parent) : base(parent) { Initialize(); }
-        public RecurringComponent(iCalObject parent, string name) : base(parent, name) { Initialize(); }
-        public void Initialize()
+        public RecurringComponent(iCalObject parent) : base(parent)
+        {
+            Periods = new List<Period>();
+            Alarms = new List<Alarm>();
+        }
+        public RecurringComponent(iCalObject parent, string name) : base(parent, name)
         {
             Periods = new List<Period>();
             Alarms = new List<Alarm>();
@@ -245,9 +246,9 @@ namespace DDay.iCal.Objects
         virtual public List<Alarm.AlarmOccurrence> PollAlarms(Date_Time Start)
         {
             List<Alarm.AlarmOccurrence> Occurrences = new List<Alarm.AlarmOccurrence>();
-            foreach (Alarm alarm in Alarms)
+            foreach (Alarm alarm in Alarms)            
                 Occurrences.AddRange(alarm.Poll(Start));
-            return Occurrences;            
+            return Occurrences;
         }
 
         #endregion
@@ -267,19 +268,6 @@ namespace DDay.iCal.Objects
             {
                 foreach (Recur rrule in RRule)
                 {
-                    // Get a list of static occurrences
-                    // This is important to correctly calculate
-                    // recurrences with COUNT.
-                    rrule.StaticOccurrences = new List<Date_Time>();
-                    foreach(Period p in Periods)
-                        rrule.StaticOccurrences.Add(p.StartTime);
-
-                    //
-                    // Determine the last allowed date in this recurrence
-                    //
-                    if (rrule.Until != null && (Until == null || Until < rrule.Until))
-                        Until = rrule.Until.Copy();
-
                     List<Date_Time> DateTimes = rrule.Evaluate(DTStart, FromDate, ToDate);
                     foreach (Date_Time dt in DateTimes)
                     {

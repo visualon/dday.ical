@@ -64,28 +64,13 @@ namespace DDay.iCal.DataTypes
             }
         }
 
-        public string EmailAddress
-        {
-            get
-            {
-                if (Value != null &&
-                    Value.Scheme == Uri.UriSchemeMailto)
-                {
-                    return Value.AbsoluteUri.Replace("mailto:", "");
-                }
-                return null;
-            }
-        }
-
         #endregion
 
         #region Constructors
 
         public Cal_Address() : base() { }
-        public Cal_Address(string value) : this("ATTENDEE", value) { }
-        public Cal_Address(string name, string value) : this()
+        public Cal_Address(string value)
         {
-            this.Name = name;
             object obj = this;
             if (!base.TryParse(value, ref obj))
                 CopyFrom(Parse("MAILTO:" + value));

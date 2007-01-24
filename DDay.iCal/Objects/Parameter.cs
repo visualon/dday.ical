@@ -45,25 +45,17 @@ namespace DDay.iCal.Objects
             }
         }
 
-        public void AddToParent()
+        #endregion
+
+        #region Protected Methods
+
+        protected void AddToParent()
         {
-            if (Parent != null &&
+            if (Parent != null &&                
                 Name != null &&
                 !Parent.Parameters.ContainsKey(Name))
                 Parent.Parameters[Name] = this;
-        }
-
-        #endregion
-
-        #region Overrides
-
-        public override iCalObject Copy(iCalObject parent)
-        {
-            Parameter p = (Parameter)base.Copy(parent);
-            foreach (string s in Values)
-                p.Values.Add(s);
-            return p;
-        }
+        }        
 
         #endregion
     }

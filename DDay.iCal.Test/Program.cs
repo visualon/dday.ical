@@ -28,23 +28,21 @@ namespace DDay.iCal.Test
             p.LoadFromUri();
 
             DDay.iCal.Test.Alarm.DoTests();
-            DDay.iCal.Test.Copy.DoTests();
             DDay.iCal.Test.Journal.DoTests();
             DDay.iCal.Test.Recurrence.DoTests();
             DDay.iCal.Test.Serialization.DoTests();
-            DDay.iCal.Test.Todo.DoTests();            
+            DDay.iCal.Test.Todo.DoTests();
 
             p.CATEGORIES();
             p.GEO1();
             p.BASE64();
             p.BASE64_1();
-            p.BINARY();
+            //p.BINARY();
             p.MERGE();
             p.UID1();
             p.ADDEVENT1();
             p.CustomClasses();
             p.LANGUAGE1();
-            p.GOOGLE1();
             p.LoadAndDisplayCalendar();
 
             p.DisposeAll();
@@ -433,34 +431,6 @@ namespace DDay.iCal.Test
         public void LANGUAGE1()
         {
             iCalendar iCal = iCalendar.LoadFromFile(@"Calendars/General/Barça 2006 - 2007.ics");
-        }
-
-        [Test]
-        public void GOOGLE1()
-        {
-            TZID tzid = "Europe/Berlin";
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars/General/GoogleCalendar.ics");
-            Event evt = iCal.Events["594oeajmftl3r9qlkb476rpr3c@google.com"];
-            Assert.IsNotNull(evt);
-
-            Date_Time dtStart = new Date_Time(2006, 12, 18, tzid, iCal);
-            Date_Time dtEnd = new Date_Time(2006, 12, 23, tzid, iCal);
-            iCal.Evaluate(dtStart, dtEnd);
-
-            Date_Time[] DateTimes = new Date_Time[]
-            {
-                new Date_Time(2006, 12, 11, 7, 0, 0, tzid, iCal),
-                new Date_Time(2006, 12, 18, 7, 0, 0, tzid, iCal),
-                new Date_Time(2006, 12, 19, 7, 0, 0, tzid, iCal),
-                new Date_Time(2006, 12, 20, 7, 0, 0, tzid, iCal),
-                new Date_Time(2006, 12, 21, 7, 0, 0, tzid, iCal),
-                new Date_Time(2006, 12, 22, 7, 0, 0, tzid, iCal)
-            };
-
-            foreach (Date_Time dt in DateTimes)
-                Assert.IsTrue(evt.OccursAt(dt), "Event should occur at " + dt);
-
-            Assert.IsTrue(evt.Periods.Count == DateTimes.Length, "There should be exactly " + DateTimes.Length + " occurrences; there were " + evt.Periods.Count);
         }
     }
 }

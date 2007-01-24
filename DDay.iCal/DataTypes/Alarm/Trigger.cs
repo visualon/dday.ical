@@ -51,10 +51,6 @@ namespace DDay.iCal.DataTypes
                 }                
                 return m_Related;
             }
-            set
-            {
-                m_Related = value;
-            }
         }
 
         public bool IsRelative

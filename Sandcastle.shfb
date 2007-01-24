@@ -1,6 +1,6 @@
-﻿<project schemaVersion="1.3.3.1">
+﻿<project schemaVersion="1.3.1.1">
     <assemblies>
-        <assembly assemblyPath=".\DDay.iCal\bin\Release\DDay.iCal.dll" xmlCommentsPath=".\DDay.iCal\bin\Release\DDay.iCal.xml" commentsOnly="False" />
+        <assembly assemblyPath="C:\Documents and Settings\dougd\My Documents\Visual Studio Projects\Classes\DDay.iCal\DDay.iCal\bin\Release\DDay.iCal.dll" xmlCommentsPath="C:\Documents and Settings\dougd\My Documents\Visual Studio Projects\Classes\DDay.iCal\DDay.iCal\bin\Release\DDay.iCal.xml" />
     </assemblies>
     <namespaceSummaries>
         <namespaceSummaryItem name="" isDocumented="False" />
@@ -15,7 +15,7 @@
     </namespaceSummaries>
     <contentPlacement>AboveNamespaces</contentPlacement>
     <dependencies>
-        <dependencyItem depPath=".\DDay.iCal\bin\Release\antlr.runtime.dll" />
+        <dependencyItem depPath="C:\Documents and Settings\dougd\My Documents\Visual Studio Projects\Classes\DDay.iCal\DDay.iCal\bin\Release\antlr.runtime.dll" />
     </dependencies>
     <projectSummary />
     <sandcastlePath />
@@ -25,24 +25,20 @@
     <helpFileFormat>HtmlHelp1x</helpFileFormat>
     <cleanIntermediates>True</cleanIntermediates>
     <purgeDuplicateTopics>True</purgeDuplicateTopics>
-    <cppCommentsFixup>False</cppCommentsFixup>
-    <frameworkVersion>2.0.50727</frameworkVersion>
     <binaryTOC>True</binaryTOC>
     <includeFavorites>False</includeFavorites>
     <preliminary>False</preliminary>
     <rootNSContainer>False</rootNSContainer>
-    <helpTitle>DDay.iCal Version 0.19</helpTitle>
+    <helpTitle>DDay.iCal Version 0.18</helpTitle>
     <htmlHelpName>Documentation</htmlHelpName>
     <language>en-US</language>
     <copyrightHref />
-    <copyrightText>Copyright 2007 Douglas Day</copyrightText>
+    <copyrightText>Copyright 2006 Douglas Day</copyrightText>
     <feedbackEMailAddress>doug@ddaysoftware.com</feedbackEMailAddress>
-    <headerText>DDay.iCal Version 0.19</headerText>
+    <headerText>DDay.iCal Version 0.18</headerText>
     <projectLinks>Local</projectLinks>
     <sdkLinks>Msdn</sdkLinks>
     <presentationStyle>Prototype</presentationStyle>
-    <namingMethod>Guid</namingMethod>
-    <syntaxFilters>Standard</syntaxFilters>
     <missingTags>AutoDocumentCtors</missingTags>
     <visibleItems>InheritedMembers, InheritedFrameworkMembers, Protected, SealedProtected</visibleItems>
 </project>
