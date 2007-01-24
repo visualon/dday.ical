@@ -48,16 +48,6 @@ namespace DDay.iCal.DataTypes
 
         #region Overrides
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Geo)
-            {
-                Geo g = (Geo)obj;
-                return g.Latitude.Equals(Latitude) && g.Longitude.Equals(Longitude);
-            }
-            return base.Equals(obj);
-        }
-
         public override bool TryParse(string value, ref object obj)
         {
             Geo g = (Geo)obj;
@@ -87,11 +77,6 @@ namespace DDay.iCal.DataTypes
                 Longitude = g.Longitude;
             }
             base.CopyFrom(obj);
-        }
-
-        public override string ToString()
-        {
-            return Latitude.Value.ToString("0.000000") + ";" + Longitude.Value.ToString("0.000000");
         }
 
         #endregion

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
-using DDay.iCal.Serialization;
 
 namespace DDay.iCal.Objects
 {
@@ -17,30 +16,24 @@ namespace DDay.iCal.Objects
     /// <see cref="EXDATE"/>s, as well as the <see cref="DTSTART"/>
     /// for the recurring item (all recurring items must have a DTSTART).
     /// </remarks>
-    public class RecurringComponent : UniqueComponent
+    public class RecurringComponent : ComponentBase
     {
         #region Public Fields
-                
-        [Serialized, DefaultValueType("DATE-TIME")] public Date_Time DTStart;        
-        public Date_Time EvalStart;        
+
+        public Date_Time DTStart;
+        public Date_Time EvalStart;
         public Date_Time EvalEnd;
-        public Date_Time Until;
-        [Serialized]
         public RDate[] ExDate;
-        [Serialized]
         public Recur[] ExRule;
-        [Serialized]
         public RDate[] RDate;
-        [Serialized]
         public Recur[] RRule;
-        [Serialized]
-        public Date_Time RecurID;
+        public Date_Time RecurID;        
 
         #endregion
 
         #region Private Fields
 
-        private List<Period> m_Periods;
+        private ArrayList m_DateTimes;
         private List<Alarm> m_Alarms;
 
         #endregion
@@ -48,19 +41,19 @@ namespace DDay.iCal.Objects
         #region Public Properties
 
         /// <summary>
-        /// A collection of <see cref="Period"/> objects that contain the dates and times
+        /// A collection of <see cref="Date_Time"/> objects that contain the dates and times
         /// when each item occurs/recurs.
         /// </summary>
-        public List<Period> Periods
+        public ArrayList DateTimes
         {
-            get { return m_Periods; }
-            set { m_Periods = value; }
+            get { return m_DateTimes; }
+            set { m_DateTimes = value; }
         }
 
         /// <summary>
         /// An alias to the DTStart field (i.e. start date/time).
         /// </summary>
-        virtual public Date_Time Start
+        public Date_Time Start
         {
             get { return DTStart; }
             set { DTStart = value; }
@@ -79,51 +72,15 @@ namespace DDay.iCal.Objects
 
         #region Constructors
 
-        public RecurringComponent() : base() { Initialize(); }
-        public RecurringComponent(iCalObject parent) : base(parent) { Initialize(); }
-        public RecurringComponent(iCalObject parent, string name) : base(parent, name) { Initialize(); }
-        public void Initialize()
+        public RecurringComponent(iCalObject parent) : base(parent)
         {
-            Periods = new List<Period>();
+            DateTimes = new ArrayList();
             Alarms = new List<Alarm>();
         }
-
-        #endregion
-
-        #region Public Methods
-
-        // FIXME: add similar methods for RDATE and EXDATE
-
-        /// <summary>
-        /// Adds a recurrence rule to the recurring component
-        /// </summary>
-        /// <param name="recur">The recurrence rule to add</param>
-        public void AddRecurrence(Recur recur)
+        public RecurringComponent(iCalObject parent, string name) : base(parent, name)
         {
-            if (RRule != null)
-            {
-                Recur[] rules = new Recur[RRule.Length + 1];
-                RRule.CopyTo(rules, 0);
-                rules[rules.Length - 1] = recur;
-                RRule = rules;
-            }
-            else RRule = new Recur[] { recur };
-        }
-
-        /// <summary>
-        /// Adds an exception recurrence rule to the recurring component
-        /// </summary>
-        /// <param name="recur">The recurrence rule to add</param>
-        public void AddException(Recur recur)
-        {
-            if (ExRule != null)
-            {
-                Recur[] rules = new Recur[ExRule.Length + 1];
-                ExRule.CopyTo(rules, 0);
-                rules[rules.Length - 1] = recur;
-                ExRule = rules;
-            }
-            else ExRule = new Recur[] { recur };
+            DateTimes = new ArrayList();
+            Alarms = new List<Alarm>();
         }
 
         #endregion
@@ -148,7 +105,7 @@ namespace DDay.iCal.Objects
         ///     An <see cref="ArrayList"/> containing a <see cref="Date_Time"/> object for
         ///     each date/time this item occurs/recurs.
         /// </returns>
-        virtual public List<Period> Evaluate(Date_Time FromDate, Date_Time ToDate)
+        virtual public ArrayList Evaluate(Date_Time FromDate, Date_Time ToDate)
         {
             // Evaluate extra time periods, without re-evaluating ones that were already evaluated
             if ((EvalStart == null && EvalEnd == null) ||
@@ -170,38 +127,13 @@ namespace DDay.iCal.Objects
             if (EvalEnd != null && ToDate > EvalEnd)
                 Evaluate(EvalEnd, ToDate);
 
-            Periods.Sort();
-
-            // Ensure the Kind of time is consistent with DTStart
-            foreach (Period p in Periods)
-            {                
-                if (p.StartTime.Kind != DTStart.Kind)
-                {
-                    p.StartTime.Value = new DateTime(p.StartTime.Year, p.StartTime.Month, p.StartTime.Day,
-                        p.StartTime.Hour, p.StartTime.Minute, p.StartTime.Second, DTStart.Kind);
-                }
-            }
+            DateTimes.Sort();
 
             // Evaluate all Alarms for this component.
             foreach (Alarm alarm in Alarms)
                 alarm.Evaluate(this);
 
-            return Periods;
-        }
-
-        /// <summary>
-        /// Clears a previous evaluation, usually because one of the 
-        /// key elements used for evaluation has changed 
-        /// (Start, End, Duration, recurrence rules, exceptions, etc.).
-        /// </summary>
-        virtual public void ClearEvaluation()
-        {
-            EvalStart = null;
-            EvalEnd = null;
-            Periods.Clear();
-
-            foreach (Alarm alarm in Alarms)
-                alarm.Occurrences.Clear();
+            return DateTimes;
         }
 
         public List<Alarm.AlarmOccurrence> PollAlarms()
@@ -245,9 +177,9 @@ namespace DDay.iCal.Objects
         virtual public List<Alarm.AlarmOccurrence> PollAlarms(Date_Time Start)
         {
             List<Alarm.AlarmOccurrence> Occurrences = new List<Alarm.AlarmOccurrence>();
-            foreach (Alarm alarm in Alarms)
+            foreach (Alarm alarm in Alarms)            
                 Occurrences.AddRange(alarm.Poll(Start));
-            return Occurrences;            
+            return Occurrences;
         }
 
         #endregion
@@ -255,8 +187,8 @@ namespace DDay.iCal.Objects
         #region Protected Overridables
 
         /// <summary>
-        /// Evaulates the RRule component, and adds each specified Period
-        /// to the <see cref="Periods"/> collection.
+        /// Evaulates the RRule component, and adds each specified DateTime
+        /// to the <see cref="DateTimes"/> collection.
         /// </summary>
         /// <param name="FromDate">The beginning date of the range to evaluate.</param>
         /// <param name="ToDate">The end date of the range to evaluate.</param>
@@ -267,26 +199,11 @@ namespace DDay.iCal.Objects
             {
                 foreach (Recur rrule in RRule)
                 {
-                    // Get a list of static occurrences
-                    // This is important to correctly calculate
-                    // recurrences with COUNT.
-                    rrule.StaticOccurrences = new List<Date_Time>();
-                    foreach(Period p in Periods)
-                        rrule.StaticOccurrences.Add(p.StartTime);
-
-                    //
-                    // Determine the last allowed date in this recurrence
-                    //
-                    if (rrule.Until != null && (Until == null || Until < rrule.Until))
-                        Until = rrule.Until.Copy();
-
-                    List<Date_Time> DateTimes = rrule.Evaluate(DTStart, FromDate, ToDate);
+                    ArrayList DateTimes = rrule.Evaluate(DTStart, FromDate, ToDate);
                     foreach (Date_Time dt in DateTimes)
                     {
-                        Period p = new Period(dt);
-
-                        if (!Periods.Contains(p))
-                            this.Periods.Add(p);
+                        if (!this.DateTimes.Contains(dt))
+                            this.DateTimes.Add(dt);
                     }
                 }
             }
@@ -294,7 +211,7 @@ namespace DDay.iCal.Objects
 
         /// <summary>
         /// Evalates the RDate component, and adds each specified DateTime or
-        /// Period to the <see cref="Periods"/> collection.
+        /// Period to the <see cref="DateTimes"/> collection.
         /// </summary>
         /// <param name="FromDate">The beginning date of the range to evaluate.</param>
         /// <param name="ToDate">The end date of the range to evaluate.</param>
@@ -308,14 +225,14 @@ namespace DDay.iCal.Objects
                     ArrayList Items = rdate.Evaluate(DTStart, FromDate, ToDate);
                     foreach (object obj in Items)
                     {
-                        Period p = null;
+                        Date_Time dt = null;
                         if (obj is Period)
-                            p = (Period)obj;
-                        else if (obj is Date_Time)                        
-                            p = new Period((Date_Time)obj);                            
+                            dt = ((Period)obj).StartTime;
+                        else if (obj is Date_Time)
+                            dt = (Date_Time)obj;
 
-                        if (p != null && !Periods.Contains(p))
-                            Periods.Add(p);
+                        if (dt != null && !DateTimes.Contains(dt))
+                            DateTimes.Add(dt);
                     }
                 }
             }
@@ -323,7 +240,7 @@ namespace DDay.iCal.Objects
 
         /// <summary>
         /// Evaulates the ExRule component, and excludes each specified DateTime
-        /// from the <see cref="Periods"/> collection.
+        /// from the <see cref="DateTimes"/> collection.
         /// </summary>
         /// <param name="FromDate">The beginning date of the range to evaluate.</param>
         /// <param name="ToDate">The end date of the range to evaluate.</param>
@@ -334,12 +251,11 @@ namespace DDay.iCal.Objects
             {
                 foreach (Recur exrule in ExRule)
                 {
-                    List<Date_Time> DateTimes = exrule.Evaluate(DTStart, FromDate, ToDate);
+                    ArrayList DateTimes = exrule.Evaluate(DTStart, FromDate, ToDate);
                     foreach (Date_Time dt in DateTimes)
                     {
-                        Period p = new Period(dt);
-                        if (this.Periods.Contains(p))
-                            this.Periods.Remove(p);
+                        if (this.DateTimes.Contains(dt))
+                            this.DateTimes.Remove(dt);
                     }
                 }
             }
@@ -347,7 +263,7 @@ namespace DDay.iCal.Objects
 
         /// <summary>
         /// Evalates the ExDate component, and excludes each specified DateTime or
-        /// Period from the <see cref="Periods"/> collection.
+        /// Period from the <see cref="DateTimes"/> collection.
         /// </summary>
         /// <param name="FromDate">The beginning date of the range to evaluate.</param>
         /// <param name="ToDate">The end date of the range to evaluate.</param>
@@ -361,20 +277,16 @@ namespace DDay.iCal.Objects
                     ArrayList Items = exdate.Evaluate(DTStart, FromDate, ToDate);
                     foreach (object obj in Items)
                     {
-                        Period p = null;
+                        Date_Time dt = null;
                         if (obj is Period)
-                            p = (Period)obj;
+                            dt = ((Period)obj).StartTime;
                         else if (obj is Date_Time)
-                            p = new Period((Date_Time)obj);
+                            dt = (Date_Time)obj;
 
-                        // If no time was provided for the ExDate, then it excludes the entire day
-                        if (!p.StartTime.HasTime || (p.EndTime != null && !p.EndTime.HasTime))
-                            p.MatchesDateOnly = true;
-
-                        if (p != null)
+                        if (dt != null)
                         {
-                            while (Periods.Contains(p))
-                                Periods.Remove(p);
+                            while (DateTimes.Contains(dt))
+                                DateTimes.Remove(dt);
                         }
                     }
                 }
@@ -390,13 +302,6 @@ namespace DDay.iCal.Objects
             if (child is Alarm)
                 Alarms.Add((Alarm)child);
             base.AddChild(child);
-        }
-
-        public override void RemoveChild(iCalObject child)
-        {
-            if (child is Alarm)
-                Alarms.Remove((Alarm)child);
-            base.RemoveChild(child);
         }
 
         #endregion

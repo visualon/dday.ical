@@ -5,7 +5,6 @@ using System.Data;
 using System.Configuration;
 using DDay.iCal.Objects;
 using DDay.iCal.DataTypes;
-using DDay.iCal.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -16,27 +15,19 @@ namespace DDay.iCal.Components
     {
         #region Private Fields
 
-        private List<AlarmOccurrence> m_Occurrences;        
+        private List<AlarmOccurrence> m_Occurrences;
 
         #endregion
 
         #region Public Fields
 
-        [Serialized]
         public AlarmAction Action;
-        [Serialized]
-        public Binary Attach;
-        [Serialized]
+        public URI Attach;
         public Cal_Address[] Attendee;
-        [Serialized]
         public Text Description;
-        [Serialized, DefaultValue("P")]
         public Duration Duration;
-        [Serialized]
         public Integer Repeat;
-        [Serialized]
         public Text Summary;
-        [Serialized]
         public Trigger Trigger;        
 
         #endregion
@@ -51,23 +42,12 @@ namespace DDay.iCal.Components
 
         #endregion
 
-        #region Static Public Methods
-
-        static public Alarm Create(RecurringComponent rc)
-        {
-            Alarm alarm = (Alarm)rc.iCalendar.Create(rc, "VALARM");
-            return alarm;
-        }
-
-        #endregion
-
         #region Constructors
 
         public Alarm(iCalObject parent)
             : base(parent)
         {            
             this.Name = "VALARM";
-            Occurrences = new List<AlarmOccurrence>();
         }
 
         #endregion                
@@ -82,33 +62,15 @@ namespace DDay.iCal.Components
         /// <returns></returns>
         virtual public List<AlarmOccurrence> Evaluate(RecurringComponent rc)
         {
-            Occurrences.Clear();
+            Occurrences = new List<AlarmOccurrence>();
 
             // If the trigger is relative, it can recur right along with
             // the recurring items, otherwise, it happens once and
-            // only once (at a precise time).            
+            // only once (at a precise time).
             if (Trigger.IsRelative)
-            {
-                Duration d = null;
-                foreach (Period p in rc.Periods)
-                {
-                    Date_Time dt = p.StartTime;
-                    if (Trigger.Related == Trigger.TriggerRelation.END)
-                    {
-                        if (p.EndTime != null)
-                        {
-                            dt = p.EndTime;
-                            if (d == null)
-                                d = p.Duration;
-                        }
-                        // Use the "last-found" duration as a reference point
-                        else if (d != null)
-                            dt = p.StartTime + d;
-                        else throw new ArgumentException("Alarm trigger is relative to the END of the occurrence; however, the occurence has no discernible end.");                                                
-                    }
-
-                    Occurrences.Add(new AlarmOccurrence(this, dt + Trigger.Duration, rc));
-                }
+            {                
+                foreach (Date_Time dt in rc.DateTimes)
+                    Occurrences.Add(new AlarmOccurrence(this, dt + Trigger.Duration, rc));                
             }
             else Occurrences.Add(new AlarmOccurrence(this, Trigger.DateTime.Copy(), rc));
 
@@ -135,15 +97,6 @@ namespace DDay.iCal.Components
                     Results.Add(ao.Copy());
             }
             return Results;
-        }
-
-        /// <summary>
-        /// Returns a typed copy of the Alarm.
-        /// </summary>
-        /// <returns>A typed copy of the Alarm object.</returns>
-        public Alarm Copy()
-        {
-            return (Alarm)base.Copy();
         }
 
         #endregion

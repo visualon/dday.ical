@@ -59,16 +59,6 @@ namespace DDay.iCal.DataTypes
             base.CopyFrom(obj);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Duration)
-            {
-                Duration d = (Duration)obj;
-                return Value.Equals(d.Value);
-            }
-            return base.Equals(obj);
-        }
-
         public override bool TryParse(string value, ref object obj)
         {
             Match match = Regex.Match(value, @"^(?<sign>\+|-)?P(((?<week>\d+)W)|(?<main>((?<day>\d+)D)?(?<time>T((?<hour>\d+)H)?((?<minute>\d+)M)?((?<second>\d+)S)?)?))$");
@@ -109,30 +99,29 @@ namespace DDay.iCal.DataTypes
             if (ts > Value)
                 value = "-";
 
-            ts = new TimeSpan(Math.Abs(Value.Ticks));
             value += "P";
 
-            if (ts.Days > 7 &&
-                ts.Days % 7 == 0 &&
-                ts.Hours == 0 &&
-                ts.Minutes == 0 &&
-                ts.Seconds == 0)                
-                value += Math.Round((double)ts.Days / 7) + "W";
+            if (Value.Days > 7 &&
+                Value.Days % 7 == 0 &&
+                Value.Hours == 0 &&
+                Value.Minutes == 0 &&
+                Value.Seconds == 0)                
+                value += Math.Round((double)Value.Days / 7) + "W";
             else
             {
-                if (ts.Days != 0)
-                    value += ts.Days + "D";
-                if (ts.Hours != 0 ||
-                    ts.Minutes != 0 ||
-                    ts.Seconds != 0)
+                if (Value.Days != 0)
+                    value += Value.Days + "D";
+                if (Value.Hours != 0 ||
+                    Value.Minutes != 0 ||
+                    Value.Seconds != 0)
                 {
                     value += "T";
-                    if (ts.Hours != 0)
-                        value += ts.Hours + "H";
-                    if (ts.Minutes != 0)
-                        value += ts.Minutes + "M";
-                    if (ts.Seconds != 0)
-                        value += ts.Seconds + "S";
+                    if (Value.Hours != 0)
+                        value += Value.Hours + "H";
+                    if (Value.Minutes != 0)
+                        value += Value.Minutes + "M";
+                    if (Value.Seconds != 0)
+                        value += Value.Seconds + "S";
                 }
             }
 
@@ -145,14 +134,7 @@ namespace DDay.iCal.DataTypes
 
         static public implicit operator TimeSpan(Duration value)
         {
-            if (value != null)
-                return value.Value;
-            else return TimeSpan.MinValue;
-        }
-
-        static public implicit operator Duration(TimeSpan ts)
-        {
-            return new Duration(ts);
+            return value.Value;
         }
 
         #endregion

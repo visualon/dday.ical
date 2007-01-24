@@ -15,9 +15,8 @@ namespace DDay.iCal.DataTypes
     /// <example>
     ///     For example, <c>CATEGORIES:Business,Personal,Something with a comma\,</c>
     /// </example>
-    /// </summary>   
-    [Encodable("BASE64,8BIT,7BIT")]
-    public class TextCollection : EncodableDataType, ICollection
+    /// </summary>    
+    public class TextCollection : iCalDataType, ICollection
     {
         #region Private Fields
 
@@ -48,26 +47,6 @@ namespace DDay.iCal.DataTypes
 
         #region Overrides
 
-        public override bool Equals(object obj)
-        {
-            if (obj is TextCollection)
-            {
-                TextCollection tc = (TextCollection)obj;                
-                for (int i = 0; i < Values.Count; i++)
-                {
-                    if (!Values[i].Equals(tc.Values[i]))
-                        return false;
-                }
-                return true;
-            }
-            else if (obj is Text)
-            {
-                if (Values.Count == 1 && Values[0].Equals(obj))
-                    return true;
-            }
-            return base.Equals(obj);
-        }
-
         public override string ToString()
         {
             string[] values = new string[Values.Count];
@@ -93,13 +72,7 @@ namespace DDay.iCal.DataTypes
 
         public override bool TryParse(string value, ref object obj)
         {
-            if (!base.TryParse(value, ref obj))
-                return false;
-            
             TextCollection tc = (TextCollection)obj;
-            if (tc.Value != null)
-                value = tc.Value;
-            
             MatchCollection matches = Regex.Matches(value, @"[^\\](,)");
             Values.Clear();
             
@@ -108,7 +81,7 @@ namespace DDay.iCal.DataTypes
             {
                 if (match.Success)
                 {
-                    tc.Values.Add(new Text(value.Substring(i, match.Index - i + 1)));                    
+                    tc.Values.Add(new Text(value.Substring(i, match.Index - i + 1)));
                     i = match.Index + 2;
                 }
                 else return false;
@@ -118,20 +91,6 @@ namespace DDay.iCal.DataTypes
                 tc.Values.Add(new Text(value.Substring(i, value.Length - i)));
 
             return true;            
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private Text NewText(string value)
-        {
-            Text t = new Text();
-            t.Encoding = Encoding;
-            object obj = t;
-            if (t.TryParse(value, ref obj))
-                return t;
-            return null;
         }
 
         #endregion

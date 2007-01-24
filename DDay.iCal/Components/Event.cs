@@ -1,12 +1,9 @@
 using System;
-using System.Diagnostics;
 using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Configuration;
 using DDay.iCal.Objects;
 using DDay.iCal.DataTypes;
-using DDay.iCal.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -24,29 +21,57 @@ namespace DDay.iCal.Components
     ///         <item>Create a TextCollection DataType for 'text' items separated by commas</item>
     ///     </list>
     /// </note>
-    [DebuggerDisplay("{Summary}: {Start} {Duration}")]
     public class Event : RecurringComponent
     {
         #region Public Fields
-                
-        [Serialized, DefaultValueType("DATE-TIME")]
+
+        public URI[] Attach;
+        public Cal_Address[] Attendee;
+        public TextCollection[] Categories;
+        public string Class;
+        public Text[] Comment;
+        public Text[] Contact;
+        public Date_Time Created;
+        public Text Description;
+        public Date_Time DTStamp;
         public Date_Time DTEnd;
-        [Serialized, DefaultValue("P")]
         public Duration Duration;
-        [Serialized]
         public Geo Geo;
-        [Serialized]
-        public Text Location;        
-        [Serialized]
-        public TextCollection[] Resources;        
-        [Serialized, DefaultValue("TENTATIVE\r\n")]
-        public EventStatus Status;        
-        [Serialized, DefaultValue("OPAQUE\r\n")]
-        public Transparency Transp;        
+        public Date_Time LastMod;
+        public Text Location;
+        public Cal_Address Organizer;
+        public Integer Priority;
+        public Text[] Related_To;
+        public RequestStatus[] RequestStatus;
+        public TextCollection[] Resources;
+        public Integer Sequence;
+        public EventStatus Status;
+        public Text Summary;
+        public Transparency Transp;
+        public string UID;
+        public URI URL;
 
         #endregion
-         
+
+        #region Private Fields
+
+        private ArrayList m_Periods;   
+     
+        #endregion
+
         #region Public Properties
+
+        /// <summary>
+        /// A collection of <see cref="Period"/> objects that represent
+        /// each start and end time for which this event can occur.
+        /// This collection is usually populated from the <see cref="Evaluate"/>
+        /// method.
+        /// </summary>
+        public ArrayList Periods
+        {
+            get { return m_Periods; }
+            set { m_Periods = value; }
+        }
 
         /// <summary>
         /// An alias to the DTEnd field (i.e. end date/time).
@@ -54,51 +79,7 @@ namespace DDay.iCal.Components
         public Date_Time End
         {
             get { return DTEnd; }
-            set
-            {
-                DTEnd = value;
-                if (DTStart != null && DTEnd != null)
-                    Duration = DTEnd - DTStart;
-            }
-        }
-
-        /// <summary>
-        /// An alias to the DTStart field (i.e. start date/time).
-        /// </summary>
-        public override Date_Time Start
-        {
-            get
-            {
-                return base.Start;
-            }
-            set
-            {
-                base.Start = value;
-                if (base.Start != null && End != null)
-                    Duration = End - base.Start;
-            }
-        }
-
-        /// <summary>
-        /// Returns true of the event is an all-day event.
-        /// </summary>
-        public bool IsAllDay
-        {
-            get { return Start != null && !Start.HasTime; }
-        }
-
-        #endregion
-
-        #region Static Public Methods
-
-        static public Event Create(iCalendar iCal)
-        {
-            Event evt = (Event)iCal.Create(iCal, "VEVENT");
-            evt.UID = UniqueComponent.NewUID();
-            evt.Created = DateTime.Now;
-            evt.DTStamp = DateTime.Now;
-
-            return evt;
+            set { DTEnd = value; }
         }
 
         #endregion
@@ -112,7 +93,8 @@ namespace DDay.iCal.Components
         /// <param name="parent">An <see cref="iCalObject"/>, usually an iCalendar object.</param>
         public Event(iCalObject parent) : base(parent)
         {
-            this.Name = "VEVENT";            
+            this.Name = "VEVENT";
+            Periods = new ArrayList();
         }
 
         #endregion
@@ -185,43 +167,32 @@ namespace DDay.iCal.Components
         /// <param name="FromDate">The beginning date of the range to evaluate.</param>
         /// <param name="ToDate">The end date of the range to evaluate.</param>
         /// <returns></returns>                
-        public override List<Period> Evaluate(Date_Time FromDate, Date_Time ToDate)
-        {
-            // Make sure Duration is not null by now
-            if (Duration == null)
-            {
-                // If a DTEnd was not provided, set one!
-                if (DTEnd == null)
-                    DTEnd = DTStart.Copy();
-                Duration = DTEnd - DTStart;
-            }
-
-            // Add the event itself, before recurrence rules are evaluated
-            // NOTE: this fixes a bug where (if evaluated multiple times)
-            // a period can be added to the Periods collection multiple times.
-            Period period = new Period(DTStart, Duration);
-            if (!Periods.Contains(period))
-                Periods.Add(period);
+        public override ArrayList Evaluate(Date_Time FromDate, Date_Time ToDate)
+        {            
+            // Add the event itself, before recurrence rules are evaluated                            
+            DateTimes.Add(DTStart.Copy());
+            Periods.Add(new Period(DTStart, Duration));
 
             // Evaluate recurrences normally
             base.Evaluate(FromDate, ToDate);
 
-            // Ensure each period has a duration
-            foreach(Period p in Periods)
+            // Remove DateTimes that already have a Period
+            for (int i = DateTimes.Count - 1; i >= 0; i--)
             {
-                if (p.EndTime == null)
-                {
-                    p.Duration = Duration;
-                    p.EndTime = p.StartTime + Duration;
-                }
-                // Ensure the Kind of time is consistent with DTStart
-                else if (p.EndTime.Kind != DTStart.Kind)
-                {
-                    p.EndTime.Value = new DateTime(p.EndTime.Year, p.EndTime.Month, p.EndTime.Day,
-                        p.EndTime.Hour, p.EndTime.Minute, p.EndTime.Second, DTStart.Kind);
-                }
+                foreach (Period p in Periods)
+                    if (p.StartTime == DateTimes[i])
+                        DateTimes.RemoveAt(i);
             }
-                        
+
+            // Convert each calculated Date_Time into a Period.
+            foreach(Date_Time dt in DateTimes)
+            {
+                Period p = new Period(dt, Duration);
+                if (!Periods.Contains(p))
+                    Periods.Add(p);
+            }
+
+            Periods.Sort();
             return Periods;
         }
                 
@@ -244,15 +215,77 @@ namespace DDay.iCal.Components
             }
         }
 
-        /// <summary>
-        /// Returns a typed copy of the Event object.
-        /// </summary>
-        /// <returns>A typed copy of the Event object.</returns>
-        public Event Copy()
+        #endregion
+
+        #region Protected Methods
+
+        protected override void EvaluateRDate(Date_Time FromDate, Date_Time ToDate)
         {
-            return (Event)base.Copy();
+            // Handle RDATEs
+            if (RDate != null)
+            {
+                foreach (RDate rdate in RDate)
+                {
+                    ArrayList Items = rdate.Evaluate(DTStart, FromDate, ToDate);
+                    foreach (object obj in Items)
+                    {
+                        Period p = null;
+                        if (obj is Period)
+                            p = (Period)obj;
+                        else if (obj is Date_Time)
+                            p = new Period((Date_Time)obj, (TimeSpan)Duration);
+
+                        if (p != null && !Periods.Contains(p))
+                        {
+                            Periods.Add(p);
+                            DateTimes.Add(p.StartTime);
+                        }
+                    }
+                }
+            }
         }
 
-        #endregion        
+        /// <summary>
+        /// Evalates the ExDate component, and excludes each specified DateTime or
+        /// Period from the <see cref="Periods"/> collection.
+        /// </summary>
+        /// <param name="FromDate">The beginning date of the range to evaluate.</param>
+        /// <param name="ToDate">The end date of the range to evaluate.</param>
+        protected override void EvaluateExDate(Date_Time FromDate, Date_Time ToDate)
+        {
+            // Handle EXDATEs
+            if (ExDate != null)
+            {
+                foreach (RDate exdate in ExDate)
+                {
+                    ArrayList Items = exdate.Evaluate(DTStart, FromDate, ToDate);
+                    foreach (object obj in Items)
+                    {
+                        Period p = null;
+                        if (obj is Period)
+                            p = (Period)obj;
+                        else if (obj is Date_Time)
+                            p = new Period((Date_Time)obj, Duration);
+
+                        // If no time was provided for the ExDate, then it excludes the entire day
+                        if (!p.StartTime.HasTime || !p.EndTime.HasTime)
+                            p.MatchesDateOnly = true;
+
+                        if (p != null)
+                        {
+                            // If p.MatchesDateOnly, remove all occurrences of this event
+                            // on that specific date
+                            while (Periods.Contains(p))
+                            {
+                                Periods.Remove(p);
+                                DateTimes.Remove(p.StartTime);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 }

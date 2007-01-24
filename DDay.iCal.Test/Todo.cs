@@ -34,8 +34,7 @@ namespace DDay.iCal.Test
             t.TODO3();
             t.TODO4();
             t.TODO5();
-            t.TODO6();
-            t.TODO7();
+            t.TODO6();            
         }
                 
         public void TestTodoActive(string calendar, ArrayList items)

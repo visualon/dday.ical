@@ -9,8 +9,7 @@ namespace DDay.iCal.DataTypes
     /// Represents in iCalendar integer
     /// </summary>
     [DebuggerDisplay("{Value}")]
-    [Encodable("BASE64,8BIT,7BIT")]
-    public class Integer : EncodableDataType
+    public class Integer : iCalDataType
     {
         #region Private Fields
 
@@ -20,7 +19,7 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-        public new int Value
+        public int Value
         {
             get { return m_Value; }
             set { m_Value = value; }
@@ -41,13 +40,6 @@ namespace DDay.iCal.DataTypes
 
         #region Overrides
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Integer)
-                return Value.Equals(((Integer)obj).Value);
-            return base.Equals(obj);
-        }
-
         public override void CopyFrom(object obj)
         {
             if (obj is Integer)
@@ -59,23 +51,11 @@ namespace DDay.iCal.DataTypes
         }
 
         public override bool TryParse(string value, ref object obj)
-        {
-            if (!base.TryParse(value, ref obj))
-                return false;
-
-            EncodableDataType ecd = (EncodableDataType)obj;
-            if (ecd.Value != null)
-                value = ecd.Value;
-
+        {   
             int i;
             bool retVal = Int32.TryParse(value, out i);
             ((Integer)obj).Value = i;
             return retVal;
-        }
-
-        public override string ToString()
-        {
-            return Value.ToString();
         }
 
         #endregion

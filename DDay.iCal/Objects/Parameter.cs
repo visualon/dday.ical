@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Text;
 
 namespace DDay.iCal.Objects
@@ -17,7 +17,7 @@ namespace DDay.iCal.Objects
     {
         #region Public Fields
 
-        public List<string> Values = new List<string>();
+        public ArrayList Values = new ArrayList();
 
         #endregion
 
@@ -31,38 +31,15 @@ namespace DDay.iCal.Objects
 
         #endregion
 
-        #region Public Methods
+        #region Protected Methods
 
-        public void CopyFrom(object obj)
-        {
-            if (obj is Parameter)
-            {
-                Values.Clear();
-
-                Parameter p = (Parameter)obj;
-                foreach (string value in p.Values)
-                    Values.Add(value);
-            }
-        }
-
-        public void AddToParent()
+        protected void AddToParent()
         {
             if (Parent != null &&
+                Parent is ContentLine &&
                 Name != null &&
-                !Parent.Parameters.ContainsKey(Name))
-                Parent.Parameters[Name] = this;
-        }
-
-        #endregion
-
-        #region Overrides
-
-        public override iCalObject Copy(iCalObject parent)
-        {
-            Parameter p = (Parameter)base.Copy(parent);
-            foreach (string s in Values)
-                p.Values.Add(s);
-            return p;
+                !((ContentLine)Parent).Parameters.ContainsKey(Name))
+                ((ContentLine)Parent).Parameters[Name] = this;
         }
 
         #endregion

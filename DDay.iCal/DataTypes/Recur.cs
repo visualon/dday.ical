@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -39,8 +38,7 @@ namespace DDay.iCal.DataTypes
         public ArrayList ByWeekNo = new ArrayList();
         public ArrayList ByMonth = new ArrayList();
         public ArrayList BySetPos = new ArrayList();
-        public DayOfWeek Wkst = DayOfWeek.Monday;
-        public List<Date_Time> StaticOccurrences = new List<Date_Time>();
+        public DayOfWeek Wkst = DayOfWeek.Monday;        
         #endregion
 
         #region Private Fields
@@ -86,64 +84,17 @@ namespace DDay.iCal.DataTypes
             base.CopyFrom(obj);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Recur)
-            {
-                Recur r = (Recur)obj;
-                if (!ArrayEquals(r.ByDay, ByDay) ||
-                    !ArrayEquals(r.ByHour, ByHour) ||
-                    !ArrayEquals(r.ByMinute, ByMinute) ||
-                    !ArrayEquals(r.ByMonth, ByMonth) ||
-                    !ArrayEquals(r.ByMonthDay, ByMonthDay) ||
-                    !ArrayEquals(r.BySecond, BySecond) ||
-                    !ArrayEquals(r.BySetPos, BySetPos) ||
-                    !ArrayEquals(r.ByWeekNo, ByWeekNo) ||
-                    !ArrayEquals(r.ByYearDay, ByYearDay))
-                    return false;
-                if (r.Count != Count) return false;
-                if (r.Frequency != Frequency) return false;
-                if (r.Interval != Interval &&
-                    // MinValue and 1 are treated as identical for Interval
-                    ((r.Interval != int.MinValue && r.Interval != 1) ||
-                     (Interval != int.MinValue && Interval != 1)))
-                    return false;
-                if (r.Until != null)
-                {
-                    if (!r.Until.Equals(Until))
-                        return false;
-                }
-                else if (Until != null)
-                    return false;
-                if (r.Wkst != Wkst) return false;
-                return true;
-            }
-            return base.Equals(obj);
-        }
-
-        private bool ArrayEquals(ArrayList a1, ArrayList a2)
-        {
-            for (int i = 0; i < a1.Count; i++)
-                if (!a1[i].Equals(a2[i]))
-                    return false;
-            return true;
-        }
-
         public override bool TryParse(string value, ref object obj)
         {
             Recur r = (Recur)obj;
-                        
-            Match match = Regex.Match(value, @"FREQ=(SECONDLY|MINUTELY|HOURLY|DAILY|WEEKLY|MONTHLY|YEARLY);?(.*)", RegexOptions.IgnoreCase);
+
+            Match match = Regex.Match(value, @"(SECONDLY|MINUTELY|HOURLY|DAILY|WEEKLY|MONTHLY|YEARLY);?(.*)", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 // Parse the frequency type
                 r.Frequency = (FrequencyType)Enum.Parse(typeof(FrequencyType), match.Groups[1].Value);
 
-                // NOTE: fixed a bug where the group 2 match
-                // resulted in an empty string, which caused
-                // an error.
-                if (match.Groups[2].Success &&
-                    match.Groups[2].Length > 0)
+                if (match.Groups[2].Success)
                 {
                     string[] keywordPairs = match.Groups[2].Value.Split(';');
                     foreach (string keywordPair in keywordPairs)
@@ -175,156 +126,23 @@ namespace DDay.iCal.DataTypes
                         }
                     }
                 }
+
+                CheckMutuallyExclusive("COUNT", "UNTIL", r.Count, r.Until);
+                CheckRange("INTERVAL", r.Interval, 1, int.MaxValue);
+                CheckRange("COUNT", r.Count, 1, int.MaxValue);
+                CheckRange("BYSECOND", r.BySecond, 0, 59);
+                CheckRange("BYMINUTE", r.ByMinute, 0, 59);
+                CheckRange("BYHOUR", r.ByHour, 0, 23);
+                CheckRange("BYMONTHDAY", r.ByMonthDay, -31, 31);
+                CheckRange("BYYEARDAY", r.ByYearDay, -366, 366);
+                CheckRange("BYWEEKNO", r.ByWeekNo, -53, 53);
+                CheckRange("BYMONTH", r.ByMonth, 1, 12);
+                CheckRange("BYSETPOS", r.BySetPos, -366, 366);               
+
+                return true;
             }
-            else if ((match = Regex.Match(value, @"every\s+(?<Interval>other|\d+)?\w{0,2}\s*(?<Freq>second|minute|hour|day|week|month|year)s?,?\s*(?<More>.+)", RegexOptions.IgnoreCase)).Success)
-            {
-                if (match.Groups["Interval"].Success)
-                {
-                    if (!int.TryParse(match.Groups["Interval"].Value, out r.Interval))
-                        r.Interval = 2; // "other"
-                }
-                else r.Interval = 1;
-
-                switch (match.Groups["Freq"].Value.ToLower())
-                {
-                    case "second": r.Frequency = FrequencyType.SECONDLY; break;
-                    case "minute": r.Frequency = FrequencyType.MINUTELY; break;
-                    case "hour": r.Frequency = FrequencyType.HOURLY; break;
-                    case "day": r.Frequency = FrequencyType.DAILY; break;
-                    case "week": r.Frequency = FrequencyType.WEEKLY; break;
-                    case "month": r.Frequency = FrequencyType.MONTHLY; break;
-                    case "year": r.Frequency = FrequencyType.YEARLY; break;
-                }
-
-                string[] values = match.Groups["More"].Value.Split(',');
-                foreach (string item in values)
-                {
-                    if ((match = Regex.Match(item, @"(?<Num>\d+)\w\w\s+(?<Type>second|minute|hour|day|week|month)", RegexOptions.IgnoreCase)).Success ||
-                        (match = Regex.Match(item, @"(?<Type>second|minute|hour|day|week|month)\s+(?<Num>\d+)", RegexOptions.IgnoreCase)).Success)
-                    {
-                        int num;
-                        if (int.TryParse(match.Groups["Num"].Value, out num))
-                        {
-                            ArrayList al = null;
-                            switch (match.Groups["Type"].Value.ToLower())
-                            {
-                                case "second":
-                                    r.BySecond.Add(num);
-                                    break;
-                                case "minute":
-                                    r.ByMinute.Add(num);
-                                    break;
-                                case "hour":
-                                    r.ByHour.Add(num);
-                                    break;
-                                case "day":
-                                    switch (r.Frequency)
-                                    {
-                                        case FrequencyType.YEARLY:
-                                            r.ByYearDay.Add(num);
-                                            break;
-                                        case FrequencyType.MONTHLY:
-                                            r.ByMonthDay.Add(num);
-                                            break;
-                                    }
-                                    break;
-                                case "week":
-                                    r.ByWeekNo.Add(num);
-                                    break;
-                                case "month":
-                                    r.ByMonth.Add(num);
-                                    break;
-                            }
-                        }
-                    }
-                    else if ((match = Regex.Match(item, @"(?<Num>\d+\w{0,2})?(\w|\s)+?(?<First>first)?(?<Last>last)?\s*((?<Day>sunday|monday|tuesday|wednesday|thursday|friday|saturday)\s*(and|or)?\s*)+", RegexOptions.IgnoreCase)).Success)
-                    {
-                        int num = int.MinValue;
-                        if (match.Groups["Num"].Success)
-                        {
-                            if (int.TryParse(match.Groups["Num"].Value, out num))
-                            {
-                                if (match.Groups["Last"].Success)
-                                {
-                                    // Make number negative
-                                    num *= -1;
-                                }
-                            }
-                        }
-                        else if (match.Groups["Last"].Success)
-                            num = -1;
-                        else if (match.Groups["First"].Success)
-                            num = 1;
-
-                        foreach (Capture capture in match.Groups["Day"].Captures)
-                        {                            
-                            DaySpecifier ds = new DaySpecifier((DayOfWeek)Enum.Parse(typeof(DayOfWeek), capture.Value, true));
-                            ds.Num = num;
-                            r.ByDay.Add(ds);
-                        }                        
-                    }
-                    else if ((match = Regex.Match(item, @"at\s+(?<Hour>\d{1,2})(:(?<Minute>\d{2})((:|\.)(?<Second>\d{2}))?)?\s*(?<Meridian>(a|p)m?)?", RegexOptions.IgnoreCase)).Success)
-                    {
-                        int hour, minute, second;
-                        
-                        if (int.TryParse(match.Groups["Hour"].Value, out hour))
-                        {
-                            // Adjust for PM
-                            if (match.Groups["Meridian"].Success && 
-                                match.Groups["Meridian"].Value.ToUpper().StartsWith("P"))
-                                hour += 12;
-                            
-                            r.ByHour.Add(hour);
-
-                            if (match.Groups["Minute"].Success &&
-                                int.TryParse(match.Groups["Minute"].Value, out minute))
-                            {
-                                r.ByMinute.Add(minute);
-                                if (match.Groups["Second"].Success &&
-                                    int.TryParse(match.Groups["Second"].Value, out second))
-                                    r.BySecond.Add(second);
-                            }
-                        }
-                    }
-                    else if ((match = Regex.Match(item, @"^\s*until\s+(?<DateTime>.+)$", RegexOptions.IgnoreCase)).Success)
-                    {
-                        DateTime dt = DateTime.Parse(match.Groups["DateTime"].Value);
-                        DateTime.SpecifyKind(dt, DateTimeKind.Utc);
-
-                        r.Until = new Date_Time(dt);
-                    }
-                    else if ((match = Regex.Match(item, @"^\s*for\s+(?<Count>\d+)\s+occurrences\s*$", RegexOptions.IgnoreCase)).Success)
-                    {
-                        if (!int.TryParse(match.Groups["Count"].Value, out r.Count))
-                            return false;
-                    }
-                }
-            }
-            else return false;
-
-            CheckMutuallyExclusive("COUNT", "UNTIL", r.Count, r.Until);
-            CheckRange("INTERVAL", r.Interval, 1, int.MaxValue);
-            CheckRange("COUNT", r.Count, 1, int.MaxValue);
-            CheckRange("BYSECOND", r.BySecond, 0, 59);
-            CheckRange("BYMINUTE", r.ByMinute, 0, 59);
-            CheckRange("BYHOUR", r.ByHour, 0, 23);
-            CheckRange("BYMONTHDAY", r.ByMonthDay, -31, 31);
-            CheckRange("BYYEARDAY", r.ByYearDay, -366, 366);
-            CheckRange("BYWEEKNO", r.ByWeekNo, -53, 53);
-            CheckRange("BYMONTH", r.ByMonth, 1, 12);
-            CheckRange("BYSETPOS", r.BySetPos, -366, 366);
-            return true;
+            return false;
         }
-
-        /// <summary>
-        /// Returns a typed copy of the object.
-        /// </summary>
-        /// <returns>A typed copy of the object.</returns>
-        public Recur Copy()
-        {
-            return (Recur)base.Copy();
-        }
-
         #endregion
 
         #region Static Methods
@@ -395,9 +213,9 @@ namespace DDay.iCal.DataTypes
 
         #region Calculating Occurrences
 
-        protected List<Date_Time> GetOccurrences(Date_Time StartDate, Date_Time EndDate, int Count)
+        protected ArrayList GetOccurrences(Date_Time StartDate, Date_Time EndDate, int Count)
         {
-            List<Date_Time> DateTimes = new List<Date_Time>();
+            ArrayList DateTimes = new ArrayList();
             while (StartDate <= EndDate &&
                 (Count == int.MinValue ||
                 DateTimes.Count <= Count))
@@ -678,25 +496,11 @@ namespace DDay.iCal.DataTypes
 
         #region Public Methods
 
-        public List<Date_Time> Evaluate(Date_Time StartDate, Date_Time FromDate, Date_Time ToDate)
+        public ArrayList Evaluate(Date_Time StartDate, Date_Time FromDate, Date_Time ToDate)
         {
-            List<Date_Time> DateTimes = new List<Date_Time>();
-            DateTimes.AddRange(StaticOccurrences);
+            ArrayList DateTimes = new ArrayList();
 
-            // If the Recur is restricted by COUNT, we need to evaluate just
-            // after any static occurrences so it's correctly restricted to a
-            // certain number. NOTE: fixes bug #13 and bug #16
-            if (Count > 0)
-            {
-                FromDate = StartDate;
-                foreach (Date_Time dt in StaticOccurrences)
-                {
-                    if (FromDate < dt)
-                        FromDate = dt.AddSeconds(1);                    
-                }
-            }
-
-            // Handle "UNTIL" values that are date-only. If we didn't change values here, "UNTIL" would
+            // Handle "UNTIL" values that are date-only. Without changing values here, "UNTIL" will
             // exclude the day it specifies, instead of the inclusive behaviour it should exhibit.
             if (Until != null && !Until.HasTime)
                 Until.Value = new DateTime(Until.Year, Until.Month, Until.Day, 23, 59, 59, Until.Value.Kind);
@@ -723,15 +527,8 @@ namespace DDay.iCal.DataTypes
             // Fill in missing, necessary ByXXX values
             r.EnsureByXXXValues(StartDate);
                         
-            // Get the occurrences
-            foreach (Date_Time occurrence in r.GetOccurrences(FromDate.Copy(), ToDate, r.Count))
-            {
-                // NOTE:
-                // Used to be DateTime.AddRange(r.GetOccurrences(FromDate.Copy(), ToDate, r.Count))
-                // By doing it this way, fixes bug #19.
-                if (!DateTimes.Contains(occurrence))
-                    DateTimes.Add(occurrence);
-            }            
+            // Get the occurrences            
+            DateTimes = r.GetOccurrences(FromDate.Copy(), ToDate, r.Count);            
 
             // Limit the count of returned recurrences
             if (Count != int.MinValue &&
@@ -910,13 +707,10 @@ namespace DDay.iCal.DataTypes
                     // Account for negative days of month (count backwards from the end of the month)
                     // NOTE: fixes RRULE18 evaluation
                     if (Day > 0)
-                        // Changed from DateTimeKind.Local to StartDate.Kind
-                        // NOTE: fixes bug #20
-                        dt = new Date_Time(new DateTime(Year, Month, Day, Hour, Minute, Second, StartDate.Kind));
+                        dt = new Date_Time(new DateTime(Year, Month, Day, Hour, Minute, Second, DateTimeKind.Local));
                     else
-                        dt = new Date_Time(new DateTime(Year, Month, 1, Hour, Minute, Second, StartDate.Kind).AddMonths(1).AddDays(Day));
+                        dt = new Date_Time(new DateTime(Year, Month, 1, Hour, Minute, Second, DateTimeKind.Local).AddMonths(1).AddDays(Day));
 
-                    // Inherit time zone info, etc. from the start date
                     dt.MergeWith(StartDate);
                     return dt;
                 }

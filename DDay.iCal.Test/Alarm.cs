@@ -35,14 +35,13 @@ namespace DDay.iCal.Test
             a.ALARM4();
             a.ALARM5();
             a.ALARM6();
-            a.ALARM7();
         }
 
         public void TestAlarm(string Calendar, List<Date_Time> Dates, Date_Time Start, Date_Time End)
         {
             iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Alarm\" + Calendar);
             Program.TestCal(iCal);
-            Event evt = iCal.Events[0];
+            Event evt = (Event)iCal.Events[0];
 
             Start.iCalendar = iCal;
             Start.TZID = tzid;
@@ -92,7 +91,7 @@ namespace DDay.iCal.Test
                 new Date_Time(2006, 7, 30, 9, 30, 0),
                 new Date_Time(2006, 8, 1, 9, 30, 0),
                 new Date_Time(2006, 8, 3, 9, 30, 0),
-                new Date_Time(2006, 8, 5, 9, 30, 0)
+                new Date_Time(2006, 8, 5, 9, 30, 0),
             });
 
             TestAlarm("ALARM2.ics", DateTimes, new Date_Time(2006, 7, 1), new Date_Time(2006, 9, 1));
@@ -172,27 +171,6 @@ namespace DDay.iCal.Test
             });
 
             TestAlarm("ALARM6.ics", DateTimes, new Date_Time(1997, 7, 1), new Date_Time(2000, 12, 31));
-        }
-
-        [Test, Category("Alarm")]
-        public void ALARM7()
-        {
-            List<Date_Time> DateTimes = new List<Date_Time>();
-            DateTimes.AddRange(new Date_Time[]
-            {
-                new Date_Time(2006, 7, 18, 10, 30, 0),
-                new Date_Time(2006, 7, 20, 10, 30, 0),
-                new Date_Time(2006, 7, 22, 10, 30, 0),
-                new Date_Time(2006, 7, 24, 10, 30, 0),
-                new Date_Time(2006, 7, 26, 10, 30, 0),
-                new Date_Time(2006, 7, 28, 10, 30, 0),
-                new Date_Time(2006, 7, 30, 10, 30, 0),
-                new Date_Time(2006, 8, 1, 10, 30, 0),
-                new Date_Time(2006, 8, 3, 10, 30, 0),
-                new Date_Time(2006, 8, 5, 10, 30, 0)
-            });
-
-            TestAlarm("ALARM7.ics", DateTimes, new Date_Time(2006, 7, 1), new Date_Time(2006, 9, 1));
         }
     }
 }

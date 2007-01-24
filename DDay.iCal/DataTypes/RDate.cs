@@ -22,12 +22,7 @@ namespace DDay.iCal.DataTypes
 
         public TZID TZID
         {
-            get
-            {
-                if (m_TZID == null && Parameters.ContainsKey("TZID"))
-                    m_TZID = new TZID(((Parameter)Parameters["TZID"]).Values[0]);
-                return m_TZID;
-            }
+            get { return m_TZID; }
             set { m_TZID = value; }
         }
 
@@ -51,19 +46,30 @@ namespace DDay.iCal.DataTypes
 
         #region Overrides
 
-        public override bool Equals(object obj)
+        public override ContentLine ContentLine
         {
-            if (obj is RDate)
+            get { return base.ContentLine; }
+            set
             {
-                RDate r = (RDate)obj;
-                for (int i = 0; i < m_Items.Count; i++)
-                    if (!Items[i].Equals(r.Items[i]))
-                        return false;
-                return true;
+                m_ContentLine = value;
+
+                if (ContentLine != null)
+                {
+                    foreach (DictionaryEntry de in value.Parameters)
+                    {
+                        Parameter p = (Parameter)de.Value;
+                        if (de.Key.Equals("TZID"))
+                        {
+                            TZID = new TZID();
+                            TZID = (TZID)TZID.Parse(p.Values[0].ToString());
+                        }
+                    }
+                    
+                    CopyFrom((RDate)Parse(ContentLine.Value));
+                }
             }
-            return base.Equals(obj);
         }
- 
+
         public override void CopyFrom(object obj)
         {
             if (obj is RDate)
@@ -82,7 +88,11 @@ namespace DDay.iCal.DataTypes
             {
                 object dt = new Date_Time();
                 object p = new Period();
-                
+                iCalendar iCal = null;                
+
+                if (ContentLine != null)
+                    iCal = ContentLine.iCalendar;
+
                 //
                 // Set the iCalendar for each Date_Time object here,
                 // so that any time zones applied to these objects will be
@@ -95,13 +105,13 @@ namespace DDay.iCal.DataTypes
                 //
                 if (((Date_Time)dt).TryParse(v, ref dt))
                 {
-                    ((Date_Time)dt).iCalendar = iCalendar;
+                    ((Date_Time)dt).iCalendar = iCal;
                     ((Date_Time)dt).TZID = TZID;
                     Items.Add(dt);
                 }
                 else if (((Period)p).TryParse(v, ref p))
                 {
-                    ((Period)p).StartTime.iCalendar = ((Period)p).EndTime.iCalendar = iCalendar;
+                    ((Period)p).StartTime.iCalendar = ((Period)p).EndTime.iCalendar = iCal;
                     ((Period)p).StartTime.TZID = ((Period)p).EndTime.TZID = TZID;
                     Items.Add(p);
                 }
@@ -126,8 +136,7 @@ namespace DDay.iCal.DataTypes
                 return Periods;
             
             foreach (object obj in Items)
-                if (!Periods.Contains(obj))
-                    Periods.Add(obj);                
+                Periods.Add(obj);                
 
             return Periods;
         }

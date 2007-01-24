@@ -42,17 +42,6 @@ namespace DDay.iCal.DataTypes
 
             #region Overrides
 
-            public override bool Equals(object obj)
-            {
-                if (obj is DaySpecifier)
-                {
-                    DaySpecifier ds = (DaySpecifier)obj;
-                    return ds.Num == Num &&
-                        ds.DayOfWeek == DayOfWeek;
-                }
-                return base.Equals(obj);
-            }
-
             public override void CopyFrom(object obj)
             {
                 if (obj is DaySpecifier)

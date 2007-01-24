@@ -10,9 +10,24 @@ namespace DDay.iCal.DataTypes
     /// Represents an RFC 2445 "text" value.
     /// </summary>
     [DebuggerDisplay("{Value}")]
-    [Encodable("BASE64,8BIT,7BIT")]
-    public class Text : EncodableDataType
+    public class Text : iCalDataType
     {
+        #region Private Fields
+
+        private string m_value;
+
+        #endregion
+
+        #region Public Properties
+
+        public string Value
+        {
+            get { return m_value; }
+            set { m_value = value; }
+        }
+
+        #endregion
+
         #region Constructors
 
         public Text() { }
@@ -35,25 +50,9 @@ namespace DDay.iCal.DataTypes
             base.CopyFrom(obj);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Text)
-            {
-                Text t = (Text)obj;
-                return Value.Equals(t.Value);
-            }
-            else if (obj is string)            
-                return Value.Equals(obj);            
-            return base.Equals(obj);
-        }
-
         public override bool TryParse(string value, ref object obj)
         {
-            if (!base.TryParse(value, ref obj))
-                return false;
             Text t = (Text)obj;
-            if (t.Value != null)
-                value = t.Value;
             value = value.Replace(@"\n", "\n");
             value = value.Replace(@"\N", "\n");            
             value = value.Replace(@"\;", ";");
@@ -76,20 +75,18 @@ namespace DDay.iCal.DataTypes
             return Value;
         }
 
-        #endregion
-
-        #region Operators
-
-        public static implicit operator string(Text t)
+        public override string Serialize()
         {
-            return t.Value;
+            // Escape semicolons, commas, newlines, and backslashes
+            string value = Value;
+            value = value.Replace("\n", @"\n");
+            value = value.Replace(";", @"\;");
+            value = value.Replace(",", @"\,");
+            value = value.Replace(@"\", @"\\");            
+
+            return value;
         }
 
-        public static implicit operator Text(string s)
-        {
-            return new Text(s);
-        }
-
-        #endregion
+        #endregion        
     }
 }

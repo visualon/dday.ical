@@ -9,8 +9,7 @@ namespace DDay.iCal.DataTypes
     /// Represents an RFC 2445 floating-point decimal value.
     /// </summary>
     [DebuggerDisplay("{Value}")]
-    [Encodable("BASE64,8BIT,7BIT")]
-    public class Float : EncodableDataType
+    public class Float : iCalDataType
     {
         #region Private Fields
 
@@ -20,7 +19,7 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-        public new double Value
+        public double Value
         {
             get { return m_Value; }
             set { m_Value = value; }
@@ -41,13 +40,6 @@ namespace DDay.iCal.DataTypes
 
         #region Overrides
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Float)
-                return Value.Equals(((Float)obj).Value);    
-            return base.Equals(obj);
-        }
-
         public override void CopyFrom(object obj)
         {
             if (obj is double)
@@ -59,14 +51,7 @@ namespace DDay.iCal.DataTypes
         }
 
         public override bool TryParse(string value, ref object obj)
-        {
-            if (!base.TryParse(value, ref obj))
-                return false;
-
-            EncodableDataType ecd = (EncodableDataType)obj;
-            if (ecd.Value != null)
-                value = ecd.Value;
-
+        {   
             double i;
             bool retVal = double.TryParse(value, out i);
             ((Float)obj).Value = i;

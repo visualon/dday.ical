@@ -1,27 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using DDay.iCal.Objects;
 
 namespace DDay.iCal.DataTypes
 {
     /// <summary>
     /// A class that is used to specify exactly when an <see cref="Alarm"/> component will trigger.
     /// Usually this date/time is relative to the component to which the Alarm is associated.
-    /// </summary>    
+    /// </summary>
+    /// <todo>
+    ///     FIXME: Allow the DateTime field to be relative to the END of the component, instead of just the START.
+    /// </todo>
     public class Trigger : iCalDataType
     {
-        public enum TriggerRelation
-        {
-            START,
-            END
-        }
-
         #region Private Fields
 
         private Date_Time m_DateTime;
         private Duration m_Duration;
-        private TriggerRelation m_Related = TriggerRelation.START;
                 
         #endregion
 
@@ -39,24 +34,6 @@ namespace DDay.iCal.DataTypes
             set { m_Duration = value; }
         }
 
-        public TriggerRelation Related
-        {
-            get
-            {       
-                if (Parameters.ContainsKey("RELATED"))
-                {
-                    Parameter p = (Parameter)Parameters["RELATED"];
-                    if (p.Values.Count > 0)
-                        m_Related = (TriggerRelation)Enum.Parse(typeof(TriggerRelation), p.Values[0].ToString());
-                }                
-                return m_Related;
-            }
-            set
-            {
-                m_Related = value;
-            }
-        }
-
         public bool IsRelative
         {
             get { return m_Duration != null; }
@@ -67,10 +44,6 @@ namespace DDay.iCal.DataTypes
         #region Constructors
 
         public Trigger() { }
-        public Trigger(TimeSpan ts)
-        {
-            Duration = ts;
-        }
         public Trigger(string value)
             : this()
         {

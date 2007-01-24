@@ -17,6 +17,12 @@ namespace DDay.iCal.Objects
     /// </remarks>
     public class ContentLine : iCalObject
     {
+        #region Public Fields
+        
+        public Hashtable Parameters = new Hashtable();
+
+        #endregion
+
         #region Private Fields
 
         private string m_value;

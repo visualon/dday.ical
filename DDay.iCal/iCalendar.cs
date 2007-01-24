@@ -1,11 +1,9 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Net;
 using System.Configuration;
 using System.IO;
-using System.Reflection;
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
 using DDay.iCal.Objects;
@@ -58,7 +56,7 @@ namespace DDay.iCal
     ///             {
     ///                 Console.Write(" (" + evt.Start.Local.ToShortTimeString() + " - " + evt.End.Local.ToShortTimeString());
     ///                 if (evt.Start.TimeZoneInfo != null)
-    ///                     Console.Write(" " + evt.Start.TimeZoneInfo.TimeZoneName);
+    ///                     Console.Write(" " + evt.Start.TimeZoneInfo.Name);
     ///                 Console.Write(")");
     ///             }
     /// 
@@ -96,7 +94,7 @@ namespace DDay.iCal
     /// </code>
     /// </para>
     /// </remarks>
-    public class iCalendar : ComponentBase, IDisposable
+    public class iCalendar : iCalObject
     {
         #region Constructors
 
@@ -109,27 +107,7 @@ namespace DDay.iCal
         /// </code>
         /// </example>
         /// </summary>
-        public iCalendar() : base(null)
-        {
-            this.Name = "VCALENDAR";
-            UniqueComponents = new UniqueComponentList<UniqueComponent>(this);
-            Events = new UniqueComponentList<Event>(this);
-            FreeBusy = new List<FreeBusy>();
-            Journals = new UniqueComponentList<Journal>(this);
-            TimeZones = new List<DDay.iCal.Components.TimeZone>();
-            Todos = new UniqueComponentList<Todo>(this);
-            
-            object[] attrs = GetType().GetCustomAttributes(typeof(ComponentBaseTypeAttribute), false);
-            if (attrs.Length > 0)
-            {
-                foreach (ComponentBaseTypeAttribute attr in attrs)
-                    m_ComponentBaseCreate = attr.Type.GetMethod("Create", BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
-            }
-            
-            if (m_ComponentBaseCreate == null)
-                m_ComponentBaseCreate = typeof(ComponentBase).GetMethod("Create", BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);            
-        }
-
+        public iCalendar() : base(null) { }
         #endregion
 
         #region Overrides
@@ -150,88 +128,37 @@ namespace DDay.iCal
         public override void AddChild(iCalObject child)
         {
             base.AddChild(child);
-            child.Parent = this;
-
-            if (child is UniqueComponent)
-                UniqueComponents.Add((UniqueComponent)child);
 
             Type type = child.GetType();
-            if (type == typeof(Event) || type.IsSubclassOf(typeof(Event))) Events.Add((Event)child);
-            else if (type == typeof(FreeBusy) || type.IsSubclassOf(typeof(FreeBusy))) FreeBusy.Add((FreeBusy)child);
-            else if (type == typeof(Journal) || type.IsSubclassOf(typeof(Journal))) Journals.Add((Journal)child);
-            else if (type == typeof(DDay.iCal.Components.TimeZone) || type.IsSubclassOf(typeof(DDay.iCal.Components.TimeZone))) TimeZones.Add((DDay.iCal.Components.TimeZone)child);
-            else if (type == typeof(Todo) || type.IsSubclassOf(typeof(Todo))) Todos.Add((Todo)child);
+            switch (type.Name)
+            {
+                case "Event": Events.Add(child); break;
+                case "FreeBusy": FreeBusy.Add(child); break;
+                case "Journal": Journals.Add(child); break;
+                case "TimeZone": TimeZones.Add(child); break;
+                case "Todo": Todos.Add(child); break;
+                default: break;
+            }                
         }
 
-        /// <summary>
-        /// Removes an <see cref="iCalObject"/>-based component from all
-        /// of the collections that this object may be contained in within
-        /// the iCalendar.
-        /// </summary>
-        /// <param name="child"></param>
-        public override void RemoveChild(iCalObject child)
-        {
-            base.RemoveChild(child);
-
-            if (child is UniqueComponent)
-                UniqueComponents.Remove((UniqueComponent)child);
-
-            Type type = child.GetType();
-            if (type == typeof(Event) || type.IsSubclassOf(typeof(Event))) Events.Remove((Event)child);
-            else if (type == typeof(FreeBusy) || type.IsSubclassOf(typeof(FreeBusy))) FreeBusy.Remove((FreeBusy)child);
-            else if (type == typeof(Journal) || type.IsSubclassOf(typeof(Journal))) Journals.Remove((Journal)child);
-            else if (type == typeof(DDay.iCal.Components.TimeZone) || type.IsSubclassOf(typeof(DDay.iCal.Components.TimeZone))) TimeZones.Remove((DDay.iCal.Components.TimeZone)child);
-            else if (type == typeof(Todo) || type.IsSubclassOf(typeof(Todo))) Todos.Remove((Todo)child);
-        }
-
-        /// <summary>
-        /// Resolves each UID in the UniqueComponents list
-        /// to a valid UID.  When the UIDs are updated, each
-        /// UniqueComponentList that contains the UniqueComponent
-        /// will be updated as well.
-        /// </summary>
-        public override void OnLoad(EventArgs e)
-        {
-            UniqueComponents.ResolveUIDs();
-
-            base.OnLoad(e);            
-        }
-
-        /// <summary>
-        /// Creates a typed copy of the iCalendar.
-        /// </summary>
-        /// <returns>An iCalendar object.</returns>
-        public iCalendar Copy()
-        {
-            return (iCalendar)base.Copy();
-        }
-        
         #endregion
 
         #region Private Fields
 
-        private UniqueComponentList<UniqueComponent> m_UniqueComponents;
-        private UniqueComponentList<Event> m_Events;
-        private List<FreeBusy> m_FreeBusy;
-        private UniqueComponentList<Journal> m_Journal;
-        private List<DDay.iCal.Components.TimeZone> m_TimeZone;
-        private UniqueComponentList<Todo> m_Todo;
-        private MethodInfo m_ComponentBaseCreate;
+        private ArrayList m_Events = new ArrayList();
+        private ArrayList m_FreeBusy = new ArrayList();
+        private ArrayList m_Journal = new ArrayList();
+        private ArrayList m_TimeZone = new ArrayList();
+        private ArrayList m_Todo = new ArrayList();
 
         #endregion
 
         #region Public Properties
 
-        public UniqueComponentList<UniqueComponent> UniqueComponents
-        {
-            get { return m_UniqueComponents; }
-            set { m_UniqueComponents = value; }
-        }
-
         /// <summary>
         /// A collection of <see cref="Event"/> components in the iCalendar.
         /// </summary>
-        public UniqueComponentList<Event> Events
+        public ArrayList Events
         {
             get { return m_Events; }
             set { m_Events = value; }
@@ -240,7 +167,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="DDay.iCal.Components.FreeBusy"/> components in the iCalendar.
         /// </summary>
-        public List<FreeBusy> FreeBusy
+        public ArrayList FreeBusy
         {
             get { return m_FreeBusy; }
             set { m_FreeBusy = value; }
@@ -249,7 +176,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="Journal"/> components in the iCalendar.
         /// </summary>
-        public UniqueComponentList<Journal> Journals
+        public ArrayList Journals
         {
             get { return m_Journal; }
             set { m_Journal = value; }
@@ -258,7 +185,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="DDay.iCal.Components.TimeZone"/> components in the iCalendar.
         /// </summary>
-        public List<DDay.iCal.Components.TimeZone> TimeZones
+        public ArrayList TimeZones
         {
             get { return m_TimeZone; }
             set { m_TimeZone = value; }
@@ -267,83 +194,24 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="Todo"/> components in the iCalendar.
         /// </summary>
-        public UniqueComponentList<Todo> Todos
+        public ArrayList Todos
         {
             get { return m_Todo; }
             set { m_Todo = value; }
         }
-
-        public Property Version
-        {
-            get
-            {
-                if (Properties.ContainsKey("VERSION"))
-                    return (Property)Properties["VERSION"];
-                return null;
-            }
-            set
-            {                
-                Properties["VERSION"] = value;
-            }
-        }
-
-        public Property ProductID
-        {
-            get
-            {
-                if (Properties.ContainsKey("PRODID"))
-                    return (Property)Properties["PRODID"];
-                return null;
-            }
-            set
-            {                
-                Properties["PRODID"] = value;
-            }            
-        }
-
-        public Property Scale
-        {
-            get
-            {
-                if (Properties.ContainsKey("CALSCALE"))
-                    return (Property)Properties["CALSCALE"];
-                return null;
-            }
-            set
-            {                
-                Properties["CALSCALE"] = value;
-            }             
-        }
-
-        public Property Method
-        {
-            get
-            {
-                if (Properties.ContainsKey("METHOD"))
-                    return (Property)Properties["METHOD"];
-                return null;
-            }
-            set
-            {
-                Properties["METHOD"] = value;
-            }
-        }
-
         #endregion
 
         #region Static Public Methods
-
+        
         /// <summary>
         /// Loads an <see cref="iCalendar"/> from the file system.
         /// </summary>
         /// <param name="Filepath">The path to the file to load.</param>
         /// <returns>An <see cref="iCalendar"/> object</returns>
-        static public iCalendar LoadFromFile(string Filepath) { return LoadFromFile(typeof(iCalendar), Filepath); }
-        static public iCalendar LoadFromFile(Type iCalendarType, string Filepath)
+        static public iCalendar LoadFromFile(string Filepath)
         {            
             FileStream fs = new FileStream(Filepath, FileMode.Open);
-
-            iCalendar iCal = LoadFromStream(iCalendarType, fs);
+            iCalendar iCal = LoadFromStream(fs);
             fs.Close();
             return iCal;
         }
@@ -353,12 +221,10 @@ namespace DDay.iCal
         /// </summary>
         /// <param name="s">The stream from which to load the <see cref="iCalendar"/> object</param>
         /// <returns>An <see cref="iCalendar"/> object</returns>
-        static public iCalendar LoadFromStream(Stream s) { return LoadFromStream(typeof(iCalendar), s); }
-        static public iCalendar LoadFromStream(Type iCalendarType, Stream s)
+        static public iCalendar LoadFromStream(Stream s)
         {
             iCalLexer lexer = new iCalLexer(s);
             iCalParser parser = new iCalParser(lexer);
-            parser.iCalendarType = iCalendarType;
             return parser.icalobject();
         }
 
@@ -366,43 +232,27 @@ namespace DDay.iCal
         /// Loads an <see cref="iCalendar"/> from a given Uri.
         /// </summary>
         /// <param name="url">The Uri from which to load the <see cref="iCalendar"/> object</param>
-        /// <returns>An <see cref="iCalendar"/> object</returns>
-        static public iCalendar LoadFromUri(Uri uri) { return LoadFromUri(typeof(iCalendar), uri); }
-        static public iCalendar LoadFromUri(Type iCalendarType, Uri uri)
-        {
-            return LoadFromUri(uri, null, null);            
-        }
-
-        /// <summary>
-        /// Loads an <see cref="iCalendar"/> from a given Uri, using a 
-        /// specified <paramref name="username"/> and <paramref name="password"/>
-        /// for credentials.
-        /// </summary>
-        /// <param name="url">The Uri from which to load the <see cref="iCalendar"/> object</param>
         /// <returns>an <see cref="iCalendar"/> object</returns>
-        static public iCalendar LoadFromUri(Uri uri, string username, string password) { return LoadFromUri(typeof(iCalendar), uri, username, password); }
-        static public iCalendar LoadFromUri(Type iCalendarType, Uri uri, string username, string password)
+        static public iCalendar LoadFromUri(Uri uri)
         {
             try
             {
                 WebClient client = new WebClient();
-                if (username != null &&
-                    password != null)
-                    client.Credentials = new System.Net.NetworkCredential(username, password);
+                client.Credentials = new System.Net.NetworkCredential("dougd", "rummage");
 
                 byte[] bytes = client.DownloadData(uri);
                 MemoryStream ms = new MemoryStream();
                 ms.SetLength(bytes.Length);
                 bytes.CopyTo(ms.GetBuffer(), 0);
-
-                return LoadFromStream(iCalendarType, ms);
+                
+                return LoadFromStream(ms);
             }
             catch (System.Net.WebException ex)
             {
                 return null;
             }
         }
-
+        
         #endregion
 
         #region Public Methods
@@ -418,9 +268,7 @@ namespace DDay.iCal
             foreach (DDay.iCal.Components.TimeZone tz in TimeZones)
             {
                 if (tz.TZID.Equals(tzid))
-                {
                     return tz;
-                }
             }
             return null;
         }
@@ -441,7 +289,7 @@ namespace DDay.iCal
             {
                 if (obj is RecurringComponent)
                     ((RecurringComponent)obj).Evaluate(FromDate, ToDate);
-            }
+            }            
         }
 
         //public ArrayList GetTodos(string category)
@@ -463,54 +311,7 @@ namespace DDay.iCal
         //    }
 
         //    return t;
-        //}
-
-        /// <summary>
-        /// Merges the current <see cref="iCalendar"/> with another iCalendar.
-        /// <note>
-        ///     Since each object is associated with one and only one iCalendar object,
-        ///     the <paramref name="iCal"/> that is passed is automatically Disposed
-        ///     in the process, because all of its objects are re-assocated with the new iCalendar.
-        /// </note>
-        /// </summary>
-        /// <param name="iCal">The iCalendar to merge with the current <see cref="iCalendar"/></param>
-        public void MergeWith(iCalendar iCal)
-        {
-            if (iCal != null)
-            {
-                foreach (UniqueComponent uc in iCal.UniqueComponents)
-                    this.AddChild(uc);
-                iCal.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// Invokes the object creation of the selected ComponentBase class.  By default,
-        /// this is the ComponentBase class itself; however, this can be changed to allow
-        /// for custom objects to be created in lieu of Event, Todo, Journal, etc. components.
-        /// </summary>
-        /// <param name="parent">The parent of the object to create.</param>
-        /// <param name="name">The name of the iCal object.</param>
-        /// <returns></returns>
-        public ComponentBase Create(iCalObject parent, string name)
-        {
-            if (m_ComponentBaseCreate == null)
-                throw new ArgumentException("Create() cannot be called without a valid ComponentBase Create() method attached");
-            else return (ComponentBase)m_ComponentBaseCreate.Invoke(null, new object[] { parent, name });
-        }
-
-        #endregion
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            Children.Clear();
-            Events.Clear();
-            FreeBusy.Clear();
-            Journals.Clear();
-            Todos.Clear();
-        }
+        //}         
 
         #endregion
     }
