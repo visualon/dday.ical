@@ -35,11 +35,10 @@ namespace DDay.iCal
 		public const int DIGIT = 27;
 		public const int DASH = 28;
 		public const int SPECIAL = 29;
-		public const int UNICODE = 30;
-		public const int SPACE = 31;
-		public const int HTAB = 32;
-		public const int SLASH = 33;
-		public const int LINEFOLDER = 34;
+		public const int SPACE = 30;
+		public const int HTAB = 31;
+		public const int SLASH = 32;
+		public const int LINEFOLDER = 33;
 		
 	}
 }

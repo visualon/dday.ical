@@ -4,10 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DDay.iCal.DataTypes
-{    
-    /// <summary>
-    /// An iCalendar status code.
-    /// </summary>
+{
     public class StatusCode : iCalDataType
     {
         #region Private Fields
@@ -97,7 +94,7 @@ namespace DDay.iCal.DataTypes
                     iparts[i] = num;
                 }
 
-                sc.Parts = iparts;
+                Parts = iparts;
                 return true;
             }
 

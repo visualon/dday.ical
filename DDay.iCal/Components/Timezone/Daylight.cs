@@ -5,11 +5,11 @@ using DDay.iCal.Objects;
 
 namespace DDay.iCal.Components
 {
-    public class Journal : ComponentBase
+    public partial class TimeZone : ComponentBase
     {
-        public Journal(iCalObject parent) : base(parent)
+        public class Daylight : TimeZoneInfo
         {
-            this.Name = "VJOURNAL";
+            public Daylight(iCalObject parent) : base(parent) { }
         }
     }
 }

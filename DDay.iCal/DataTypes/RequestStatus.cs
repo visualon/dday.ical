@@ -1,15 +1,10 @@
 using System;
-using System.Diagnostics;
 using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DDay.iCal.DataTypes
 {
-    /// <summary>
-    /// A class that represents the return status of an iCalendar request.
-    /// </summary>
-    [DebuggerDisplay("{StatusCode} - {StatusDesc}")]
     public class RequestStatus : iCalDataType
     {
         #region Public Fields
