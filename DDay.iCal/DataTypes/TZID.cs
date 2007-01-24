@@ -1,25 +1,14 @@
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DDay.iCal.DataTypes
-{    
-    /// <summary>
-    /// A time zone identifier, used to associate <see cref="Date_Time"/> (and other) objects
-    /// with a specific time zone.
-    /// </summary>
+{
     public class TZID : iCalDataType
     {
-        #region Public Fields
-
         public bool GloballyUnique = false;
         public string ID = string.Empty;
-
-        #endregion
-
-        #region Constructors
 
         public TZID() { }
         public TZID(string value)
@@ -28,9 +17,19 @@ namespace DDay.iCal.DataTypes
             CopyFrom((TZID)Parse(value));
         }
 
-        #endregion
-
-        #region Overrides
+        public override DDay.iCal.Objects.ContentLine ContentLine
+        {
+            get
+            {
+                return base.ContentLine;
+            }
+            set
+            {
+                base.ContentLine = value;
+                if (ContentLine != null)
+                    CopyFrom((TZID)Parse(ContentLine.Value));
+            }
+        }
 
         public override void CopyFrom(object obj)
         {
@@ -80,15 +79,9 @@ namespace DDay.iCal.DataTypes
             return (GloballyUnique ? "/" : "") + ID;
         }
 
-        #endregion
-
-        #region Operators
-
         static public implicit operator TZID(string input)
         {
             return new TZID(input);
         }
-
-        #endregion
     }
 }

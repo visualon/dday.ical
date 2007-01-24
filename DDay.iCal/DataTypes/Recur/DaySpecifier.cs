@@ -5,9 +5,6 @@ using System.Text.RegularExpressions;
 
 namespace DDay.iCal.DataTypes
 {
-    /// <summary>
-    /// Represents an RFC 2445 "BYDAY" value.
-    /// </summary>
     public partial class Recur : iCalDataType
     {
         public class DaySpecifier : iCalDataType, IComparable
@@ -41,17 +38,6 @@ namespace DDay.iCal.DataTypes
             #endregion
 
             #region Overrides
-
-            public override bool Equals(object obj)
-            {
-                if (obj is DaySpecifier)
-                {
-                    DaySpecifier ds = (DaySpecifier)obj;
-                    return ds.Num == Num &&
-                        ds.DayOfWeek == DayOfWeek;
-                }
-                return base.Equals(obj);
-            }
 
             public override void CopyFrom(object obj)
             {

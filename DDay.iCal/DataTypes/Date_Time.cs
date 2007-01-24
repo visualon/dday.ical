@@ -8,16 +8,8 @@ using DDay.iCal.Components;
 
 namespace DDay.iCal.DataTypes
 {
-    /// <summary>
-    /// The iCalendar equivalent of the .NET <see cref="DateTime"/> class.
-    /// <remarks>
-    /// In addition to the features of the <see cref="DateTime"/> class, the <see cref="Date_Time"/>
-    /// class handles time zone differences, and integrates seamlessly into
-    /// the iCalendar framework.
-    /// </remarks>
-    /// </summary>
     [DebuggerDisplay("{HasTime ? Value.ToString() : Value.ToShortDateString()}")]
-    public class Date_Time : iCalDataType, IComparable
+    public class Date_Time : iCalDataType
     {
         #region Private Fields
 
@@ -25,38 +17,29 @@ namespace DDay.iCal.DataTypes
         private bool m_HasDate = false;
         private bool m_HasTime = false;
         private TZID m_TZID = null;
-        private DDay.iCal.Components.TimeZone.TimeZoneInfo m_TimeZoneInfo = null;        
+        private DDay.iCal.Components.TimeZone.TimeZoneInfo m_TimeZoneInfo = null;
+        private iCalendar m_iCalendar = null;
 
         #endregion
 
         #region Public Properties
 
-        /// <summary>
-        /// Converts the date/time to the computer's local date/time.
-        /// </summary>
         public DateTime Local
         {
             get
             {
-                if (!HasTime)
-                    return DateTime.SpecifyKind(Value, DateTimeKind.Local);
-                else if (Value.Kind == DateTimeKind.Local &&
+                if (Value.Kind == DateTimeKind.Local &&
                     TimeZoneInfo != null)
                     return UTC.ToLocalTime();
                 else return Value.ToLocalTime();
             }
         }
 
-        /// <summary>
-        /// Converts the date/time to UTC (Coordinated Universal Time)
-        /// </summary>
         public DateTime UTC
         {
             get
             {
-                if (!HasTime)
-                    return DateTime.SpecifyKind(Value, DateTimeKind.Utc);
-                else if (Value.Kind == DateTimeKind.Local)
+                if (Value.Kind == DateTimeKind.Local)
                 {
                     DateTime value = Value;
                     if (TimeZoneInfo != null)
@@ -74,10 +57,6 @@ namespace DDay.iCal.DataTypes
             }
         }
 
-        /// <summary>
-        /// Retrieves the <see cref="TimeZoneInfo"/> object for the time
-        /// zone set by <see cref="TZID"/>.
-        /// </summary>
         public DDay.iCal.Components.TimeZone.TimeZoneInfo TimeZoneInfo
         {
             get
@@ -90,36 +69,15 @@ namespace DDay.iCal.DataTypes
                         if (tz != null)
                             m_TimeZoneInfo = tz.GetTimeZoneInfo(this);
                     }
-                    else throw new ApplicationException("The Date_Time object must have an iCalendar associated with it in order to use TimeZones.");
                 }
                 return m_TimeZoneInfo;
             }
         }
 
-        /// <summary>
-        /// Sets/Gets the iCalendar associated with this <see cref="Date_Time"/>.
-        /// <note>
-        /// This property cannot be <see cref="null"/> when the <see cref="TZID"/>
-        /// has been set for this <see cref="Date_Time"/> object.
-        /// </note>
-        /// </summary>
         public iCalendar iCalendar
         {
-            get { return base.iCalendar; }
-            set { Parent = value; }
-        }
-
-        public string TimeZoneName
-        {
-            get
-            {
-                if (TZID != null &&
-                    TimeZoneInfo != null)
-                {
-                    return TimeZoneInfo.TimeZoneName;
-                }
-                return string.Empty;
-            }
+            get { return m_iCalendar; }
+            set { m_iCalendar = value; }
         }
 
         public DateTime Value
@@ -142,12 +100,7 @@ namespace DDay.iCal.DataTypes
 
         public TZID TZID
         {
-            get
-            {
-                if (m_TZID == null && Parameters.ContainsKey("TZID"))
-                    m_TZID = new TZID(((Parameter)Parameters["TZID"]).Values[0]);
-                return m_TZID;
-            }
+            get { return m_TZID; }
             set { m_TZID = value; }
         }
 
@@ -211,22 +164,12 @@ namespace DDay.iCal.DataTypes
             get { return Value.TimeOfDay; }
         }
 
-        public DateTimeKind Kind
-        {
-            get { return Value.Kind; }
-            set
-            {
-                // Change the type of Date/Time value
-                Value = DateTime.SpecifyKind(Value, value);
-            }
-        }
-
         #endregion
 
         #region Constructors
 
-        public Date_Time() : base() { }
-        public Date_Time(Date_Time value) : this()
+        public Date_Time() { }
+        public Date_Time(Date_Time value)
         {
             CopyFrom(value);
         }
@@ -235,7 +178,7 @@ namespace DDay.iCal.DataTypes
             CopyFrom(Parse(value));
         }
         public Date_Time(DateTime value) : this(value, null, null) {}
-        public Date_Time(DateTime value, TZID tzid, iCalendar iCal) : this()
+        public Date_Time(DateTime value, TZID tzid, iCalendar iCal)
         {
             this.Value = value;
             this.HasDate = true;
@@ -244,15 +187,9 @@ namespace DDay.iCal.DataTypes
             this.iCalendar = iCal;
         }
         public Date_Time(int year, int month, int day, int hour, int minute, int second)
-            : this(new DateTime(year, month, day, hour, minute, second, DateTimeKind.Local))
-        {
-            HasTime = true;
-        }
+            : this(new DateTime(year, month, day, hour, minute, second, DateTimeKind.Local)) { }
         public Date_Time(int year, int month, int day, int hour, int minute, int second, TZID tzid, iCalendar iCal)
-            : this(new DateTime(year, month, day, hour, minute, second, DateTimeKind.Local), tzid, iCal)
-        {
-            HasTime = true;
-        }
+            : this(new DateTime(year, month, day, hour, minute, second, DateTimeKind.Local), tzid, iCal) {}
         public Date_Time(int year, int month, int day)
             : this(year, month, day, 0, 0, 0) { }
         public Date_Time(int year, int month, int day, TZID tzid, iCalendar iCal)
@@ -261,7 +198,33 @@ namespace DDay.iCal.DataTypes
         #endregion
 
         #region Overrides
-               
+
+        public override ContentLine ContentLine
+        {
+            get { return base.ContentLine; }
+            set
+            {                
+                if (value != null)
+                {
+                    CopyFrom((Date_Time)Parse(value.Value));
+
+                    foreach (DictionaryEntry de in value.Parameters)
+                    {
+                        Parameter p = (Parameter)de.Value;
+                        if (de.Key.Equals("TZID"))
+                        {
+                            TZID = new TZID();
+                            TZID = (TZID)TZID.Parse(p.Values[0].ToString());
+                        }
+                    }
+
+                    iCalendar = value.iCalendar;
+                }
+
+                base.ContentLine = value;
+            }
+        }
+
         public override void CopyFrom(object obj)
         {
             if (obj is Date_Time)
@@ -334,10 +297,10 @@ namespace DDay.iCal.DataTypes
         public override bool Equals(object obj)
         {
             if (obj is Date_Time)
-                return ((Date_Time)obj).UTC.Equals(UTC);
+                return ((Date_Time)obj).UTC == UTC;
             else if (obj is DateTime)
                 return ((DateTime)obj).ToUniversalTime() == UTC;
-            return false;            
+            return base.Equals(obj);
         }
 
         public override string ToString()
@@ -398,6 +361,11 @@ namespace DDay.iCal.DataTypes
             return copy;
         }
 
+        /*public static implicit operator DateTime(Date_Time left)
+        {
+            return left.UTC;
+        }*/
+
         public static implicit operator Date_Time(DateTime left)
         {
             return new Date_Time(left.ToUniversalTime());
@@ -409,21 +377,9 @@ namespace DDay.iCal.DataTypes
 
         public Date_Time Copy()
         {
-            return (Date_Time)base.Copy();
-        }
-
-        public void SetKind(DateTimeKind kind)
-        {
-            switch(kind)
-            {
-                case DateTimeKind.Local:
-                    Value = Local;
-                    break;
-                case DateTimeKind.Utc:
-                    Value = UTC;
-                    break;
-                default: break;
-            }            
+            Date_Time dt = new Date_Time();
+            dt.CopyFrom(this);
+            return dt;
         }
 
         public Date_Time AddYears(int years)
@@ -473,24 +429,6 @@ namespace DDay.iCal.DataTypes
             Date_Time dt = Copy();
             dt.Value = Value.AddMilliseconds(milliseconds);
             return dt;
-        }
-
-        #endregion
-
-        #region IComparable Members
-
-        public int CompareTo(object obj)
-        {
-            if (obj is Date_Time)
-            {
-                if (this.Equals(obj))
-                    return 0;
-                else if (this < (Date_Time)obj)
-                    return -1;
-                else if (this > (Date_Time)obj)
-                    return 1;
-            }
-            throw new ArgumentException("obj must be a Date_Time");
         }
 
         #endregion
