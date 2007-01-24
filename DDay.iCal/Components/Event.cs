@@ -1,12 +1,10 @@
 using System;
-using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Configuration;
 using DDay.iCal.Objects;
 using DDay.iCal.DataTypes;
-using DDay.iCal.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -24,25 +22,40 @@ namespace DDay.iCal.Components
     ///         <item>Create a TextCollection DataType for 'text' items separated by commas</item>
     ///     </list>
     /// </note>
-    [DebuggerDisplay("{Summary}: {Start} {Duration}")]
     public class Event : RecurringComponent
     {
         #region Public Fields
-                
-        [Serialized, DefaultValueType("DATE-TIME")]
+
+        public Binary[] Attach;
+        public Cal_Address[] Attendee;
+        public TextCollection[] Categories;
+        public Text Class;
+        public Text[] Comment;
+        public Text[] Contact;
+        [DefaultValueType("DATE-TIME")]
+        public Date_Time Created;
+        public Text Description;
+        [DefaultValueType("DATE-TIME")]
+        public Date_Time DTStamp;
+        [DefaultValueType("DATE-TIME")]
         public Date_Time DTEnd;
-        [Serialized, DefaultValue("P")]
         public Duration Duration;
-        [Serialized]
         public Geo Geo;
-        [Serialized]
-        public Text Location;        
-        [Serialized]
-        public TextCollection[] Resources;        
-        [Serialized, DefaultValue("TENTATIVE\r\n")]
-        public EventStatus Status;        
-        [Serialized, DefaultValue("OPAQUE\r\n")]
+        [DefaultValueType("DATE-TIME")]
+        public Date_Time LastModified;
+        public Text Location;
+        public Cal_Address Organizer;
+        public Integer Priority;
+        public Text[] Related_To;
+        public RequestStatus[] RequestStatus;
+        public TextCollection[] Resources;
+        public Integer Sequence;
+        [DefaultValue(EventStatus.TENTATIVE)]
+        public EventStatus Status;
+        public Text Summary;
+        [DefaultValue(Transparency.OPAQUE)]
         public Transparency Transp;        
+        public URI URL;
 
         #endregion
          
@@ -54,29 +67,7 @@ namespace DDay.iCal.Components
         public Date_Time End
         {
             get { return DTEnd; }
-            set
-            {
-                DTEnd = value;
-                if (DTStart != null && DTEnd != null)
-                    Duration = DTEnd - DTStart;
-            }
-        }
-
-        /// <summary>
-        /// An alias to the DTStart field (i.e. start date/time).
-        /// </summary>
-        public override Date_Time Start
-        {
-            get
-            {
-                return base.Start;
-            }
-            set
-            {
-                base.Start = value;
-                if (base.Start != null && End != null)
-                    Duration = End - base.Start;
-            }
+            set { DTEnd = value; }
         }
 
         /// <summary>
@@ -84,7 +75,7 @@ namespace DDay.iCal.Components
         /// </summary>
         public bool IsAllDay
         {
-            get { return Start != null && !Start.HasTime; }
+            get { return !Start.HasTime; }
         }
 
         #endregion
@@ -93,10 +84,8 @@ namespace DDay.iCal.Components
 
         static public Event Create(iCalendar iCal)
         {
-            Event evt = (Event)iCal.Create(iCal, "VEVENT");
+            Event evt = new Event(iCal);
             evt.UID = UniqueComponent.NewUID();
-            evt.Created = DateTime.Now;
-            evt.DTStamp = DateTime.Now;
 
             return evt;
         }
@@ -186,16 +175,7 @@ namespace DDay.iCal.Components
         /// <param name="ToDate">The end date of the range to evaluate.</param>
         /// <returns></returns>                
         public override List<Period> Evaluate(Date_Time FromDate, Date_Time ToDate)
-        {
-            // Make sure Duration is not null by now
-            if (Duration == null)
-            {
-                // If a DTEnd was not provided, set one!
-                if (DTEnd == null)
-                    DTEnd = DTStart.Copy();
-                Duration = DTEnd - DTStart;
-            }
-
+        {            
             // Add the event itself, before recurrence rules are evaluated
             // NOTE: this fixes a bug where (if evaluated multiple times)
             // a period can be added to the Periods collection multiple times.
@@ -205,7 +185,7 @@ namespace DDay.iCal.Components
 
             // Evaluate recurrences normally
             base.Evaluate(FromDate, ToDate);
-
+                        
             // Ensure each period has a duration
             foreach(Period p in Periods)
             {
@@ -213,12 +193,6 @@ namespace DDay.iCal.Components
                 {
                     p.Duration = Duration;
                     p.EndTime = p.StartTime + Duration;
-                }
-                // Ensure the Kind of time is consistent with DTStart
-                else if (p.EndTime.Kind != DTStart.Kind)
-                {
-                    p.EndTime.Value = new DateTime(p.EndTime.Year, p.EndTime.Month, p.EndTime.Day,
-                        p.EndTime.Hour, p.EndTime.Minute, p.EndTime.Second, DTStart.Kind);
                 }
             }
                         
@@ -242,15 +216,6 @@ namespace DDay.iCal.Components
                 else if (DTEnd == null && Duration != null)                
                     DTEnd = DTStart + Duration;
             }
-        }
-
-        /// <summary>
-        /// Returns a typed copy of the Event object.
-        /// </summary>
-        /// <returns>A typed copy of the Event object.</returns>
-        public Event Copy()
-        {
-            return (Event)base.Copy();
         }
 
         #endregion        

@@ -15,26 +15,19 @@ namespace DDay.iCal.DataTypes
     [DebuggerDisplay("{Value}")]
     public class Cal_Address : URI
     {
-        #region Private Fields
-
-        private Cal_Address m_SentBy;
-        private Text m_CN;
-        private URI m_DirectoryEntry;
-
-        #endregion
-
         #region Public Properties
 
         public Cal_Address SentBy
         {
             get
             {
-                if (m_SentBy == null && Parameters.ContainsKey("SENT-BY"))
+                if (Parameters.ContainsKey("SENT-BY"))
                 {
                     Parameter p = (Parameter)Parameters["SENT-BY"];
-                    m_SentBy = new Cal_Address(p.Values[0].ToString());                    
+                    Cal_Address ca = new Cal_Address(p.Values[0].ToString());
+                    return ca;
                 }
-                return m_SentBy;
+                return null;
             }
         }
 
@@ -42,12 +35,13 @@ namespace DDay.iCal.DataTypes
         {
             get
             {
-                if (m_CN == null && Parameters.ContainsKey("CN"))
+                if (Parameters.ContainsKey("CN"))
                 {
                     Parameter p = (Parameter)Parameters["CN"];
-                    m_CN = new Text(p.Values[0].ToString());                    
+                    Text cn = new Text(p.Values[0].ToString());
+                    return cn;
                 }
-                return m_CN;
+                return null;
             }
         }
 
@@ -55,23 +49,11 @@ namespace DDay.iCal.DataTypes
         {
             get
             {
-                if (m_DirectoryEntry == null && Parameters.ContainsKey("DIR"))
+                if (Parameters.ContainsKey("DIR"))
                 {
                     Parameter p = (Parameter)Parameters["DIR"];
-                    m_DirectoryEntry = new URI(p.Values[0].ToString());                    
-                }
-                return m_DirectoryEntry;
-            }
-        }
-
-        public string EmailAddress
-        {
-            get
-            {
-                if (Value != null &&
-                    Value.Scheme == Uri.UriSchemeMailto)
-                {
-                    return Value.AbsoluteUri.Replace("mailto:", "");
+                    URI uri = new URI(p.Values[0].ToString());
+                    return uri;
                 }
                 return null;
             }
@@ -82,28 +64,7 @@ namespace DDay.iCal.DataTypes
         #region Constructors
 
         public Cal_Address() : base() { }
-        public Cal_Address(string value) : this("ATTENDEE", value) { }
-        public Cal_Address(string name, string value) : this()
-        {
-            this.Name = name;
-            object obj = this;
-            if (!base.TryParse(value, ref obj))
-                CopyFrom(Parse("MAILTO:" + value));
-        }
-
-        #endregion
-
-        #region Operators
-
-        static public implicit operator string(Cal_Address addr)
-        {
-            return addr.Value.OriginalString;
-        }
-
-        static public implicit operator Cal_Address(string s)
-        {
-            return new Cal_Address(s);
-        }
+        public Cal_Address(string value) : base(value) { }
 
         #endregion
     }

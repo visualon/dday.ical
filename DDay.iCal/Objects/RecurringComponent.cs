@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
-using DDay.iCal.Serialization;
 
 namespace DDay.iCal.Objects
 {
@@ -20,21 +19,15 @@ namespace DDay.iCal.Objects
     public class RecurringComponent : UniqueComponent
     {
         #region Public Fields
-                
-        [Serialized, DefaultValueType("DATE-TIME")] public Date_Time DTStart;        
-        public Date_Time EvalStart;        
+
+        [DefaultValueType("DATE-TIME")] public Date_Time DTStart;
+        public Date_Time EvalStart;
         public Date_Time EvalEnd;
-        public Date_Time Until;
-        [Serialized]
         public RDate[] ExDate;
-        [Serialized]
         public Recur[] ExRule;
-        [Serialized]
         public RDate[] RDate;
-        [Serialized]
         public Recur[] RRule;
-        [Serialized]
-        public Date_Time RecurID;
+        public Date_Time RecurID;        
 
         #endregion
 
@@ -60,7 +53,7 @@ namespace DDay.iCal.Objects
         /// <summary>
         /// An alias to the DTStart field (i.e. start date/time).
         /// </summary>
-        virtual public Date_Time Start
+        public Date_Time Start
         {
             get { return DTStart; }
             set { DTStart = value; }
@@ -79,51 +72,15 @@ namespace DDay.iCal.Objects
 
         #region Constructors
 
-        public RecurringComponent() : base() { Initialize(); }
-        public RecurringComponent(iCalObject parent) : base(parent) { Initialize(); }
-        public RecurringComponent(iCalObject parent, string name) : base(parent, name) { Initialize(); }
-        public void Initialize()
+        public RecurringComponent(iCalObject parent) : base(parent)
         {
             Periods = new List<Period>();
             Alarms = new List<Alarm>();
         }
-
-        #endregion
-
-        #region Public Methods
-
-        // FIXME: add similar methods for RDATE and EXDATE
-
-        /// <summary>
-        /// Adds a recurrence rule to the recurring component
-        /// </summary>
-        /// <param name="recur">The recurrence rule to add</param>
-        public void AddRecurrence(Recur recur)
+        public RecurringComponent(iCalObject parent, string name) : base(parent, name)
         {
-            if (RRule != null)
-            {
-                Recur[] rules = new Recur[RRule.Length + 1];
-                RRule.CopyTo(rules, 0);
-                rules[rules.Length - 1] = recur;
-                RRule = rules;
-            }
-            else RRule = new Recur[] { recur };
-        }
-
-        /// <summary>
-        /// Adds an exception recurrence rule to the recurring component
-        /// </summary>
-        /// <param name="recur">The recurrence rule to add</param>
-        public void AddException(Recur recur)
-        {
-            if (ExRule != null)
-            {
-                Recur[] rules = new Recur[ExRule.Length + 1];
-                ExRule.CopyTo(rules, 0);
-                rules[rules.Length - 1] = recur;
-                ExRule = rules;
-            }
-            else ExRule = new Recur[] { recur };
+            Periods = new List<Period>();
+            Alarms = new List<Alarm>();
         }
 
         #endregion
@@ -172,36 +129,11 @@ namespace DDay.iCal.Objects
 
             Periods.Sort();
 
-            // Ensure the Kind of time is consistent with DTStart
-            foreach (Period p in Periods)
-            {                
-                if (p.StartTime.Kind != DTStart.Kind)
-                {
-                    p.StartTime.Value = new DateTime(p.StartTime.Year, p.StartTime.Month, p.StartTime.Day,
-                        p.StartTime.Hour, p.StartTime.Minute, p.StartTime.Second, DTStart.Kind);
-                }
-            }
-
             // Evaluate all Alarms for this component.
             foreach (Alarm alarm in Alarms)
                 alarm.Evaluate(this);
 
             return Periods;
-        }
-
-        /// <summary>
-        /// Clears a previous evaluation, usually because one of the 
-        /// key elements used for evaluation has changed 
-        /// (Start, End, Duration, recurrence rules, exceptions, etc.).
-        /// </summary>
-        virtual public void ClearEvaluation()
-        {
-            EvalStart = null;
-            EvalEnd = null;
-            Periods.Clear();
-
-            foreach (Alarm alarm in Alarms)
-                alarm.Occurrences.Clear();
         }
 
         public List<Alarm.AlarmOccurrence> PollAlarms()
@@ -245,9 +177,9 @@ namespace DDay.iCal.Objects
         virtual public List<Alarm.AlarmOccurrence> PollAlarms(Date_Time Start)
         {
             List<Alarm.AlarmOccurrence> Occurrences = new List<Alarm.AlarmOccurrence>();
-            foreach (Alarm alarm in Alarms)
+            foreach (Alarm alarm in Alarms)            
                 Occurrences.AddRange(alarm.Poll(Start));
-            return Occurrences;            
+            return Occurrences;
         }
 
         #endregion
@@ -267,19 +199,6 @@ namespace DDay.iCal.Objects
             {
                 foreach (Recur rrule in RRule)
                 {
-                    // Get a list of static occurrences
-                    // This is important to correctly calculate
-                    // recurrences with COUNT.
-                    rrule.StaticOccurrences = new List<Date_Time>();
-                    foreach(Period p in Periods)
-                        rrule.StaticOccurrences.Add(p.StartTime);
-
-                    //
-                    // Determine the last allowed date in this recurrence
-                    //
-                    if (rrule.Until != null && (Until == null || Until < rrule.Until))
-                        Until = rrule.Until.Copy();
-
                     List<Date_Time> DateTimes = rrule.Evaluate(DTStart, FromDate, ToDate);
                     foreach (Date_Time dt in DateTimes)
                     {
@@ -390,13 +309,6 @@ namespace DDay.iCal.Objects
             if (child is Alarm)
                 Alarms.Add((Alarm)child);
             base.AddChild(child);
-        }
-
-        public override void RemoveChild(iCalObject child)
-        {
-            if (child is Alarm)
-                Alarms.Remove((Alarm)child);
-            base.RemoveChild(child);
         }
 
         #endregion

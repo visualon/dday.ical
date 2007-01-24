@@ -17,30 +17,6 @@ namespace DDay.iCal.Serialization.iCalendar.Objects
 
         #endregion
 
-        #region Protected Properties
-
-        protected ComponentBase Component
-        {
-            get { return m_component; }
-        }
-
-        virtual protected List<object> FieldsAndProperties
-        {
-            get
-            {
-                List<object> List = new List<object>();
-                foreach (FieldInfo fi in m_component.GetType().GetFields())
-                    if (fi.GetCustomAttributes(typeof(Serialized), true).Length > 0)
-                        List.Add(fi);
-                foreach (PropertyInfo pi in m_component.GetType().GetProperties())
-                    if (pi.GetCustomAttributes(typeof(Serialized), true).Length > 0)
-                        List.Add(pi);
-                return List;
-            }
-        }
-
-        #endregion
-
         #region Constructors
 
         public ComponentBaseSerializer(DDay.iCal.Objects.ComponentBase component) : base(component)
@@ -58,78 +34,55 @@ namespace DDay.iCal.Serialization.iCalendar.Objects
             byte[] open = encoding.GetBytes("BEGIN:" + m_component.Name + "\r\n");
             stream.Write(open, 0, open.Length);
                         
-            // Get a list of fields and properties
-            List<object> items = this.FieldsAndProperties;
+            // Get a list of fields
+            List<FieldInfo> fields = new List<FieldInfo>(m_component.GetType().GetFields());
             
-            // Alphabetize the list of fields & properties we just obtained
-            items.Sort(new FieldPropertyAlphabetizer());
+            // Alphabetize the list of fields we just obtained
+            fields.Sort(new FieldAlphabetizer());
 
-            // Iterate through each item and attempt to serialize it
-            foreach (object item in items)
+            // Iterate through each field and attempt to serialize it
+            foreach (FieldInfo field in fields)
             {
-                FieldInfo field = null;
-                PropertyInfo prop = null;
-                Type itemType = null;
-                string itemName = null;
-                object[] itemAttrs = null;
-
-                if (item is FieldInfo)
+                // Make sure the field isn't marked as "NotSerialized"
+                if (field.GetCustomAttributes(typeof(NotSerialized), true).Length == 0)
                 {
-                    field = (FieldInfo)item;
-                    itemType = field.FieldType;
-                    itemName = field.Name;
-                }
-                else
-                {
-                    prop = (PropertyInfo)item;
-                    itemType = prop.PropertyType;
-                    itemName = prop.Name;
-                }
-
-                // Get attributes that are attached to each item
-                itemAttrs = (field != null) ? field.GetCustomAttributes(true) : prop.GetCustomAttributes(true);
-
-                // Get the item's value
-                object obj = (field == null) ? prop.GetValue(m_component, null) : field.GetValue(m_component);
-
-                // Adjust the items' name to be iCal-compliant
-                if (obj is iCalObject)
-                {
-                    iCalObject ico = (iCalObject)obj;
-                    if (ico.Name == null)
-                        ico.Name = itemName.ToUpper().Replace("_", "-");                    
-                }
-
-                // Retrieve custom attributes for this field/property
-                if (obj is iCalDataType)
-                    ((iCalDataType)obj).Attributes = itemAttrs;                
-
-                // Get the default value of the object, if available
-                object defaultValue = null;
-                foreach (Attribute a in itemAttrs)
-                    if (a is DefaultValueAttribute)
-                        defaultValue = ((DefaultValueAttribute)a).Value;
-
-                // Create a serializer for the object
-                ISerializable serializer = SerializerFactory.Create(obj);           
-                
-                // To continue, the default value must either not be set,
-                // or it must not match the actual value of the item.
-                if (defaultValue == null ||
-                    (serializer != null && !serializer.SerializeToString().Equals(defaultValue.ToString())))
-                {
-                    // FIXME: enum values cannot name themselves; we need to do it for them.
-                    // For this to happen, we probably need to wrap enum values into a 
-                    // class that inherits from iCalObject.
-                    if (itemType.IsEnum)
-                    {       
-                        byte[] data = encoding.GetBytes(itemName.ToUpper().Replace("_", "-") + ":");
-                        stream.Write(data, 0, data.Length);
+                    object obj = field.GetValue(m_component);
+                    if (obj is iCalObject)
+                    {
+                        iCalObject ico = (iCalObject)obj;
+                        if (ico.Name == null)
+                            ico.Name = field.Name.ToUpper().Replace("_", "-");
                     }
+
+                    // Create a serializer for the object
+                    ISerializable serializer = SerializerFactory.Create(obj);
+
+                    // Check to see if the property matches its default value.
+                    // If so, we don't even need to serialize it, as it is
+                    // already at its default value.                    
+                    object defaultValue = null;
+                    object[] dvAttrs = field.GetCustomAttributes(typeof(DefaultValueAttribute), true);
+                    if (dvAttrs.Length > 0)
+                        defaultValue = ((DefaultValueAttribute)dvAttrs[0]).Value;
                     
-                    // Actually serialize the object
-                    if (serializer != null)
-                        serializer.Serialize(stream, encoding);
+                    // To continue, the default value must either not be set,
+                    // or it must not match the actual value of the item.
+                    if (defaultValue == null ||
+                        (serializer != null && !serializer.SerializeToString().Equals(defaultValue.ToString() + "\r\n")))
+                    {
+                        // FIXME: enum values cannot name themselves; we need to do it for them.
+                        // For this to happen, we probably need to wrap enum values into a 
+                        // class that inherits from iCalObject.
+                        if (field.FieldType.IsEnum)
+                        {       
+                            byte[] data = encoding.GetBytes(field.Name.ToUpper().Replace("_", "-") + ":");
+                            stream.Write(data, 0, data.Length);
+                        }
+                        
+                        // Actually serialize the object
+                        if (serializer != null)
+                            serializer.Serialize(stream, encoding);
+                    }
                 }
             }
 
@@ -145,27 +98,13 @@ namespace DDay.iCal.Serialization.iCalendar.Objects
 
         #region Helper Classes
 
-        private class FieldPropertyAlphabetizer : IComparer<object>
+        private class FieldAlphabetizer : IComparer<FieldInfo>
         {
-            #region IComparer<object> Members
+            #region IComparer<FieldInfo> Members
 
-            public int Compare(object x, object y)
+            public int Compare(FieldInfo x, FieldInfo y)
             {
-                string xName = null;
-                string yName = null;
-                if (x is FieldInfo)
-                    xName = ((FieldInfo)x).Name;
-                else if (x is PropertyInfo)
-                    xName = ((PropertyInfo)x).Name;
-
-                if (y is FieldInfo)
-                    yName = ((FieldInfo)y).Name;
-                else if (y is PropertyInfo)
-                    yName = ((PropertyInfo)y).Name;
-
-                if (xName == null || yName == null)
-                    return 0;
-                else return xName.CompareTo(yName);
+                return x.Name.CompareTo(y.Name);
             }
 
             #endregion

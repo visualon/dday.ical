@@ -75,7 +75,7 @@ namespace DDay.iCal.DataTypes
         }
 
         virtual public void CopyFrom(object obj)
-        {
+        {           
         }
         
         virtual public bool TryParse(string value, ref object obj) { return false; }        
@@ -103,19 +103,7 @@ namespace DDay.iCal.DataTypes
         }
         
         #endregion
-
-        #region Overrides
-
-        public override iCalObject Copy(iCalObject parent)
-        {
-            iCalDataType icdt = (iCalDataType)Activator.CreateInstance(GetType());
-            icdt.CopyFrom(this);
-            icdt.Parent = parent;
-            return icdt;            
-        }
-
-        #endregion
-
+        
         #region Content Validation
 
         public void CheckRange(string name, ICollection values, int min, int max)

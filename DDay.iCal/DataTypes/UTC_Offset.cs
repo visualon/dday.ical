@@ -78,30 +78,6 @@ namespace DDay.iCal.DataTypes
                 (this.Seconds != 0 ? this.Seconds.ToString("00") : string.Empty);
         }
 
-        /// <summary>
-        /// Returns a typed copy of the object.
-        /// </summary>
-        /// <returns>A typed copy of the object.</returns>
-        public UTC_Offset Copy()
-        {
-            return (UTC_Offset)base.Copy();
-        }
-
-        #endregion
-
-        #region Operators
-
-        static public implicit operator UTC_Offset(TimeSpan ts)
-        {
-            UTC_Offset off = new UTC_Offset();
-            if (ts.Ticks >= 0)
-                off.Positive = true;
-            off.Hours = Math.Abs(ts.Hours);
-            off.Minutes = Math.Abs(ts.Minutes);
-            off.Seconds = Math.Abs(ts.Seconds);
-            return off;
-        }
-
         #endregion
     }
 }

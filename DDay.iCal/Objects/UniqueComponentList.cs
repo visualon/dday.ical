@@ -42,13 +42,8 @@ namespace DDay.iCal.Objects
             {
                 if ((item as UniqueComponent).UID == null)
                     (item as UniqueComponent).UID = UniqueComponent.NewUID();                
-                m_Dictionary[(item as UniqueComponent).UID] = item;
+                m_Dictionary[(item as UniqueComponent).UID.Value] = item;
             }
-        }
-
-        public bool ContainsKey(string UID)
-        {
-            return m_Dictionary.ContainsKey(UID);
         }
                 
         #endregion
@@ -64,41 +59,30 @@ namespace DDay.iCal.Objects
         {   
             m_Components.Insert(index, item);
             if ((item as UniqueComponent).UID != null)
-                m_Dictionary[(item as UniqueComponent).UID] = item;
+                m_Dictionary[(item as UniqueComponent).UID.Value] = item;
         }
 
         public void RemoveAt(int index)
         {
             T item = m_Components[index];
             if ((item as UniqueComponent).UID != null)
-                m_Dictionary.Remove((item as UniqueComponent).UID);
+                m_Dictionary.Remove((item as UniqueComponent).UID.Value);
             m_Components.RemoveAt(index);
-        }
-
-        public void UIDChangedHandler(object sender, Text oldUID, Text newUID)
-        {
-            if (oldUID != null && ContainsKey(oldUID))
-                m_Dictionary.Remove(oldUID);
-            if (newUID != null)
-                m_Dictionary[newUID] = (T)sender;
         }
 
         public T this[int index]
         {
             get
-            {
-                if (index >= 0 &&
-                    index < m_Components.Count)
-                    return m_Components[index];
-                return default(T);
+            {                
+                return m_Components[index];                
             }
             set
             {
                 T item = m_Components[index];
                 if ((item as UniqueComponent).UID != null)
                 {
-                    m_Dictionary.Remove((item as UniqueComponent).UID);
-                    m_Dictionary[(value as UniqueComponent).UID] = value;
+                    m_Dictionary.Remove((item as UniqueComponent).UID.Value);
+                    m_Dictionary[(value as UniqueComponent).UID.Value] = value;
                 }
                 m_Components[index] = value;
             }
@@ -116,13 +100,15 @@ namespace DDay.iCal.Objects
             {                
                 if (m_Dictionary.ContainsKey(uid))
                 {
-                    T item = this[uid];
-                    Remove(item);
-                    Add(value);
+                    T item = m_Dictionary[uid];
+                    m_Components.Remove(item);
+                    m_Components.Add(value);
+                    m_Dictionary[uid] = value;
                 }
                 else
                 {
-                    Add(value);                    
+                    m_Components.Add(value);
+                    m_Dictionary[uid] = value;
                 }
             }
         }
@@ -133,16 +119,9 @@ namespace DDay.iCal.Objects
 
         public void Add(T item)
         {            
-            if (!m_Components.Contains(item))
-            {                
-                m_Components.Add(item);
-
-                UniqueComponent uc = item as UniqueComponent;
-                uc.UIDChanged += new UniqueComponent.UIDChangedEventHandler(UIDChangedHandler);
-
-                if (uc.UID != null)
-                    m_Dictionary[uc.UID] = item;
-            }
+            m_Components.Add(item);
+            if ((item as UniqueComponent).UID != null)
+                m_Dictionary[(item as UniqueComponent).UID.Value] = item;
         }
 
         public bool Contains(T item)
@@ -157,7 +136,7 @@ namespace DDay.iCal.Objects
 
         public bool Remove(T item)
         {
-            return m_Components.Remove(item) && ((item as UniqueComponent).UID == null || m_Dictionary.Remove((item as UniqueComponent).UID));
+            return m_Components.Remove(item) && ((item as UniqueComponent).UID == null || m_Dictionary.Remove((item as UniqueComponent).UID.Value));
         }
 
         public void Clear()

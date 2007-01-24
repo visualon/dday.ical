@@ -1,11 +1,9 @@
 using System;
 using System.Data;
 using System.Collections;
-using System.Collections.Generic;
 using System.Configuration;
 using DDay.iCal.Objects;
 using DDay.iCal.DataTypes;
-using DDay.iCal.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -19,19 +17,15 @@ namespace DDay.iCal.Components
         {
             #region Public Fields
 
-            [Serialized]
             public UTC_Offset TZOffsetFrom;
-            [Serialized]
-            public UTC_Offset TZOffsetTo;            
-            [Serialized]
+            public UTC_Offset TZOffsetTo;
+            public Text[] Comment;
             public Text[] TZName;
 
             #endregion
             
             #region Constructors
 
-            public TimeZoneInfo() : base() { }
-            public TimeZoneInfo(iCalObject parent) : base(parent) { }
             public TimeZoneInfo(string name, iCalObject parent)
                 : base(parent)
             {
@@ -60,41 +54,20 @@ namespace DDay.iCal.Components
                 {
                     if (TZName.Length > 0)
                         return TZName[0].Value;
-                    return string.Empty;
+                    return null;
                 }
                 set
                 {
-                    if (TZName == null)
+                    if (TZName.Length > 0)
+                        TZName[0] = new Text(value);
+                    else
+                    {
                         TZName = new Text[1];
-                    TZName[0] = new Text(value);
-                    TZName[0].Name = "TZNAME";
+                        TZName[0] = new Text(value);
+                    }
                 }
             }
 
-            /// <summary>
-            /// Returns a typed copy of the TimeZoneInfo object.
-            /// </summary>
-            /// <returns>A typed copy of the TimeZoneInfo object.</returns>
-            public TimeZoneInfo Copy()
-            {
-                return (TimeZoneInfo)base.Copy();
-            }
-
-            /// <summary>
-            /// Creates a copy of the <see cref="TimeZoneInfo"/> object.
-            /// </summary>
-            public override iCalObject Copy(iCalObject parent)
-            {
-                // Create a copy
-                iCalObject obj = base.Copy(parent);
-
-                // Copy the name, since the .ctor(iCalObject) constructor
-                // doesn't handle it
-                obj.Name = this.Name;
-                
-                return obj;
-            }
-                                  
             #endregion
         }
     }

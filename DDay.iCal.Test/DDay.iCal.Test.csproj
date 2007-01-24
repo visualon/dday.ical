@@ -30,9 +30,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.2.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="nunit.framework, Version=2.2.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
@@ -40,13 +38,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alarm.cs" />
-    <Compile Include="Copy.cs" />
     <Compile Include="Serialize.cs" />
     <Compile Include="Journal.cs" />
     <Compile Include="Recurrence.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Todo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DDay.iCal\DDay.iCal.csproj">
+      <Project>{F88DB6D3-CB95-4707-9C88-B53403AADC61}</Project>
+      <Name>DDay.iCal</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Calendars\General\Test1.ics">
@@ -60,9 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Calendars\Alarm\ALARM7.ics">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Calendars\General\Barça 2006 - 2007.ics">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Calendars\General\CATEGORIES.ics">
@@ -98,9 +98,6 @@
     <None Include="Calendars\General\GEO1.ics">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Calendars\General\GoogleCalendar.ics">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Calendars\Journal\JOURNAL2.ics">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -108,9 +105,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Calendars\Recurrence\RRULE6_1.ics">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Calendars\Serialization\Barça 2006 - 2007.ics">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Calendars\Serialization\SERIALIZE4.ics">
@@ -308,12 +302,6 @@
     <None Include="Calendars\General\USHolidays.ics">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DDay.iCal\DDay.iCal.csproj">
-      <Project>{F88DB6D3-CB95-4707-9C88-B53403AADC61}</Project>
-      <Name>DDay.iCal</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

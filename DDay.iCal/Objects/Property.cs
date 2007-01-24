@@ -28,7 +28,7 @@ namespace DDay.iCal.Objects
     {
         #region Private Fields
 
-        private string m_value = null;        
+        private string m_value;        
 
         #endregion
 
@@ -52,13 +52,10 @@ namespace DDay.iCal.Objects
                 this.Parameters[de.Key] = de.Value;
         }
         public Property(iCalObject parent) : base(parent) { }
-        public Property(iCalObject parent, string name) : base(parent, name)
+        public Property(iCalObject parent, string name, string value) : base(parent, name)
         {
+            Value = value;
             AddToParent();
-        }
-        public Property(iCalObject parent, string name, string value) : this(parent, name)
-        {
-            Value = value;            
         }
 
         #endregion
@@ -69,20 +66,12 @@ namespace DDay.iCal.Objects
         {
             if (obj is Property)
             {
+                // FIXME: compare parameters here also?
                 Property p = (Property)obj;
                 return p.Name.Equals(Name) &&
-                    ((p.Value == null && Value == null) ||
-                    (p.Value != null && p.Value.Equals(Value)));
+                    p.Value.Equals(Value);
             }
             return base.Equals(obj);
-        }
-
-        public override iCalObject Copy(iCalObject parent)
-        {
-            Property p = (Property)base.Copy(parent);
-            p.Name = Name;
-            p.Value = Value;
-            return p;
         }
 
         #endregion

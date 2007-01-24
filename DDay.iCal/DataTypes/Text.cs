@@ -77,19 +77,5 @@ namespace DDay.iCal.DataTypes
         }
 
         #endregion
-
-        #region Operators
-
-        public static implicit operator string(Text t)
-        {
-            return t.Value;
-        }
-
-        public static implicit operator Text(string s)
-        {
-            return new Text(s);
-        }
-
-        #endregion
     }
 }

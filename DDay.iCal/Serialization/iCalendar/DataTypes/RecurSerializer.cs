@@ -34,20 +34,10 @@ namespace DDay.iCal.Serialization.iCalendar.DataTypes
 
             values.Add("FREQ=" + Enum.GetName(typeof(Recur.FrequencyType), m_Recur.Frequency));
 
-            //-- FROM RFC2445 --
-            //The INTERVAL rule part contains a positive integer representing how
-            //often the recurrence rule repeats. The default value is "1", meaning
-            //every second for a SECONDLY rule, or every minute for a MINUTELY
-            //rule, every hour for an HOURLY rule, every day for a DAILY rule,
-            //every week for a WEEKLY rule, every month for a MONTHLY rule and
-            //every year for a YEARLY rule.
-            
             int interval = m_Recur.Interval;
             if (interval == int.MinValue)
                 interval = 1;
-
-            if (interval != 1)
-                values.Add("INTERVAL=" + interval);
+            values.Add("INTERVAL=" + interval);
 
             if (m_Recur.Until != null)
             {

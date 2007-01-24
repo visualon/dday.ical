@@ -150,11 +150,6 @@ namespace DDay.iCal.DataTypes
             else return TimeSpan.MinValue;
         }
 
-        static public implicit operator Duration(TimeSpan ts)
-        {
-            return new Duration(ts);
-        }
-
         #endregion
     }
 }

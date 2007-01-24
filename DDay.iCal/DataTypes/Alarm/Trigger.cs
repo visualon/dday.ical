@@ -51,10 +51,6 @@ namespace DDay.iCal.DataTypes
                 }                
                 return m_Related;
             }
-            set
-            {
-                m_Related = value;
-            }
         }
 
         public bool IsRelative
@@ -67,10 +63,6 @@ namespace DDay.iCal.DataTypes
         #region Constructors
 
         public Trigger() { }
-        public Trigger(TimeSpan ts)
-        {
-            Duration = ts;
-        }
         public Trigger(string value)
             : this()
         {

@@ -12,7 +12,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using DDay.iCal.Test;
-using DDay.iCal.Objects;
 using DDay.iCal.Serialization;
 
 namespace DDay.iCal.Test
@@ -28,11 +27,10 @@ namespace DDay.iCal.Test
             p.LoadFromUri();
 
             DDay.iCal.Test.Alarm.DoTests();
-            DDay.iCal.Test.Copy.DoTests();
             DDay.iCal.Test.Journal.DoTests();
             DDay.iCal.Test.Recurrence.DoTests();
             DDay.iCal.Test.Serialization.DoTests();
-            DDay.iCal.Test.Todo.DoTests();            
+            DDay.iCal.Test.Todo.DoTests();
 
             p.CATEGORIES();
             p.GEO1();
@@ -41,10 +39,6 @@ namespace DDay.iCal.Test
             p.BINARY();
             p.MERGE();
             p.UID1();
-            p.ADDEVENT1();
-            p.CustomClasses();
-            p.LANGUAGE1();
-            p.GOOGLE1();
             p.LoadAndDisplayCalendar();
 
             p.DisposeAll();
@@ -258,10 +252,8 @@ namespace DDay.iCal.Test
         public void MERGE()
         {
             iCalendar iCal1 = iCalendar.LoadFromFile(@"Calendars\Recurrence\RRULE21.ics");
-            iCalendar iCal2 = iCalendar.LoadFromFile(@"Calendars\Recurrence\RRULE22.ics");
-
-            // Change the UID of the 2nd event to make sure it's different
-            iCal2.Events[iCal1.Events[0].UID].UID = "1234567890";
+            iCalendar iCal2 = iCalendar.LoadFromFile(@"Calendars\Recurrence\RRULE22.ics");            
+            
             iCal1.MergeWith(iCal2);
             
             Event evt1 = iCal1.Events[0];
@@ -369,98 +361,6 @@ namespace DDay.iCal.Test
             
             Event evt = iCal.Events["uuid1153170430406"];
             Assert.IsNotNull(evt, "Event could not be accessed by UID");
-        }
-
-        [Test]
-        public void ADDEVENT1()
-        {
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\General\GEO1.ics");
-            Program.TestCal(iCal);
-
-            Event evt = Event.Create(iCal);
-            evt.Summary = "Test event";
-            evt.Description = "This is an event to see if event creation works";
-            evt.Start = new Date_Time(2006, 12, 15, "US-Eastern", iCal);
-            evt.Duration = new TimeSpan(1, 0, 0);
-            evt.Organizer = "dougd@daywesthealthcare.com";
-
-            if (!Directory.Exists(@"Calendars\General\Temp"))
-                Directory.CreateDirectory(@"Calendars\General\Temp");
-
-            iCalendarSerializer serializer = new iCalendarSerializer(iCal);
-            serializer.Serialize(@"Calendars\General\Temp\GEO1_Serialized.ics");
-        }
-
-        [ComponentBaseType(typeof(MyComponentBase))]
-        public class iCalendarWithDifferentComponents : iCalendar
-        {            
-        }
-
-        public class MyComponentBase : ComponentBase
-        {
-            public MyComponentBase(iCalObject parent) : base(parent) { }
-
-            static public ComponentBase Create(iCalObject parent, string name)
-            {
-                switch (name)
-                {
-                    case "VALARM": return new DDay.iCal.Components.Alarm(parent); break;
-                    case "VEVENT": return new MyEvent(parent); break;
-                    case "VFREEBUSY": return new DDay.iCal.Components.FreeBusy(parent); break;
-                    case "VJOURNAL": return new DDay.iCal.Components.Journal(parent); break;
-                    case "VTIMEZONE": return new DDay.iCal.Components.TimeZone(parent); break;
-                    case "VTODO": return new DDay.iCal.Components.Todo(parent); break;
-                    case "DAYLIGHT":
-                    case "STANDARD":
-                        return new DDay.iCal.Components.TimeZone.TimeZoneInfo(name.ToUpper(), parent); break;
-                    default: return new ComponentBase(parent, name); break;
-                }
-            }
-        }
-
-        public class MyEvent : Event
-        {
-            public MyEvent(iCalObject parent) : base(parent) { }
-        }
-
-        [Test]
-        public void CustomClasses()
-        {
-            iCalendarWithDifferentComponents iCal = (iCalendarWithDifferentComponents)iCalendar.LoadFromFile(typeof(iCalendarWithDifferentComponents), @"Calendars\General\GEO1.ics");
-        }
-
-        [Test]
-        public void LANGUAGE1()
-        {
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars/General/Barça 2006 - 2007.ics");
-        }
-
-        [Test]
-        public void GOOGLE1()
-        {
-            TZID tzid = "Europe/Berlin";
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars/General/GoogleCalendar.ics");
-            Event evt = iCal.Events["594oeajmftl3r9qlkb476rpr3c@google.com"];
-            Assert.IsNotNull(evt);
-
-            Date_Time dtStart = new Date_Time(2006, 12, 18, tzid, iCal);
-            Date_Time dtEnd = new Date_Time(2006, 12, 23, tzid, iCal);
-            iCal.Evaluate(dtStart, dtEnd);
-
-            Date_Time[] DateTimes = new Date_Time[]
-            {
-                new Date_Time(2006, 12, 11, 7, 0, 0, tzid, iCal),
-                new Date_Time(2006, 12, 18, 7, 0, 0, tzid, iCal),
-                new Date_Time(2006, 12, 19, 7, 0, 0, tzid, iCal),
-                new Date_Time(2006, 12, 20, 7, 0, 0, tzid, iCal),
-                new Date_Time(2006, 12, 21, 7, 0, 0, tzid, iCal),
-                new Date_Time(2006, 12, 22, 7, 0, 0, tzid, iCal)
-            };
-
-            foreach (Date_Time dt in DateTimes)
-                Assert.IsTrue(evt.OccursAt(dt), "Event should occur at " + dt);
-
-            Assert.IsTrue(evt.Periods.Count == DateTimes.Length, "There should be exactly " + DateTimes.Length + " occurrences; there were " + evt.Periods.Count);
         }
     }
 }

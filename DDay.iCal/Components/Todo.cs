@@ -1,71 +1,50 @@
 using System;
-using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Configuration;
 using DDay.iCal.Objects;
 using DDay.iCal.DataTypes;
-using DDay.iCal.Serialization;
 
 namespace DDay.iCal.Components
 {
     /// <summary>
     /// A class that represents an RFC 2445 VTODO component.
-    /// </summary> 
-    [DebuggerDisplay("{Summary} - {Status}")]
+    /// </summary>    
     public class Todo : RecurringComponent
     {
-        #region Public Fields
-               
-        [Serialized, DefaultValueType("DATE-TIME")]
-        public Date_Time Completed;        
-        [Serialized, DefaultValueType("DATE-TIME")]
+        #region Public Fields        
+        public Binary[] Attach;
+        public Cal_Address[] Attendee;
+        public TextCollection[] Categories;
+        public Text Class;
+        public Text[] Comment;
+        [DefaultValueType("DATE-TIME")]
+        public Date_Time Completed;
+        public Text[] Contact;
+        [DefaultValueType("DATE-TIME")]
+        public Date_Time Created;
+        public Text Description;
+        [DefaultValueType("DATE-TIME")]
+        public Date_Time DTStamp;
+        [DefaultValueType("DATE-TIME")]
         public Date_Time Due;
-        [Serialized, DefaultValue("P")]
         public Duration Duration;
-        [Serialized]
         public Geo Geo;
-        [Serialized]
-        public Text Location;        
-        [Serialized]
-        public Integer PercentComplete;        
-        [Serialized]
-        public TextCollection[] Resources;        
-
-        #endregion
-
-        #region Private Fields
-
-        private bool m_Loaded = false;
-        private TodoStatus m_Status;
-
-        #endregion
-
-        #region Public Properties
-
-        [Serialized, DefaultValue("NEEDS_ACTION\r\n")]
-        public TodoStatus Status
-        {
-            get { return m_Status; }
-            set
-            {
-                if (m_Status != value)
-                {
-                    // Automatically set/unset the Completed time, once the
-                    // component is fully loaded (When deserializing, it doesn't
-                    // automatically track the completed time).
-                    if (m_Loaded)
-                    {
-                        if (value == TodoStatus.COMPLETED)
-                            Completed = DateTime.Now;
-                        else Completed = null;
-                    }
-
-                    m_Status = value;
-                }
-            }
-        }
+        [DefaultValueType("DATE-TIME")]
+        public Date_Time LastModified;
+        public Text Location;
+        public Cal_Address Organizer;
+        public Integer PercentComplete;
+        public Integer Priority;
+        public Text[] RelatedTo; 
+        public RequestStatus[] RequestStatus;
+        public TextCollection[] Resources;
+        public Integer Sequence;
+        [DefaultValue(TodoStatus.NEEDS_ACTION)]
+        public TodoStatus Status;
+        public Text Summary;        
+        public Uri Url;
 
         #endregion
 
@@ -83,10 +62,8 @@ namespace DDay.iCal.Components
 
         static public Todo Create(iCalendar iCal)
         {
-            Todo t = (Todo)iCal.Create(iCal, "VTODO");
+            Todo t = new Todo(iCal);
             t.UID = UniqueComponent.NewUID();
-            t.Created = DateTime.Now;
-            t.DTStamp = DateTime.Now;
 
             return t;
         }
@@ -106,8 +83,7 @@ namespace DDay.iCal.Components
         {
             if (Status == TodoStatus.COMPLETED)
             {
-                if (Completed == null ||
-                    Completed > currDt)
+                if (Completed == null)
                     return true;
 
                 foreach (Period p in Periods)
@@ -115,7 +91,7 @@ namespace DDay.iCal.Components
                     if (p.StartTime > Completed && // The item has recurred after it was completed
                         currDt >= p.StartTime)     // and the current date is after or on the recurrence date.
                         return false;
-                }                
+                }
                 return true;
             }
             return false;
@@ -166,7 +142,6 @@ namespace DDay.iCal.Components
         public override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            m_Loaded = true;
 
             // Automatically determine Duration from Due, or Due from Duration
             if (DTStart != null)
@@ -176,15 +151,6 @@ namespace DDay.iCal.Components
                 else if (Due == null && Duration != null)
                     Due = DTStart + Duration;                
             }
-        }
-
-        /// <summary>
-        /// Returns a typed copy of the Todo object.
-        /// </summary>
-        /// <returns>A typed copy of the Todo object.</returns>
-        public Todo Copy()
-        {
-            return (Todo)base.Copy();
         }
 
         #endregion

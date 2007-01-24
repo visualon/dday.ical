@@ -22,12 +22,10 @@ namespace DDay.iCal.Serialization.iCalendar
                     return new EnumSerializer(obj as Enum);
                 else if (type == typeof(DDay.iCal.iCalendar) || type.IsSubclassOf(typeof(DDay.iCal.iCalendar)))
                     return new iCalendarSerializer(obj as DDay.iCal.iCalendar);
-                else if (type == typeof(UniqueComponent) || type.IsSubclassOf(typeof(UniqueComponent)))
-                    return new UniqueComponentSerializer(obj as UniqueComponent);
                 else if (type == typeof(ComponentBase) || type.IsSubclassOf(typeof(ComponentBase)))
                     return new ComponentBaseSerializer(obj as ComponentBase);
-                else if (type == typeof(iCalDataType) || type.IsSubclassOf(typeof(iCalDataType)))
-                    return new DataTypeSerializer(obj as iCalDataType);
+                else if (type == typeof(iCalDataType) || type.IsSubclassOf(typeof(iCalDataType)))                
+                    return new DataTypeSerializer(obj as iCalDataType);                
                 else if (type == typeof(Parameter) || type.IsSubclassOf(typeof(Parameter)))
                     return new ParameterSerializer(obj as Parameter);
                 else if (type == typeof(Property) || type.IsSubclassOf(typeof(Property)))

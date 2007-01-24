@@ -76,7 +76,7 @@ namespace DDay.iCal.Serialization.iCalendar.DataTypes
                     }
                 }
 
-                // If the value type is already the default value type, don't worry about displaying it
+                // If the value is already the default value, don't worry about displaying it
                 if (valueType != null)
                     Params.Add("VALUE=" + valueType);
                 

@@ -26,7 +26,7 @@ namespace Example1
             iCal = iCalendar.LoadFromFile(@"Calendars\USHolidays.ics");
             iCal.MergeWith(iCalendar.LoadFromFile(@"Calendars\lotr.ics"));
             iCal.MergeWith(iCalendar.LoadFromFile(@"Calendars\To-do.ics"));
-            iCal.MergeWith(iCalendar.LoadFromFile(@"Calendars\Barça 2006 - 2007.ics"));
+            //iCal.MergeWith(iCalendar.LoadFromFile("Barça 2006 - 2007.ics"));
             if (iCal == null)
                 throw new ApplicationException("iCalendar could not be loaded.");
         }
