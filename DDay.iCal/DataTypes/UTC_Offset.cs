@@ -5,32 +5,19 @@ using System.Text.RegularExpressions;
 
 namespace DDay.iCal.DataTypes
 {
-    /// <summary>
-    /// Represents a time offset from UTC (Coordinated Universal Time).
-    /// </summary>
     public class UTC_Offset : iCalDataType
     {
-        #region Public Fields
-
         public bool Positive = false;
         public int Hours;
         public int Minutes;
         public int Seconds = 0;
 
-        #endregion
-
-        #region Constructors
-
         public UTC_Offset() { }
         public UTC_Offset(string value)
             : this()
         {
-            CopyFrom((UTC_Offset)Parse(value));
+            CopyFrom((UTC_Offset)Parse(value));            
         }
-
-        #endregion
-
-        #region Overrides
 
         public override void CopyFrom(object obj)
         {
@@ -42,7 +29,6 @@ namespace DDay.iCal.DataTypes
                 this.Minutes = utco.Minutes;
                 this.Seconds = utco.Seconds;
             }
-            base.CopyFrom(obj);
         }
 
         public override bool TryParse(string value, ref object obj)
@@ -70,38 +56,18 @@ namespace DDay.iCal.DataTypes
             return false;
         }
 
-        public override string ToString()
+        public override DDay.iCal.Objects.ContentLine ContentLine
         {
-            return (this.Positive ? "+" : "-") +
-                this.Hours.ToString("00") +
-                this.Minutes.ToString("00") +
-                (this.Seconds != 0 ? this.Seconds.ToString("00") : string.Empty);
+            get
+            {
+                return base.ContentLine;
+            }
+            set
+            {
+                base.ContentLine = value;
+                if (ContentLine != null)
+                    CopyFrom((UTC_Offset)Parse(ContentLine.Value));
+            }
         }
-
-        /// <summary>
-        /// Returns a typed copy of the object.
-        /// </summary>
-        /// <returns>A typed copy of the object.</returns>
-        public UTC_Offset Copy()
-        {
-            return (UTC_Offset)base.Copy();
-        }
-
-        #endregion
-
-        #region Operators
-
-        static public implicit operator UTC_Offset(TimeSpan ts)
-        {
-            UTC_Offset off = new UTC_Offset();
-            if (ts.Ticks >= 0)
-                off.Positive = true;
-            off.Hours = Math.Abs(ts.Hours);
-            off.Minutes = Math.Abs(ts.Minutes);
-            off.Seconds = Math.Abs(ts.Seconds);
-            return off;
-        }
-
-        #endregion
     }
 }

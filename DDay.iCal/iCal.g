@@ -20,28 +20,31 @@ options
 }
 
 // iCalendar object
-icalobject returns [iCalendar iCal = (iCalendar)Activator.CreateInstance(iCalendarType);]
+icalobject returns [iCalendar iCal = new iCalendar();]
 :
-    (BEGIN COLON VCALENDAR CRLF icalbody[iCal] END COLON VCALENDAR CRLF)* {iCal.OnLoad(EventArgs.Empty);}
+    (BEGIN COLON VCALENDAR CRLF icalbody[iCal] END COLON VCALENDAR CRLF)+
 ;
     
-icalbody[iCalendar iCal]: (calprops[iCal])? (component[iCal])?;
+icalbody[iCalendar iCal]: calprops[iCal] component[iCal]; 
 component[iCalObject o]: (iana_comp[o] | x_comp[o])+;
-iana_comp[iCalObject o] { ComponentBase c; }: BEGIN COLON n:IANA_TOKEN {c = o.iCalendar.Create(o, n.getText());} CRLF (calendarline[c])+ END COLON IANA_TOKEN CRLF { c.OnLoad(EventArgs.Empty); };
-x_comp[iCalObject o] { ComponentBase c; }: BEGIN COLON n:X_NAME {c = o.iCalendar.Create(o, n.getText());} CRLF (calendarline[c])+ END COLON X_NAME CRLF { c.OnLoad(EventArgs.Empty); };
+iana_comp[iCalObject o] { ComponentBase c; }: BEGIN COLON n:IANA_TOKEN {c = ComponentBase.Create(o, n.getText());} CRLF (calendarline[c])+ END COLON IANA_TOKEN CRLF { c.OnLoad(EventArgs.Empty); };
+x_comp[iCalObject o] { ComponentBase c; }: BEGIN COLON n:X_NAME {c = ComponentBase.Create(o, n.getText());} CRLF (calendarline[c])+ END COLON X_NAME CRLF { c.OnLoad(EventArgs.Empty); };
 
 // iCalendar Properties
-calprops[iCalendar iCal]: calprop[iCal] (calprop[iCal])+;
+calprops[iCalendar iCal]
+:
+    calprop[iCal] (calprop[iCal])+
+;
 calprop[iCalObject o]: prodid[o] | version[o] | calscale[o] | method[o] | iana_prop[o] | x_prop[o];
-prodid[iCalObject o] {Property p; string v;}: n:PRODID { p = new Property(o); } (SEMICOLON xparam[p])* COLON v=text {p.Name = n.getText(); p.Value = v; p.AddToParent(); } CRLF;
-version[iCalObject o] {Property p; string v;}: n:VERSION { p = new Property(o); } (SEMICOLON xparam[p])* COLON v=version_number {p.Name = n.getText(); p.Value = v; p.AddToParent(); } CRLF;
-calscale[iCalObject o] {Property p;}: n:CALSCALE { p = new Property(o); } (SEMICOLON xparam[p])* COLON v:IANA_TOKEN {p.Name = n.getText(); p.Value = v.getText(); p.AddToParent(); } CRLF;
-method[iCalObject o] {Property p;}: n:METHOD { p = new Property(o); } (SEMICOLON xparam[p])* COLON v:IANA_TOKEN {p.Name = n.getText(); p.Value = v.getText(); p.AddToParent(); } CRLF;
-iana_prop[iCalObject o] {Property p; string v;}: n:IANA_TOKEN { p = new Property(o); } (SEMICOLON xparam[p])* COLON v=text {p.Name = n.getText(); p.Value = v; p.AddToParent(); } CRLF;
-x_prop[iCalObject o] {Property p; string v;}: n:X_NAME { p = new Property(o); } (SEMICOLON xparam[p])* COLON v=text {p.Name = n.getText(); p.Value = v; p.AddToParent(); } CRLF;
+prodid[iCalObject o] {Property p; string v;}: n:PRODID (SEMICOLON xparam[o])* COLON v=text {p = new Property(o, n.getText(), v);} CRLF;
+version[iCalObject o] {Property p; string v;}: n:VERSION (SEMICOLON xparam[o])* COLON v=version_number {p = new Property(o, n.getText(), v);} CRLF;
+calscale[iCalObject o] {Property p;}: n:CALSCALE (SEMICOLON xparam[o])* COLON v:IANA_TOKEN {p = new Property(o, n.getText(), v.getText());} CRLF;
+method[iCalObject o] {Property p;}: n:METHOD (SEMICOLON xparam[o])* COLON v:IANA_TOKEN {p = new Property(o, n.getText(), v.getText());} CRLF;
+iana_prop[iCalObject o] {Property p; string v;}: n:IANA_TOKEN (SEMICOLON xparam[o])* COLON v=text {p = new Property(o, n.getText(), v);} CRLF;
+x_prop[iCalObject o] {Property p; string v;}: n:X_NAME (SEMICOLON xparam[o])* COLON v=text {p = new Property(o, n.getText(), v);} CRLF;
 
 // Content Line
-calendarline[iCalObject o]: contentline[o] | component[o]; // Allow for embedded components here (VALARM)
+calendarline[iCalObject o]: contentline[o] | component[o];
 contentline[iCalObject o]
 {
     ContentLine c = new ContentLine(o);
@@ -51,7 +54,7 @@ contentline[iCalObject o]
 
 name returns [string s = string.Empty;]: x:X_NAME {s = x.getText();} | i:IANA_TOKEN {s = i.getText();};
 param[iCalObject o] {Parameter p; string n; string v;}: n=param_name {p = new Parameter(o, n);} EQUAL v=param_value {p.Values.Add(v);} (COMMA v=param_value {p.Values.Add(v);})*;
-param_name returns [string n = string.Empty;]: i:IANA_TOKEN {n = i.getText();} | x:X_NAME {n = x.getText();}; // FIXME: in rfc 32445, X_NAME was x-token, but x-token was not defined.
+param_name returns [string n = string.Empty;]: i:IANA_TOKEN {n = i.getText();} | x:X_NAME {n = x.getText();}; // FIXME: in rfc 32445, X_NAME was x-token.
 param_value returns [string v = string.Empty;]: v=paramtext | v=quoted_string;
 paramtext returns [string t = string.Empty] {string c;}: (c=safe_char {t += c;})*;
 value returns [string v = string.Empty] {string c;}: (c=value_char {v += c;})*;
@@ -79,7 +82,7 @@ class iCalLexer extends Lexer;
 options
 {
     k=3; // k=2 for CRLF, k=3 to handle LINEFOLDER        
-    charVocabulary = '\u0000'..'\ufffe';
+    charVocabulary = '\u0000'..'\u00ff';
 }
 tokens
 {
@@ -97,8 +100,7 @@ LF: '\u000a' {$setType(Token.SKIP);};
 protected ALPHA: '\u0041'..'\u005a' | '\u0061'..'\u007a';
 protected DIGIT: '\u0030'..'\u0039';
 protected DASH: '\u002d';
-SPECIAL: '\u0021' | '\u0023'..'\u002b' | '\u003c' | '\u003e'..'\u0040' | '\u005b' | '\u005d'..'\u0060' | '\u007b'..'\u00ff';
-UNICODE: '\u0100'..'\uFFFE';
+SPECIAL: '\u0021' | '\u0023'..'\u002b' | '\u003c' | '\u003e'..'\u0040' | '\u005b' | '\u005d'..'\u0060' | '\u007b'..'\u007e';
 SPACE: '\u0020';
 HTAB: '\u0009';
 COLON: '\u003a';
@@ -118,7 +120,7 @@ IANA_TOKEN: (ALPHA | DIGIT | DASH)+
     if (int.TryParse(s, out val))
         $setType(NUMBER);
     else if (s.Length > 2)
-    {
+    {    
         switch (s.Substring(0,2))
         {
             case "X-": $setType(X_NAME); break;

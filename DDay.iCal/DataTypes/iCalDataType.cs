@@ -6,25 +6,11 @@ using DDay.iCal.Objects;
 
 namespace DDay.iCal.DataTypes
 {
-    /// <summary>
-    /// An abstract class from which all iCalendar data types inherit.
-    /// </summary>
-    public abstract class iCalDataType : iCalObject
+    public abstract class iCalDataType
     {
-        #region Protected Fields
+        #region Private Fields
 
-        protected ContentLine m_ContentLine = null;
-        protected object[] m_Attributes = new object[0];
-
-        #endregion
-
-        #region Public Properties
-
-        public object[] Attributes
-        {
-            get { return m_Attributes; }
-            set { m_Attributes = value; }
-        }
+        private ContentLine m_ContentLine = null;
 
         #endregion
 
@@ -33,36 +19,7 @@ namespace DDay.iCal.DataTypes
         virtual public ContentLine ContentLine
         {
             get { return m_ContentLine; }
-            set
-            {
-                m_ContentLine = value;
-                if (value != null)
-                {
-                    // Assign parameters from the content line
-                    foreach (DictionaryEntry de in value.Parameters)
-                        Parameters[de.Key] = de.Value;
-
-                    // Assign the NAME of the object from the content line
-                    Name = value.Name;
-
-                    // Assign a parent to the object if it doesn't already have one
-                    // NOTE: This assures that some data types will load correctly
-                    // by being associated to an iCalendar.
-                    if (this.Parent == null)
-                        this.Parent = value.iCalendar;
-
-                    // Parse the content line
-                    CopyFrom(Parse(value.Value));
-
-                    // Assign a parent to the object if it doesn't already have one
-                    // NOTE: this makes sure that some objects have a parent
-                    // in case they lost it while parsing
-                    if (this.Parent == null)
-                        this.Parent = value.iCalendar;
-
-                    OnLoad(EventArgs.Empty);
-                }
-            }
+            set { m_ContentLine = value; }
         }        
         
         virtual public object Parse(string value)
@@ -74,46 +31,10 @@ namespace DDay.iCal.DataTypes
             return obj;
         }
 
-        virtual public void CopyFrom(object obj)
-        {
-        }
+        virtual public void CopyFrom(object obj) { }
+        virtual public bool TryParse(string value, ref object obj) { return false; }
+        virtual public string Serialize() { return ToString(); }
         
-        virtual public bool TryParse(string value, ref object obj) { return false; }        
-
-        virtual public Type ValueType()
-        {
-            if (Parameters.ContainsKey("VALUE"))
-            {
-                Parameter p = (Parameter)Parameters["VALUE"];
-                if (p.Values.Count > 0)
-                {
-                    string type = p.Values[0].ToString();
-                    if (type == "DATE") // We have no "DATE" type; it's combined with DATE-TIME.
-                        type = "DATE-TIME";
-
-                    type = type.Replace("-", "_");
-                    Type iCalType = System.Type.GetType("DDay.iCal.DataTypes." + type, false, true);
-
-                    if (iCalType != null)
-                        return iCalType;
-                }
-            }
-
-            return GetType();
-        }
-        
-        #endregion
-
-        #region Overrides
-
-        public override iCalObject Copy(iCalObject parent)
-        {
-            iCalDataType icdt = (iCalDataType)Activator.CreateInstance(GetType());
-            icdt.CopyFrom(this);
-            icdt.Parent = parent;
-            return icdt;            
-        }
-
         #endregion
 
         #region Content Validation

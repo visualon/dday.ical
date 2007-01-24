@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace DDay.iCal.DataTypes
-{    
-    public enum Transparency
+{
+    public enum Status
     {
-        OPAQUE,
-        TRANSPARENT
-    };    
+        TENTATIVE,
+        CONFIRMED,
+        CANCELLED
+    };
 }
