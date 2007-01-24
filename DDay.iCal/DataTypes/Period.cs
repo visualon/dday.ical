@@ -5,17 +5,14 @@ using System.Text;
 
 namespace DDay.iCal.DataTypes
 {
-    /// <summary>
-    /// Represents an iCalendar period of time.
-    /// </summary>
     [DebuggerDisplay("Period ( {StartTime} - {EndTime} )")]
-    public class Period : iCalDataType, IComparable
+    public class Period : iCalDataType
     {
         #region Public Fields
 
         public Date_Time StartTime = new Date_Time();
-        public Date_Time EndTime;
-        public Duration Duration;
+        public Date_Time EndTime = new Date_Time();
+        public Duration Duration = new Duration();
         
         /// <summary>
         /// When true, comparisons between this and other <see cref="Period"/>
@@ -29,23 +26,19 @@ namespace DDay.iCal.DataTypes
         #region Constructors
 
         public Period() { }
-        public Period(Date_Time occurs) : this(occurs, null) { }
-        public Period(Date_Time start, Date_Time end)
+        public Period(DateTime start, DateTime end)
             : this()
         {
-            StartTime = start.Copy();
-            if (end != null)
-            {
-                EndTime = end.Copy();
-                Duration = new Duration(end.Value - start.Value);
-            }
+            StartTime = new Date_Time(start);
+            EndTime = new Date_Time(end);
+            Duration = new Duration(start - end);
         }
-        public Period(Date_Time start, TimeSpan duration)
+        public Period(DateTime start, TimeSpan duration)
             : this()
         {
-            StartTime = start.Copy();            
-            Duration = new Duration(duration);            
-            EndTime = start + duration;
+            StartTime = new Date_Time(start);
+            Duration = new Duration(duration);
+            EndTime = new Date_Time(start + duration);
         }
         public Period(string value)
             : this()
@@ -56,7 +49,7 @@ namespace DDay.iCal.DataTypes
         #endregion
 
         #region Overrides
-        
+
         public override bool Equals(object obj)
         {
             if (obj is Period)
@@ -66,23 +59,15 @@ namespace DDay.iCal.DataTypes
                 {
                     return
                         StartTime.Value.Date == p.StartTime.Value.Date &&
-                        (
-                            EndTime == null ||
-                            p.EndTime == null ||
-                            EndTime.Value.Date == p.EndTime.Value.Date
-                        );
+                        EndTime.Value.Date == p.EndTime.Value.Date;
                 }
                 else
                 {
                     return
-                        StartTime.Equals(p.StartTime) &&
-                        (
-                            EndTime == null ||
-                            p.EndTime == null ||
-                            EndTime.Equals(p.EndTime)
-                        );
+                        StartTime.Value == p.StartTime.Value &&
+                        EndTime.Value == p.EndTime.Value;
                 }
-            }            
+            }
             return false;
         }
 
@@ -100,9 +85,16 @@ namespace DDay.iCal.DataTypes
                 EndTime = p.EndTime;
                 Duration = p.Duration;
             }
-            base.CopyFrom(obj);
         }
-               
+
+        public override object Parse(string value)
+        {
+            object p = new Period();
+            if (!TryParse(value, ref p))
+                throw new ArgumentException("Period.Parse cannot parse the value '" + value + "' because it is not formatted correctly.");
+            return p;
+        }
+
         public override bool TryParse(string value, ref object obj)
         {
             Period p = (Period)obj;
@@ -110,10 +102,6 @@ namespace DDay.iCal.DataTypes
             string[] values = value.Split('/');
             if (values.Length != 2)
                 return false;
-
-            p.StartTime = new Date_Time();
-            p.EndTime = new Date_Time();
-            p.Duration = new Duration();
 
             object st = p.StartTime;
             object et = p.EndTime;
@@ -126,31 +114,13 @@ namespace DDay.iCal.DataTypes
                 );
 
             // Fill in missing values
-            if (!p.EndTime.HasDate)            
-                p.EndTime = p.StartTime + p.Duration;            
+            if (!p.EndTime.HasDate)
+                p.EndTime = new Date_Time(p.StartTime.Value + p.Duration.Value);
             else if (p.Duration.Value.Ticks == 0)
                 p.Duration = new Duration(p.EndTime.Value - p.StartTime.Value);
 
             return retVal;
         }        
-
-        #endregion
-
-        #region IComparable Members
-
-        public int CompareTo(object obj)
-        {
-            if (obj is Period)
-            {
-                if (Equals(obj))
-                    return 0;
-                else if (StartTime < ((Period)obj).StartTime)
-                    return -1;
-                else if (StartTime > ((Period)obj).StartTime)
-                    return 1;
-            }
-            throw new ArgumentException("obj must be a Period type");
-        }
 
         #endregion
     }
