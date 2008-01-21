@@ -226,18 +226,13 @@ namespace DDay.iCal.Components
 
         public override List<Period> Evaluate(Date_Time FromDate, Date_Time ToDate)
         {
-            // TODO items can only recur if a start date is specified
-            if (DTStart != null)
-            {
-                // Add the todo itself, before recurrence rules are evaluated
-                Period startPeriod = new Period(DTStart);
-                if (DTStart != null &&
-                    !Periods.Contains(startPeriod))
-                    Periods.Add(startPeriod);
+            // Add the todo itself, before recurrence rules are evaluated
+            Period startPeriod = new Period(DTStart);
+            if (DTStart != null &&
+                !Periods.Contains(startPeriod))
+                Periods.Add(startPeriod);
 
-                return base.Evaluate(FromDate, ToDate);
-            }
-            return new List<Period>();
+            return base.Evaluate(FromDate, ToDate);
         }
 
         /// <summary>
@@ -288,7 +283,7 @@ namespace DDay.iCal.Components
         {
             if (recur.Count != int.MinValue)
                 dt = DTStart.Copy();
-            else recur.IncrementDate(ref dt, -recur.Interval);
+            else recur.IncrementDate(dt, -recur.Interval);
         }
 
         private void ExtrapolateTimes()

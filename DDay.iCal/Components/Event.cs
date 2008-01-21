@@ -316,9 +316,11 @@ namespace DDay.iCal.Components
                 }
                 // Ensure the Kind of time is consistent with DTStart
                 else if (p.EndTime.Kind != DTStart.Kind)
-                    p.EndTime.Kind = DTStart.Kind;
+                {
+                    p.EndTime.Value = DateTime.SpecifyKind(p.EndTime.Value, DTStart.Kind);;
+                }
             }
-
+                        
             return Periods;
         }
         

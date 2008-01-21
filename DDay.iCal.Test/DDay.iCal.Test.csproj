@@ -354,9 +354,6 @@
     <None Include="Calendars\Recurrence\RRULE42.ics">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Calendars\Serialization\SERIALIZE29.ics">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Calendars\Serialization\SERIALIZE27.ics">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

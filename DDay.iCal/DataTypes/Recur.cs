@@ -511,16 +511,13 @@ namespace DDay.iCal.DataTypes
                 ByDay.Count == 0)
                 this.ByDay.Add(new DaySpecifier(StartDate.Value.DayOfWeek));            
             if (Frequency > FrequencyType.SECONDLY &&
-                this.BySecond.Count == 0 &&
-                StartDate.HasTime /* NOTE: Fixes a bug where all-day events have BySecond/ByMinute/ByHour added incorrectly */)
+                this.BySecond.Count == 0)
                 this.BySecond.Add(StartDate.Value.Second);
             if (Frequency > FrequencyType.MINUTELY &&
-                this.ByMinute.Count == 0 &&
-                StartDate.HasTime /* NOTE: Fixes a bug where all-day events have BySecond/ByMinute/ByHour added incorrectly */)
+                this.ByMinute.Count == 0)
                 this.ByMinute.Add(StartDate.Value.Minute);
-            if (Frequency > FrequencyType.HOURLY &&                
-                this.ByHour.Count == 0 &&
-                StartDate.HasTime /* NOTE: Fixes a bug where all-day events have BySecond/ByMinute/ByHour added incorrectly */)
+            if (Frequency > FrequencyType.HOURLY &&
+                this.ByHour.Count == 0)
                 this.ByHour.Add(StartDate.Value.Hour);
             // If neither BYDAY, BYMONTHDAY, or BYYEARDAY is specified,
             // default to the current day of month
@@ -620,102 +617,48 @@ namespace DDay.iCal.DataTypes
 
         #region Calculating Occurrences
 
-        protected List<Date_Time> GetOccurrences(Date_Time StartDate, Date_Time FromDate, Date_Time ToDate, int Count)
+        protected List<Date_Time> GetOccurrences(Date_Time StartDate, Date_Time EndDate, int Count)
         {
             List<Date_Time> DateTimes = new List<Date_Time>();
-
-            // If the Recur is restricted by COUNT, we need to evaluate just
-            // after any static occurrences so it's correctly restricted to a
-            // certain number. NOTE: fixes bug #13 and bug #16
-            if (Count > 0)
-            {
-                FromDate = StartDate;
-                foreach (Date_Time dt in StaticOccurrences)
-                {
-                    if (FromDate < dt)
-                        FromDate = dt;
-                }
-            }
-
-            // Handle "UNTIL" values that are date-only. If we didn't change values here, "UNTIL" would
-            // exclude the day it specifies, instead of the inclusive behaviour it should exhibit.
-            if (Until != null && !Until.HasTime)
-                Until.Value = new DateTime(Until.Year, Until.Month, Until.Day, 23, 59, 59, Until.Value.Kind);
-
-            // Ignore recurrences that occur outside our time frame we're looking at
-            if ((Until != null && FromDate > Until) ||
-                ToDate < StartDate)
-                return DateTimes;
-
-            // Narrow down our time range further to avoid over-processing
-            if (Until != null && Until < ToDate)
-                ToDate = Until;
-            if (StartDate > FromDate)
-                FromDate = StartDate;
-
-            // If the interval is greater than 1, then we need to ensure that the StartDate occurs in one of the
-            // "active" days/weeks/months/years/etc. to ensure that we properly "step" through the interval.
-            // NOTE: Fixes bug #1741093 - WEEKLY frequency eval behaves strangely
-            {
-                long difference = DateUtils.DateDiff(Frequency, StartDate, FromDate, Wkst);
-                while (difference % Interval > 0)
-                {
-                    FromDate = DateUtils.AddFrequency(Frequency, FromDate, -1);
-                    difference--;
-                }                
-            }
-
-            // If the start date has no time, then our "From" date should not either 
-            // NOTE: Fixes bug #1876582 - All-day holidays are sometimes giving incorrect times
-            if (!StartDate.HasTime)
-            {
-                FromDate = new Date_Time(FromDate.Year, FromDate.Month, FromDate.Day, StartDate.Hour, StartDate.Minute, StartDate.Second);
-                FromDate.Kind = StartDate.Kind;
-                FromDate.HasTime = false;
-            }
-
-            while (
-                FromDate <= ToDate &&
-                (
-                    Count == int.MinValue ||
-                    DateTimes.Count <= Count)
-                )
+            while (StartDate <= EndDate &&
+                (Count == int.MinValue ||
+                DateTimes.Count <= Count))
             {
                 // Retrieve occurrences that occur on our interval period
-                if (BySetPos.Count == 0 && IsValidDate(FromDate) && !DateTimes.Contains(FromDate.Value))
-                    DateTimes.Add(FromDate.Copy());
+                if (BySetPos.Count == 0 && IsValidDate(StartDate) && !DateTimes.Contains(StartDate.Value))
+                    DateTimes.Add(StartDate.Copy());
 
                 // Retrieve "extra" occurrences that happen within our interval period
                 if (Frequency > FrequencyType.SECONDLY)
                 {
-                    foreach (Date_Time dt in GetExtraOccurrences(FromDate, ToDate))
+                    foreach (Date_Time dt in GetExtraOccurrences(StartDate, EndDate))
                     {
                         // Don't add duplicates
                         if (!DateTimes.Contains(dt))
                             DateTimes.Add(dt.Copy());
                     }
                 }
-
-                IncrementDate(ref FromDate);
+                                
+                IncrementDate(StartDate);
             }
-
+            
             return DateTimes;
         }
 
-        public void IncrementDate(ref Date_Time dt)
+        public void IncrementDate(Date_Time dt)
         {
-            IncrementDate(ref dt, this.Interval);
+            IncrementDate(dt, this.Interval);
         }
 
-        public void IncrementDate(ref Date_Time dt, int Interval)
+        public void IncrementDate(Date_Time dt, int Interval)
         {
-            Date_Time old = dt.Copy();
+            DateTime old = dt.Value;
             switch (Frequency)
             {
-                case FrequencyType.SECONDLY: dt = old.AddSeconds(Interval); break;
-                case FrequencyType.MINUTELY: dt = old.AddMinutes(Interval); break;
-                case FrequencyType.HOURLY: dt = old.AddHours(Interval); break;
-                case FrequencyType.DAILY: dt = old.AddDays(Interval); break;
+                case FrequencyType.SECONDLY: dt.Value = old.AddSeconds(Interval); break;
+                case FrequencyType.MINUTELY: dt.Value = old.AddMinutes(Interval); break;
+                case FrequencyType.HOURLY: dt.Value = old.AddHours(Interval); break;
+                case FrequencyType.DAILY: dt.Value = old.AddDays(Interval); break;
                 case FrequencyType.WEEKLY:
                     // How the week increments depends on the WKST indicated (defaults to Monday)
                     // So, basically, we determine the week of year using the necessary rules,
@@ -723,7 +666,7 @@ namespace DDay.iCal.DataTypes
                     // So, if the current week number is 36, and our Interval is 2, then our goal
                     // week number is 38.
                     // NOTE: fixes RRULE12 eval.
-                    int current = _Calendar.GetWeekOfYear(old.Value, System.Globalization.CalendarWeekRule.FirstFourDayWeek, Wkst),
+                    int current = _Calendar.GetWeekOfYear(old, System.Globalization.CalendarWeekRule.FirstFourDayWeek, Wkst),
                         lastLastYear = _Calendar.GetWeekOfYear(new DateTime(old.Year-1, 12, 31, 0, 0, 0, DateTimeKind.Local), System.Globalization.CalendarWeekRule.FirstFourDayWeek, Wkst),
                         last = _Calendar.GetWeekOfYear(new DateTime(old.Year, 12, 31, 0, 0, 0, DateTimeKind.Local), System.Globalization.CalendarWeekRule.FirstFourDayWeek, Wkst),
                         goal = current + Interval;
@@ -738,13 +681,12 @@ namespace DDay.iCal.DataTypes
                     while (current != goal)
                     {
                         old = old.AddDays(interval);
-                        current = _Calendar.GetWeekOfYear(old.Value, System.Globalization.CalendarWeekRule.FirstFourDayWeek, Wkst);
+                        current = _Calendar.GetWeekOfYear(old, System.Globalization.CalendarWeekRule.FirstFourDayWeek, Wkst);
                     }
-
-                    dt = old;
+                    dt.Value = old;
                     break;
-                case FrequencyType.MONTHLY: dt = old.AddDays(-old.Day + 1).AddMonths(Interval); break;
-                case FrequencyType.YEARLY: dt = old.AddDays(-old.DayOfYear + 1).AddYears(Interval); break;
+                case FrequencyType.MONTHLY: dt.Value = old.AddDays(-old.Day + 1).AddMonths(Interval); break;
+                case FrequencyType.YEARLY: dt.Value = old.AddDays(-old.DayOfYear + 1).AddYears(Interval); break;
                 default: throw new Exception("FrequencyType.NONE cannot be evaluated. Please specify a FrequencyType before evaluating the recurrence.");
             }
         }
@@ -761,7 +703,7 @@ namespace DDay.iCal.DataTypes
             // FIXME: is there a reason for this?
             //AbsEndDate = AbsEndDate.AddSeconds(-1);
 
-            IncrementDate(ref EndDate, 1);
+            IncrementDate(EndDate, 1);
             EndDate = EndDate.AddSeconds(-1);
             if (EndDate > AbsEndDate)
                 EndDate = AbsEndDate;
@@ -862,7 +804,7 @@ namespace DDay.iCal.DataTypes
         }
 
         protected void FillDays(TimeCalculation TC)
-        {            
+        {
             foreach (int day in TC.Days)
             {
                 TC.Day = day;
@@ -872,51 +814,27 @@ namespace DDay.iCal.DataTypes
 
         protected void FillHours(TimeCalculation TC)
         {
-            if (TC.Hours.Count > 0)
+            foreach (int hour in TC.Hours)
             {
-                foreach (int hour in TC.Hours)
-                {
-                    TC.Hour = hour;
-                    FillMinutes(TC);
-                }
-            }
-            else
-            {
-                TC.Hour = 0;
+                TC.Hour = hour;
                 FillMinutes(TC);
             }
         }
 
         protected void FillMinutes(TimeCalculation TC)
         {
-            if (TC.Minutes.Count > 0)
+            foreach (int minute in TC.Minutes)
             {
-                foreach (int minute in TC.Minutes)
-                {
-                    TC.Minute = minute;
-                    FillSeconds(TC);
-                }
-            }
-            else
-            {
-                TC.Minute = 0;
+                TC.Minute = minute;
                 FillSeconds(TC);
             }
         }
 
         protected void FillSeconds(TimeCalculation TC)
         {
-            if (TC.Seconds.Count > 0)
+            foreach (int second in TC.Seconds)
             {
-                foreach (int second in TC.Seconds)
-                {
-                    TC.Second = second;
-                    TC.Calculate();
-                }
-            }
-            else
-            {
-                TC.Second = 0;
+                TC.Second = second;
                 TC.Calculate();
             }
         }
@@ -996,6 +914,87 @@ namespace DDay.iCal.DataTypes
             List<Date_Time> DateTimes = new List<Date_Time>();
             DateTimes.AddRange(StaticOccurrences);
 
+            // If the Recur is restricted by COUNT, we need to evaluate just
+            // after any static occurrences so it's correctly restricted to a
+            // certain number. NOTE: fixes bug #13 and bug #16
+            if (Count > 0)
+            {
+                FromDate = StartDate;
+                foreach (Date_Time dt in StaticOccurrences)
+                {
+                    if (FromDate < dt)
+                        FromDate = dt;
+                }
+            }            
+
+            // Handle "UNTIL" values that are date-only. If we didn't change values here, "UNTIL" would
+            // exclude the day it specifies, instead of the inclusive behaviour it should exhibit.
+            if (Until != null && !Until.HasTime)
+                Until.Value = new DateTime(Until.Year, Until.Month, Until.Day, 23, 59, 59, Until.Value.Kind);
+
+            // Ignore recurrences that occur outside our time frame we're looking at
+            if ((Until != null && FromDate > Until) ||
+                ToDate < StartDate)
+                return DateTimes;
+            
+            // Narrow down our time range further to avoid over-processing
+            if (Until != null && Until < ToDate)
+                ToDate = Until;
+            if (StartDate > FromDate)
+                FromDate = StartDate;
+
+            /*
+            // If the frequency is WEEKLY, and the interval is greater than 1,
+            // then we need to ensure that the StartDate occurs in one of the
+            // "active" weeks, to ensure that we properly "step" through weeks.
+            // NOTE: Fixes bug #1741093 - WEEKLY frequency eval behaves strangely
+            if (Frequency == FrequencyType.WEEKLY &&
+                Interval > 1)
+            {   
+                // Get the week of year of the time frame we want to calculate          
+                int firstEvalWeek = _Calendar.GetWeekOfYear(FromDate.Value, System.Globalization.CalendarWeekRule.FirstFourDayWeek, Wkst);
+
+                // Count backwards in years, calculating how many weeks' difference we have between
+                // start date and evaluation period.
+                Date_Time evalDate = FromDate;
+                while (evalDate.Year > StartDate.Year)
+                {
+                    firstEvalWeek += _Calendar.GetWeekOfYear(new DateTime(evalDate.Year - 1, 12, 31), System.Globalization.CalendarWeekRule.FirstFourDayWeek, Wkst);
+                    evalDate = evalDate.AddYears(-1);
+                }
+
+                // Determine the difference, in weeks, between the start date and the evaluation period.
+                int startWeek = _Calendar.GetWeekOfYear(StartDate.Value, System.Globalization.CalendarWeekRule.FirstFourDayWeek, Wkst);
+                int weeksDifference = firstEvalWeek - startWeek;
+
+                // Determine how many weeks the evaluation period needs to change
+                // in order to "align" to the start date week, given the specified interval.
+                int offset = 0;
+                while (weeksDifference % Interval != 0)
+                {
+                    weeksDifference--;
+                    offset++;
+                }
+
+                // Offset the week back to a "compatible" week for evaluation
+                FromDate = FromDate.AddDays(-offset * 7);
+            }*/
+
+            // If the interval is greater than 1, then we need to ensure that the StartDate occurs in one of the
+            // "active" days/weeks/months/years/etc. to ensure that we properly "step" through the interval.
+            // NOTE: Fixes bug #1741093 - WEEKLY frequency eval behaves strangely
+            if (Interval > 1)
+            {
+                // Determine the difference between our two dates, using our frequency as the UNIT.
+                long difference = DateUtils.DateDiff(this.Frequency, StartDate, FromDate, Wkst);
+
+                while (difference % Interval > 0)
+                {
+                    FromDate = DateUtils.AddFrequency(this.Frequency, FromDate, -1);
+                    difference--;
+                }
+            }
+
             // Create a temporary recurrence for populating 
             // missing information using the 'StartDate'.
             Recur r = new Recur();
@@ -1008,10 +1007,10 @@ namespace DDay.iCal.DataTypes
             r.EnsureByXXXValues(StartDate);
                         
             // Get the occurrences
-            foreach (Date_Time occurrence in r.GetOccurrences(StartDate, FromDate.Copy(), ToDate.Copy(), r.Count))
+            foreach (Date_Time occurrence in r.GetOccurrences(FromDate.Copy(), ToDate, r.Count))
             {
                 // NOTE:
-                // Used to be DateTimes.AddRange(r.GetOccurrences(FromDate.Copy(), ToDate, r.Count))
+                // Used to be DateTime.AddRange(r.GetOccurrences(FromDate.Copy(), ToDate, r.Count))
                 // By doing it this way, fixes bug #19.
                 if (!DateTimes.Contains(occurrence))
                     DateTimes.Add(occurrence);
@@ -1036,7 +1035,7 @@ namespace DDay.iCal.DataTypes
             foreach (Date_Time dt in DateTimes)
                 dt.MergeWith(StartDate);
 
-            // Ensure that DateTimes have an assigned time if they occur less than daily
+            // Ensure that DateTimes have an assigned time if they occur less than dailyB
             foreach (Date_Time dt in DateTimes)
             {
                 if (Frequency < FrequencyType.DAILY)
