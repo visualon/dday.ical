@@ -15,7 +15,7 @@ using NUnit.Framework;
 namespace DDay.iCal.Test
 {
     [TestFixture]
-    public class AlarmTest
+    public class Alarm
     {
         private TZID tzid;
 
@@ -28,7 +28,7 @@ namespace DDay.iCal.Test
         public void TestAlarm(string Calendar, List<iCalDateTime> Dates, iCalDateTime Start, iCalDateTime End)
         {
             iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Alarm\" + Calendar);
-            ProgramTest.TestCal(iCal);
+            Program.TestCal(iCal);
             Event evt = iCal.Events[0];
 
             Start.iCalendar = iCal;

@@ -17,7 +17,7 @@ using DDay.iCal.Serialization.iCalendar.Components;
 namespace DDay.iCal.Test
 {
     [TestFixture]
-    public class SerializationTest
+    public class Serialization
     {
         private TZID tzid;
 

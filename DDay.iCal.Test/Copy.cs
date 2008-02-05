@@ -16,7 +16,7 @@ using DDay.iCal.Serialization;
 namespace DDay.iCal.Test
 {
     [TestFixture]
-    public class CopyTest
+    public class Copy
     {
         private TZID tzid;
 
@@ -26,101 +26,101 @@ namespace DDay.iCal.Test
             tzid = new TZID("US-Eastern");
         }
 
-        private void CopyCalendarTest(string filename)
+        private void CopyTest(string filename)
         {
             iCalendar iCal1 = iCalendar.LoadFromFile(@"Calendars\Serialization\" + filename);
             iCalendar iCal2 = iCal1.Copy();
-            SerializationTest.CompareCalendars(iCal1, iCal2);
+            Serialization.CompareCalendars(iCal1, iCal2);
         }
 
         [Test, Category("Copy")]
         public void COPY1()
         {
-            CopyCalendarTest("SERIALIZE1.ics");            
+            CopyTest("SERIALIZE1.ics");            
         }
 
         [Test, Category("Copy")]
         public void COPY2()
         {
-            CopyCalendarTest("SERIALIZE2.ics");
+            CopyTest("SERIALIZE2.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY3()
         {
-            CopyCalendarTest("SERIALIZE3.ics");
+            CopyTest("SERIALIZE3.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY4()
         {
-            CopyCalendarTest("SERIALIZE4.ics");
+            CopyTest("SERIALIZE4.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY5()
         {
-            CopyCalendarTest("SERIALIZE5.ics");
+            CopyTest("SERIALIZE5.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY6()
         {
-            CopyCalendarTest("SERIALIZE6.ics");
+            CopyTest("SERIALIZE6.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY7()
         {
-            CopyCalendarTest("SERIALIZE7.ics");
+            CopyTest("SERIALIZE7.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY8()
         {
-            CopyCalendarTest("SERIALIZE8.ics");
+            CopyTest("SERIALIZE8.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY9()
         {
-            CopyCalendarTest("SERIALIZE9.ics");
+            CopyTest("SERIALIZE9.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY10()
         {
-            CopyCalendarTest("SERIALIZE10.ics");
+            CopyTest("SERIALIZE10.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY11()
         {
-            CopyCalendarTest("SERIALIZE11.ics");
+            CopyTest("SERIALIZE11.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY12()
         {
-            CopyCalendarTest("SERIALIZE12.ics");
+            CopyTest("SERIALIZE12.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY13()
         {
-            CopyCalendarTest("SERIALIZE13.ics");
+            CopyTest("SERIALIZE13.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY14()
         {
-            CopyCalendarTest("SERIALIZE14.ics");
+            CopyTest("SERIALIZE14.ics");
         }
 
         [Test, Category("Copy")]
         public void COPY15()
         {
-            CopyCalendarTest("SERIALIZE15.ics");
+            CopyTest("SERIALIZE15.ics");
         }
     }
 }

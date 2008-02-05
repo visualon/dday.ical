@@ -15,7 +15,7 @@ using NUnit.Framework;
 namespace DDay.iCal.Test
 {
     [TestFixture]
-    public class JournalTest
+    public class Journal
     {
         private TZID tzid;
 
@@ -27,7 +27,7 @@ namespace DDay.iCal.Test
 
         static public void DoTests()
         {
-            JournalTest j = new JournalTest();
+            Journal j = new Journal();
             j.InitAll();
             j.JOURNAL1();
             j.JOURNAL2();
@@ -37,7 +37,7 @@ namespace DDay.iCal.Test
         public void JOURNAL1()
         {
             iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Journal\JOURNAL1.ics");
-            ProgramTest.TestCal(iCal);
+            Program.TestCal(iCal);
             DDay.iCal.Components.Journal j = (DDay.iCal.Components.Journal)iCal.Journals[0];
 
             Assert.IsNotNull(j, "Journal entry was null");
@@ -50,7 +50,7 @@ namespace DDay.iCal.Test
         public void JOURNAL2()
         {
             iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Journal\JOURNAL2.ics");
-            ProgramTest.TestCal(iCal);
+            Program.TestCal(iCal);
             DDay.iCal.Components.Journal j = (DDay.iCal.Components.Journal)iCal.Journals[0];
 
             Assert.IsNotNull(j, "Journal entry was null");
