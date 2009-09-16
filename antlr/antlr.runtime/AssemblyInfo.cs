@@ -9,7 +9,7 @@ using System.Security;
 
 // TODO: Review the values of the assembly attributes
 
-[assembly: AllowPartiallyTrustedCallers()]
+[assembly:AllowPartiallyTrustedCallers()]
 
 [assembly: AssemblyTitle("antlr.runtime")]
 [assembly: AssemblyDescription("ANTLR Runtime for .NET")]

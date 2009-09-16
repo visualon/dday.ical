@@ -3,29 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
     /// <summary>
     /// An iCalendar representation of the <c>RRULE</c> property.
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "RecurrencePattern", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]    
-    [KnownType(typeof(DaySpecifier))]    
-    [KnownType(typeof(List<int>))]
-    [KnownType(typeof(List<DaySpecifier>))]
-    [KnownType(typeof(List<iCalDateTime>))]
-#else
-    [Serializable]
-#endif
     public partial class RecurrencePattern : iCalDataType
     {
         #region Private Fields
-        
-#if !SILVERLIGHT
-        [NonSerialized]
-#endif
+
+        public System.Globalization.CultureInfo _Culture;
         public System.Globalization.Calendar _Calendar;
 
         private FrequencyType _Frequency;
@@ -50,36 +38,24 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public FrequencyType Frequency
         {
             get { return _Frequency; }
             set { _Frequency = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
         public iCalDateTime Until
         {
             get { return _Until; }
             set { _Until = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 3)]
-#endif
         public int Count
         {
             get { return _Count; }
             set { _Count = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 4)]
-#endif
         public int Interval
         {
             get
@@ -91,108 +67,72 @@ namespace DDay.iCal.DataTypes
             set { _Interval = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 5)]
-#endif
         public List<int> BySecond
         {
             get { return _BySecond; }
             set { _BySecond = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 6)]
-#endif
         public List<int> ByMinute
         {
             get { return _ByMinute; }
             set { _ByMinute = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 7)]
-#endif
         public List<int> ByHour
         {
             get { return _ByHour; }
             set { _ByHour = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 8)]
-#endif
         public List<DaySpecifier> ByDay
         {
             get { return _ByDay; }
             set { _ByDay = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 9)]
-#endif
         public List<int> ByMonthDay
         {
             get { return _ByMonthDay; }
             set { _ByMonthDay = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 10)]
-#endif
         public List<int> ByYearDay
         {
             get { return _ByYearDay; }
             set { _ByYearDay = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 11)]
-#endif
         public List<int> ByWeekNo
         {
             get { return _ByWeekNo; }
             set { _ByWeekNo = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 12)]
-#endif
         public List<int> ByMonth
         {
             get { return _ByMonth; }
             set { _ByMonth = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 13)]
-#endif
         public List<int> BySetPos
         {
             get { return _BySetPos; }
             set { _BySetPos = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 14)]
-#endif
         public DayOfWeek Wkst
         {
             get { return _Wkst; }
             set { _Wkst = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 15)]
-#endif
         public List<iCalDateTime> StaticOccurrences
         {
             get { return _StaticOccurrences; }
             set { _StaticOccurrences = value; }
         }
-
-#if DATACONTRACT
-        [DataMember(Order = 16)]
-#endif
+                
         public RecurrenceRestrictionType RestrictionType
         {
             get
@@ -209,9 +149,6 @@ namespace DDay.iCal.DataTypes
             set { _RestrictionType = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 17)]
-#endif
         public RecurrenceEvaluationModeType? EvaluationMode
         {
             get
@@ -823,6 +760,9 @@ namespace DDay.iCal.DataTypes
         {
             List<iCalDateTime> DateTimes = new List<iCalDateTime>();
             iCalDateTime EndDate = new iCalDateTime(StartDate);
+            
+            // FIXME: is there a reason for this?
+            //AbsEndDate = AbsEndDate.AddSeconds(-1);
 
             IncrementDate(ref EndDate, 1);
             EndDate = EndDate.AddSeconds(-1);

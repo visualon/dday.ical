@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
@@ -18,13 +17,6 @@ namespace DDay.iCal.DataTypes
     /// </example>
     /// </summary>   
     [Encodable("BASE64,8BIT,7BIT")]
-#if DATACONTRACT
-    [CollectionDataContract(Name = "TextCollection", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(List<Text>))]
-    [KnownType(typeof(Text))]
-#else
-    [Serializable]
-#endif
     public class TextCollection : EncodableDataType, ICollection
     {
         #region Private Fields
@@ -35,9 +27,6 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public List<Text> Values
         {
             get { return m_Values; }
@@ -128,14 +117,14 @@ namespace DDay.iCal.DataTypes
             {
                 if (match.Success)
                 {
-                    tc.Values.Add(new Text(value.Substring(i, match.Index - i + 1), true));                    
+                    tc.Values.Add(new Text(value.Substring(i, match.Index - i + 1)));                    
                     i = match.Index + 2;
                 }
                 else return false;
             }
 
             if (i < value.Length)
-                tc.Values.Add(new Text(value.Substring(i, value.Length - i), true));
+                tc.Values.Add(new Text(value.Substring(i, value.Length - i)));
 
             return true;            
         }

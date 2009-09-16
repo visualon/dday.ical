@@ -587,35 +587,6 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             SerializeTest("LANGUAGE2.ics", typeof(iCalendarSerializer));
         }
 
-        [Test, Category("Serialization")]
-        public void LANGUAGE3()
-        {
-            SerializeTest("RussiaHolidays.ics", typeof(iCalendarSerializer));
-
-            string calendarPath = Path.Combine(Environment.CurrentDirectory, "Calendars");
-            calendarPath = Path.Combine(calendarPath, "Serialization");
-
-            // Ensure that LoadFromUri() and LoadFromFile() produce identical results.
-            // Thanks to Eugene, a student from Russia, who helped track down this bug.
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            iCalendar russia1 = iCalendar.LoadFromUri(new Uri(Path.Combine(calendarPath, "RussiaHolidays.ics")));
-            iCalendar russia2 = iCalendar.LoadFromFile(Path.Combine(calendarPath, "RussiaHolidays.ics"));
-
-            CompareCalendars(russia1, russia2);
-        }
-
-        [Test, Category("Serialization")]
-        public void LANGUAGE4()
-        {
-            string calendarPath = Path.Combine(Environment.CurrentDirectory, "Calendars");
-            calendarPath = Path.Combine(calendarPath, "Serialization");
-
-            iCalendar russia1 = iCalendar.LoadFromUri(new Uri("http://www.mozilla.org/projects/calendar/caldata/RussiaHolidays.ics"));
-            iCalendar russia2 = iCalendar.LoadFromFile(Path.Combine(calendarPath, "RussiaHolidays.ics"));
-
-            CompareCalendars(russia1, russia2);
-        }
-
         [Test]
         public void REQUIREDPARAMETERS1()
         {
@@ -661,7 +632,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\TIMEZONE2.ics");
 
             iCalTimeZone tz = iCal.TimeZones[0];
-            foreach (iCalTimeZoneInfo tzi in tz.TimeZoneInfos)
+            foreach (TimeZoneInfo tzi in tz.TimeZoneInfos)
                 tzi.Start = new iCalDateTime(2007, 1, 1);
 
             iCalendarSerializer serializer = new iCalendarSerializer(iCal);
@@ -670,7 +641,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\Temp\TIMEZONE2.ics");
             tz = iCal.TimeZones[0];
 
-            foreach (iCalTimeZoneInfo tzi in tz.TimeZoneInfos)
+            foreach (TimeZoneInfo tzi in tz.TimeZoneInfos)
             {
                 ContentLine cl = tzi.Start.ContentLine;
                 Assert.IsFalse(cl.Parameters.ContainsKey("VALUE"), "\"DTSTART\" property MUST be represented in local time in timezones");
@@ -682,7 +653,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\TIMEZONE2.ics");
 
             tz = iCal.TimeZones[0];
-            foreach (iCalTimeZoneInfo tzi in tz.TimeZoneInfos)
+            foreach (TimeZoneInfo tzi in tz.TimeZoneInfos)
                 tzi.Start = DateTime.Now.ToUniversalTime();
 
             serializer = new iCalendarSerializer(iCal);
@@ -691,7 +662,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\Temp\TIMEZONE2.ics");
             tz = iCal.TimeZones[0];
 
-            foreach (iCalTimeZoneInfo tzi in tz.TimeZoneInfos)
+            foreach (TimeZoneInfo tzi in tz.TimeZoneInfos)
             {
                 ContentLine cl = tzi.Start.ContentLine;
                 Assert.IsFalse(cl.Parameters.ContainsKey("VALUE"), "\"DTSTART\" property MUST be represented in local time in timezones");
@@ -807,55 +778,6 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             Assert.AreEqual(2, parms.Count);
             Assert.AreEqual("DATE", parms[0].Values[0]);
             Assert.AreEqual("OTHER", parms[1].Values[0]);
-        }
-
-        /// <summary>
-        /// Tests that a Google calendar is correctly loaded and parsed.
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void PARSE11()
-        {
-            iCalendar iCal = iCalendar.LoadFromUri(new Uri("http://www.google.com/calendar/ical/tvhot064q4p48frqdalgo3fb2k%40group.calendar.google.com/public/basic.ics"));
-            Assert.IsNotNull(iCal);
-            Assert.AreEqual(1, iCal.Events.Count);
-            Assert.AreEqual(1, iCal.TimeZones.Count);
-
-            TZID tzid = iCal.TimeZones[0].TZID;
-            IList<Occurrence> occurrences = iCal.GetOccurrences(new iCalDateTime(2009, 8, 24, tzid, iCal), new iCalDateTime(2009, 9, 28, tzid, iCal));
-            Assert.AreEqual(5, occurrences.Count);
-            Assert.AreEqual(new iCalDateTime(2009, 8, 26, 8, 0, 0, tzid, iCal), occurrences[0].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 2, 8, 0, 0, tzid, iCal), occurrences[1].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 9, 8, 0, 0, tzid, iCal), occurrences[2].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 16, 8, 0, 0, tzid, iCal), occurrences[3].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 23, 8, 0, 0, tzid, iCal), occurrences[4].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 8, 26, 10, 0, 0, tzid, iCal), occurrences[0].Period.EndTime);
-        }
-
-        /// <summary>
-        /// Tests that string escaping works with Text elements.
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void PARSE12()
-        {
-            string value = @"test\with\;characters";
-            Text v1 = value;
-            Text v2 = new Text(value, true);
-
-            Assert.AreEqual(value, v1.Value, "String escaping was incorrect.");
-            Assert.AreEqual(@"test\with;characters", v2.Value, "String escaping was incorrect.");
-
-            value = @"C:\Path\To\My\New\Information";
-            v1 = value;
-            v2 = new Text(value, true);
-            Assert.AreEqual(value, v1.Value, "String escaping was incorrect.");
-            Assert.AreEqual("C:\\Path\\To\\My\new\\Information", v2.Value, "String escaping was incorrect.");
-
-            value = @"\""This\r\nis\Na\, test\""\;\\;,";
-            v1 = value;
-            v2 = new Text(value, true);
-
-            Assert.AreEqual(value, v1.Value, "String escaping was incorrect.");
-            Assert.AreEqual("\"This\\r\nis\na, test\";\\;,", v2.Value, "String escaping was incorrect.");
         }
 
         private static byte[] ReadBinary(string fileName)

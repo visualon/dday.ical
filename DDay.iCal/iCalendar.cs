@@ -10,8 +10,6 @@ using System.Text;
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
 using DDay.iCal.Serialization;
-using System.Threading;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal
 {
@@ -89,11 +87,6 @@ namespace DDay.iCal
     /// </code>
     /// </para>
     /// </remarks>
-#if DATACONTRACT
-    [DataContract(Name = "iCalendar", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public class iCalendar : ComponentBase, IDisposable
     {
         #region Constructors
@@ -107,8 +100,7 @@ namespace DDay.iCal
         /// </code>
         /// </example>
         /// </summary>
-        public iCalendar()
-            : base(null)
+        public iCalendar() : base(null)
         {
             this.Name = "VCALENDAR";
             UniqueComponents = new UniqueComponentList<UniqueComponent>(this);
@@ -116,17 +108,17 @@ namespace DDay.iCal
             FreeBusy = new List<FreeBusy>();
             Journals = new UniqueComponentList<Journal>(this);
             TimeZones = new List<iCalTimeZone>();
-            Todos = new UniqueComponentList<Todo>(this);
-
+            Todos = new UniqueComponentList<Todo>(this);            
+            
             object[] attrs = GetType().GetCustomAttributes(typeof(ComponentBaseTypeAttribute), false);
             if (attrs.Length > 0)
             {
                 foreach (ComponentBaseTypeAttribute attr in attrs)
                     m_ComponentBaseCreate = attr.Type.GetMethod("Create", BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
             }
-
+            
             if (m_ComponentBaseCreate == null)
-                m_ComponentBaseCreate = typeof(ComponentBase).GetMethod("Create", BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
+                m_ComponentBaseCreate = typeof(ComponentBase).GetMethod("Create", BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);            
         }
 
         #endregion
@@ -204,7 +196,7 @@ namespace DDay.iCal
         {
             return (iCalendar)base.Copy();
         }
-
+        
         #endregion
 
         #region Private Fields
@@ -216,7 +208,7 @@ namespace DDay.iCal
         private List<iCalTimeZone> m_TimeZone;
         private UniqueComponentList<Todo> m_Todo;
         private MethodInfo m_ComponentBaseCreate;
-
+        
         // The buffer size used to convert streams from UTF-8 to Unicode
         private const int bufferSize = 8096;
 
@@ -259,7 +251,7 @@ namespace DDay.iCal
             get { return m_FreeBusy; }
             set { m_FreeBusy = value; }
         }
-
+        
         /// <summary>
         /// A collection of <see cref="Journal"/> components in the iCalendar.
         /// </summary>
@@ -296,10 +288,10 @@ namespace DDay.iCal
                 return null;
             }
             set
-            {
+            {                
                 if (string.IsNullOrEmpty(value) &&
                     Properties.ContainsKey("VERSION"))
-                    Properties.Remove("VERSION");
+                    Properties.Remove("VERSION");                    
                 else Properties["VERSION"] = new Property(this, "VERSION", value);
             }
         }
@@ -316,9 +308,9 @@ namespace DDay.iCal
             {
                 if (string.IsNullOrEmpty(value) &&
                     Properties.ContainsKey("PRODID"))
-                    Properties.Remove("PRODID");
+                    Properties.Remove("PRODID"); 
                 else Properties["PRODID"] = new Property(this, "PRODID", value);
-            }
+            }            
         }
 
         virtual public string Scale
@@ -369,9 +361,9 @@ namespace DDay.iCal
             get
             {
                 if (Properties.ContainsKey("X-DDAY-ICAL-RECURRENCE-RESTRICTION"))
-                    return
+                    return 
                         (RecurrenceRestrictionType)Enum.Parse(
-                            typeof(RecurrenceRestrictionType),
+                            typeof(RecurrenceRestrictionType), 
                             ((Property)Properties["X-DDAY-ICAL-RECURRENCE-RESTRICTION"]).Value,
                             true
                         );
@@ -379,7 +371,7 @@ namespace DDay.iCal
             }
             set
             {
-                Properties["X-DDAY-ICAL-RECURRENCE-RESTRICTION"] = new Property(this, "X-DDAY-ICAL-RECURRENCE-RESTRICTION", value.ToString());
+                Properties["X-DDAY-ICAL-RECURRENCE-RESTRICTION"] = new Property(this, "X-DDAY-ICAL-RECURRENCE-RESTRICTION", value.ToString());                
             }
         }
 
@@ -443,7 +435,7 @@ namespace DDay.iCal
             return LoadFromFile(
                 iCalendarType, Filepath, encoding, new iCalendarSerializer());
         }
-        static public iCalendar LoadFromFile(Type iCalendarType, string Filepath, Encoding encoding, DDay.iCal.Serialization.ISerializable serializer)
+        static public iCalendar LoadFromFile(Type iCalendarType, string Filepath, Encoding encoding, ISerializable serializer)
         {
             FileStream fs = new FileStream(Filepath, FileMode.Open);
 
@@ -473,7 +465,7 @@ namespace DDay.iCal
         {
             return LoadFromStream<T>(tr, new iCalendarSerializer());
         }
-        static public T LoadFromStream<T>(TextReader tr, DDay.iCal.Serialization.ISerializable serializer)
+        static public T LoadFromStream<T>(TextReader tr, ISerializable serializer)
         {
             if (typeof(T) == typeof(iCalendar) ||
                 typeof(T).IsSubclassOf(typeof(iCalendar)))
@@ -488,7 +480,7 @@ namespace DDay.iCal
         {
             return LoadFromStream<T>(s, encoding, new iCalendarSerializer());
         }
-        static public T LoadFromStream<T>(Stream s, Encoding encoding, DDay.iCal.Serialization.ISerializable serializer)
+        static public T LoadFromStream<T>(Stream s, Encoding encoding, ISerializable serializer)
         {
             if (typeof(T) == typeof(iCalendar) ||
                 typeof(T).IsSubclassOf(typeof(iCalendar)))
@@ -509,11 +501,11 @@ namespace DDay.iCal
             iCalendarSerializer serializer = new iCalendarSerializer();
             return (iCalendar)serializer.Deserialize(tr, iCalendarType);
         }
-        static public iCalendar LoadFromStream(Type iCalendarType, Stream s, Encoding e, DDay.iCal.Serialization.ISerializable serializer)
-        {
+        static public iCalendar LoadFromStream(Type iCalendarType, Stream s, Encoding e, ISerializable serializer)
+        {            
             return (iCalendar)serializer.Deserialize(s, e, iCalendarType);
         }
-        static public iCalendar LoadFromStream(Type iCalendarType, TextReader tr, DDay.iCal.Serialization.ISerializable serializer)
+        static public iCalendar LoadFromStream(Type iCalendarType, TextReader tr, ISerializable serializer)
         {
             string text = tr.ReadToEnd();
             MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(text));
@@ -526,11 +518,7 @@ namespace DDay.iCal
         /// <param name="url">The Uri from which to load the <see cref="iCalendar"/> object</param>
         /// <returns>An <see cref="iCalendar"/> object</returns>
         static public iCalendar LoadFromUri(Uri uri) { return LoadFromUri(typeof(iCalendar), uri, null, null, null); }
-
-#if !SILVERLIGHT
         static public iCalendar LoadFromUri(Uri uri, WebProxy proxy) { return LoadFromUri(typeof(iCalendar), uri, null, null, proxy); }
-#endif
-
         static public T LoadFromUri<T>(Uri uri)
         {
             if (typeof(T) == typeof(iCalendar) ||
@@ -564,74 +552,22 @@ namespace DDay.iCal
             }
             else return default(T);
         }
-
-#if !SILVERLIGHT
         static public iCalendar LoadFromUri(Uri uri, string username, string password, WebProxy proxy) { return LoadFromUri(typeof(iCalendar), uri, username, password, proxy); }
-#endif
-
         static public iCalendar LoadFromUri(Type iCalendarType, Uri uri, string username, string password) { return LoadFromUri(iCalendarType, uri, username, password, null); }
-
-#if SILVERLIGHT
-        static public iCalendar LoadFromUri(Type iCalendarType, Uri uri, string username, string password, object unusedProxy)
-#else
         static public iCalendar LoadFromUri(Type iCalendarType, Uri uri, string username, string password, WebProxy proxy)
-#endif
         {
             try
             {
-                WebRequest request = WebRequest.Create(uri);                
+                WebClient client = new WebClient();
+                if (username != null &&
+                    password != null)
+                    client.Credentials = new System.Net.NetworkCredential(username, password);
 
-                if (username != null && password != null)
-                    request.Credentials = new System.Net.NetworkCredential(username, password);
-
-#if !SILVERLIGHT
                 if (proxy != null)
-                    request.Proxy = proxy;
-#endif
+                    client.Proxy = proxy;
 
-                AutoResetEvent evt = new AutoResetEvent(false);
-
-                string str = null;
-                request.BeginGetResponse(new AsyncCallback(
-                    delegate(IAsyncResult result)
-                    {
-                        Encoding e = Encoding.UTF8;
-
-                        try
-                        {
-                            using (WebResponse resp = request.EndGetResponse(result))
-                            {
-                                // Try to determine the content encoding
-                                try
-                                {
-                                    List<string> keys = new List<string>(resp.Headers.AllKeys);
-                                    if (keys.Contains("Content-Encoding"))
-                                        e = Encoding.GetEncoding(resp.Headers["Content-Encoding"]);
-                                }
-                                catch
-                                {
-                                    // Fail gracefully back to UTF-8
-                                }
-
-                                using (Stream stream = resp.GetResponseStream())
-                                using (StreamReader sr = new StreamReader(stream, e))
-                                {
-                                    str = sr.ReadToEnd();
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            evt.Set();
-                        }
-                    }
-                ), null);
-
-                evt.WaitOne();
-
-                if (str != null)
-                    return LoadFromStream(new StringReader(str));
-                return null;
+                string str = client.DownloadString(uri);
+                return LoadFromStream(new StringReader(str));
             }
             catch (System.Net.WebException ex)
             {
@@ -660,7 +596,7 @@ namespace DDay.iCal
             }
             return null;
         }
-
+                
         /// <summary>
         /// Evaluates component recurrences for the given range of time.
         /// <example>
@@ -696,7 +632,7 @@ namespace DDay.iCal
         public void ClearEvaluation()
         {
             foreach (RecurringComponent rc in RecurringComponents)
-                rc.ClearEvaluation();
+                rc.ClearEvaluation();            
         }
 
         /// <summary>
@@ -776,7 +712,7 @@ namespace DDay.iCal
                 foreach (Parameter p in iCal.Parameters)
                 {
                     if (!Parameters.ContainsKey(p.Key))
-                        AddParameter(p);
+                        AddParameter(p);                        
                 }
 
                 // Merge all properties
@@ -845,7 +781,7 @@ namespace DDay.iCal
         {
             if (m_ComponentBaseCreate == null)
                 throw new ArgumentException("Create() cannot be called without a valid ComponentBase Create() method attached");
-
+                        
             ConstructorInfo ci = typeof(T).GetConstructor(new Type[] { typeof(iCalObject) });
             if (ci != null)
             {

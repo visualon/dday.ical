@@ -3,18 +3,12 @@ using System.Collections;
 using System.Text;
 using System.Reflection;
 using DDay.iCal.Components;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
     /// <summary>
     /// An abstract class from which all iCalendar data types inherit.
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "iCalDataType", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public abstract class iCalDataType : iCalObject
     {
         #region Protected Fields
@@ -26,9 +20,6 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public object[] Attributes
         {
             get { return m_Attributes; }
@@ -66,10 +57,6 @@ namespace DDay.iCal.DataTypes
                     {
                         // Set the parent on the copied object
                         icdt.Parent = value.Parent;
-
-                        // Unescape values within the data type.
-                        if (icdt is IEscapable)
-                            ((IEscapable)icdt).Unescape();
 
                         CopyFrom(icdt);
 

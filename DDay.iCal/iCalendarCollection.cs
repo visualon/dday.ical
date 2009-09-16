@@ -4,7 +4,6 @@ using System.Text;
 
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal
 {
@@ -13,11 +12,6 @@ namespace DDay.iCal
     /// several public properties for direct access to components
     /// from each individual iCalendar.
     /// </summary>
-#if DATACONTRACT
-    [CollectionDataContract(Name = "iCalendarCollection", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public class iCalendarCollection : ICollection<iCalendar>
     {
         #region Private Fields

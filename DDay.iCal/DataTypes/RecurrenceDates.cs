@@ -4,21 +4,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using DDay.iCal.Components;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
     /// <summary>
     /// An iCalendar list of recurring dates (or date exclusions)
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "RecurrenceDates", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(TZID))]
-    [KnownType(typeof(Period))]
-    [KnownType(typeof(List<Period>))]    
-#else
-    [Serializable]
-#endif
     public class RecurrenceDates : iCalDataType
     {
         #region Private Fields
@@ -30,9 +21,6 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public TZID TZID
         {
             get
@@ -44,9 +32,6 @@ namespace DDay.iCal.DataTypes
             set { m_TZID = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
         public List<Period> Periods
         {
             get { return m_Periods; }

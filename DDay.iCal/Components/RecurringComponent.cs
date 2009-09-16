@@ -5,7 +5,6 @@ using System.Text;
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
 using DDay.iCal.Serialization;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -17,20 +16,6 @@ namespace DDay.iCal.Components
     /// RRULEs, RDATE, EXRULEs, and EXDATEs, as well as the DTSTART
     /// for the recurring item (all recurring items must have a DTSTART).
     /// </remarks>
-#if DATACONTRACT
-    [DataContract(Name = "RecurringComponent", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(iCalDateTime))]
-    [KnownType(typeof(RecurrenceDates))]
-    [KnownType(typeof(RecurrenceDates[]))]
-    [KnownType(typeof(RecurrencePattern))]
-    [KnownType(typeof(RecurrencePattern[]))]
-    [KnownType(typeof(List<Period>))]
-    [KnownType(typeof(List<Alarm>))]
-    [KnownType(typeof(Period))]
-    [KnownType(typeof(Alarm))]
-#else
-    [Serializable]
-#endif
     public class RecurringComponent : UniqueComponent
     {
         #region Private Fields
@@ -56,9 +41,6 @@ namespace DDay.iCal.Components
         /// The start date/time of the component.
         /// </summary>
         [Serialized, DefaultValueType("DATE-TIME")]
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         virtual public iCalDateTime DTStart
         {
             get { return _DTStart; }
@@ -71,9 +53,6 @@ namespace DDay.iCal.Components
         }        
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
         virtual public RecurrenceDates[] ExDate
         {
             get { return _ExDate; }
@@ -81,9 +60,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 3)]
-#endif
         virtual public RecurrencePattern[] ExRule
         {
             get { return _ExRule; }
@@ -91,9 +67,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 4)]
-#endif
         virtual public RecurrenceDates[] RDate
         {
             get { return _RDate; }
@@ -101,9 +74,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 5)]
-#endif
         virtual public iCalDateTime Recurrence_ID
         {
             get { return _RecurID; }
@@ -116,9 +86,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 6)]
-#endif
         virtual public RecurrencePattern[] RRule
         {
             get { return _RRule; }
@@ -128,9 +95,6 @@ namespace DDay.iCal.Components
         /// <summary>
         /// An alias to the DTStart field (i.e. start date/time).
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 7)]
-#endif
         virtual public iCalDateTime Start
         {
             get { return DTStart; }
@@ -142,9 +106,6 @@ namespace DDay.iCal.Components
         /// recurrence pattern of the component.  NOTE: This isn't
         /// set until the recurrence pattern is evaluated.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 8)]
-#endif
         virtual public iCalDateTime Until
         {
             get { return _Until; }
@@ -160,9 +121,6 @@ namespace DDay.iCal.Components
         /// A collection of <see cref="Period"/> objects that contain the dates and times
         /// when each item occurs/recurs.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 9)]
-#endif
         virtual public List<Period> Periods
         {
             get { return _Periods; }
@@ -172,9 +130,6 @@ namespace DDay.iCal.Components
         /// <summary>
         /// A list of <see cref="Alarm"/>s for this recurring component.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 10)]
-#endif
         virtual public List<Alarm> Alarms
         {
             get { return _Alarms; }

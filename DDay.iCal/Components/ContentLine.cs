@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Text;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -15,11 +14,6 @@ namespace DDay.iCal.Components
     /// 75 characters in length.  A <see cref="ContentLine"/> represents
     /// this entire line, including potential line wrap sequences ("\r\n ").
     /// </remarks>
-#if DATACONTRACT
-    [DataContract(Name = "ContentLine", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]    
-#else
-    [Serializable]
-#endif
     public class ContentLine : iCalObject
     {
         #region Private Fields
@@ -30,9 +24,6 @@ namespace DDay.iCal.Components
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public string Value
         {
             get { return m_value; }

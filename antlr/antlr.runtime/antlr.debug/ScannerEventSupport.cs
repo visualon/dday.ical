@@ -2,8 +2,7 @@ namespace antlr.debug
 {
 	using System;
 	using System.Reflection;
-
-    using Hashtable	    = System.Collections.Hashtable;
+	using Hashtable		= System.Collections.Hashtable;
 	using ArrayList		= System.Collections.ArrayList;
 
 	using antlr.collections.impl;

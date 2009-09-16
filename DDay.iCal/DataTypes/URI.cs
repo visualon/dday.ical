@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
@@ -12,11 +11,6 @@ namespace DDay.iCal.DataTypes
     /// An iCalendar URI (Universal Resource Identifier) value.
     /// </summary>
     [DebuggerDisplay("{Value}")]
-#if DATACONTRACT
-    [DataContract(Name = "URI", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public class URI : iCalDataType
     {
         #region Private Fields
@@ -32,46 +26,40 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
-        virtual public string Value
+        public string Value
         {
             get { return m_Value; }
-            set
-            {                
-                CopyFrom(Parse(value));                
-            }
+            set { m_Value = value; }
         }
 
-        virtual public string Scheme
+        public string Scheme
         {
             get { return m_Scheme; }
-            protected set { m_Scheme = value; }
+            set { m_Scheme = value; }
         }
 
-        virtual public string Authority
+        public string Authority
         {
             get { return m_Authority; }
-            protected set { m_Authority = value; }
+            set { m_Authority = value; }
         }
 
-        virtual public string Path
+        public string Path
         {
             get { return m_Path; }
-            protected set { m_Path = value; }
+            set { m_Path = value; }
         }
 
-        virtual public string Query
+        public string Query
         {
             get { return m_Query; }
-            protected set { m_Query = value; }
+            set { m_Query = value; }
         }
 
-        virtual public string Fragment
+        public string Fragment
         {
             get { return m_Fragment; }
-            protected set { m_Fragment = value; }
+            set { m_Fragment = value; }
         }
 
         #endregion
@@ -81,7 +69,7 @@ namespace DDay.iCal.DataTypes
         public URI() { }
         public URI(string value)
             : this()
-        {            
+        {
             CopyFrom(Parse(value));
         }
 
@@ -116,7 +104,7 @@ namespace DDay.iCal.DataTypes
                 Regex re = new Regex(regexPattern, RegexOptions.ExplicitCapture);
                 Match m = re.Match(value);
 
-                uri.m_Value = m.Value;
+                uri.Value = m.Value;
                 uri.Scheme = m.Groups["scheme"].Value.ToLower();
                 uri.Authority = m.Groups["authority"].Value;
                 uri.Path = m.Groups["path"].Value;
@@ -137,21 +125,12 @@ namespace DDay.iCal.DataTypes
             if (obj is URI)
             {
                 URI uri = (URI)obj;
-                m_Value = uri.Value;
+                Value = uri.Value;
                 Scheme = uri.Scheme;
                 Authority = uri.Authority;
                 Path = uri.Path;
                 Query = uri.Query;
                 Fragment = uri.Fragment;
-            }
-            else
-            {
-                Value = null;
-                Scheme = null;
-                Authority = null;
-                Path = null;
-                Query = null;
-                Fragment = null;
             }
             base.CopyFrom(obj);
         }

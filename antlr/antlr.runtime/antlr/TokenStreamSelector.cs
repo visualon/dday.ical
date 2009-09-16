@@ -1,8 +1,6 @@
 using System;
-
-using Hashtable = System.Collections.Hashtable;
-
-using Stack    		= System.Collections.Generic.Stack<object>;
+using Hashtable		= System.Collections.Hashtable;
+using Stack    		= System.Collections.Stack;
 	
 namespace antlr
 {

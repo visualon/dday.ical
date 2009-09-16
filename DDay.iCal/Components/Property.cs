@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using DDay.iCal.Components;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -25,11 +24,6 @@ namespace DDay.iCal.Components
     /// There may be other, custom X-properties applied to the calendar,
     /// and X-properties may be applied to calendar components.
     /// </remarks>
-#if DATACONTRACT
-    [DataContract(Name = "Property", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public class Property : 
         iCalObject,
         IKeyedObject<string>

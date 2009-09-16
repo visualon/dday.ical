@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -13,11 +12,6 @@ namespace DDay.iCal.Components
     /// <see cref="iCalendar"/> class to maintain a collection of events,
     /// to-do items, journal entries, and free/busy times.
     /// </summary>
-#if DATACONTRACT
-    [CollectionDataContract(Name = "UniqueComponentList", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public class UniqueComponentList<T> : iCalObject, IList<T>
     {
         #region Private Fields

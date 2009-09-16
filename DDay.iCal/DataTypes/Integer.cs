@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
@@ -11,11 +10,6 @@ namespace DDay.iCal.DataTypes
     /// </summary>
     [DebuggerDisplay("{Value}")]
     [Encodable("BASE64,8BIT,7BIT")]
-#if DATACONTRACT
-    [DataContract(Name = "Integer", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public class Integer : EncodableDataType
     {
         #region Private Fields

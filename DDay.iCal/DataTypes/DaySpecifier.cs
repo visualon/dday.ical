@@ -3,18 +3,12 @@ using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
     /// <summary>
     /// Represents an RFC 2445 "BYDAY" value.
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "DaySpecifier", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]    
-#else
-    [Serializable]
-#endif
     public class DaySpecifier : iCalDataType, IComparable
     {
         #region Private Fields
@@ -26,19 +20,13 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
-        virtual public int Num
+        public int Num
         {
             get { return m_Num; }
             set { m_Num = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
-        virtual public DayOfWeek DayOfWeek
+        public DayOfWeek DayOfWeek
         {
             get { return m_DayOfWeek; }
             set { m_DayOfWeek = value; }

@@ -15,7 +15,7 @@ namespace antlr
 	using IList 		= System.Collections.IList;
 	using IDictionary 	= System.Collections.IDictionary;
 	using ArrayList 	= System.Collections.ArrayList;
-    using Hashtable     = System.Collections.Hashtable;
+	using Hashtable		= System.Collections.Hashtable;
 	using IComparer		= System.Collections.IComparer;
 	using StringBuilder = System.Text.StringBuilder;
 	using BitSet 		= antlr.collections.impl.BitSet;
