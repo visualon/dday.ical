@@ -5,7 +5,6 @@ using System.Text;
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
 using DDay.iCal.Serialization;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -17,20 +16,6 @@ namespace DDay.iCal.Components
     /// RRULEs, RDATE, EXRULEs, and EXDATEs, as well as the DTSTART
     /// for the recurring item (all recurring items must have a DTSTART).
     /// </remarks>
-#if DATACONTRACT
-    [DataContract(Name = "RecurringComponent", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(iCalDateTime))]
-    [KnownType(typeof(RecurrenceDates))]
-    [KnownType(typeof(RecurrenceDates[]))]
-    [KnownType(typeof(RecurrencePattern))]
-    [KnownType(typeof(RecurrencePattern[]))]
-    [KnownType(typeof(List<Period>))]
-    [KnownType(typeof(List<Alarm>))]
-    [KnownType(typeof(Period))]
-    [KnownType(typeof(Alarm))]
-#else
-    [Serializable]
-#endif
     public class RecurringComponent : UniqueComponent
     {
         #region Private Fields
@@ -56,9 +41,6 @@ namespace DDay.iCal.Components
         /// The start date/time of the component.
         /// </summary>
         [Serialized, DefaultValueType("DATE-TIME")]
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         virtual public iCalDateTime DTStart
         {
             get { return _DTStart; }
@@ -68,12 +50,21 @@ namespace DDay.iCal.Components
                 if (_DTStart != null)
                     _DTStart.Name = "DTSTART";
             }
-        }        
+        }
+
+        virtual public iCalDateTime EvalStart
+        {
+            get { return _EvalStart; }
+            set { _EvalStart = value; }
+        }
+
+        virtual public iCalDateTime EvalEnd
+        {
+            get { return _EvalEnd; }
+            set { _EvalEnd = value; }
+        }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
         virtual public RecurrenceDates[] ExDate
         {
             get { return _ExDate; }
@@ -81,9 +72,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 3)]
-#endif
         virtual public RecurrencePattern[] ExRule
         {
             get { return _ExRule; }
@@ -91,9 +79,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 4)]
-#endif
         virtual public RecurrenceDates[] RDate
         {
             get { return _RDate; }
@@ -101,9 +86,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 5)]
-#endif
         virtual public iCalDateTime Recurrence_ID
         {
             get { return _RecurID; }
@@ -116,9 +98,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 6)]
-#endif
         virtual public RecurrencePattern[] RRule
         {
             get { return _RRule; }
@@ -128,9 +107,6 @@ namespace DDay.iCal.Components
         /// <summary>
         /// An alias to the DTStart field (i.e. start date/time).
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 7)]
-#endif
         virtual public iCalDateTime Start
         {
             get { return DTStart; }
@@ -142,9 +118,6 @@ namespace DDay.iCal.Components
         /// recurrence pattern of the component.  NOTE: This isn't
         /// set until the recurrence pattern is evaluated.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 8)]
-#endif
         virtual public iCalDateTime Until
         {
             get { return _Until; }
@@ -160,9 +133,6 @@ namespace DDay.iCal.Components
         /// A collection of <see cref="Period"/> objects that contain the dates and times
         /// when each item occurs/recurs.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 9)]
-#endif
         virtual public List<Period> Periods
         {
             get { return _Periods; }
@@ -172,29 +142,10 @@ namespace DDay.iCal.Components
         /// <summary>
         /// A list of <see cref="Alarm"/>s for this recurring component.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 10)]
-#endif
         virtual public List<Alarm> Alarms
         {
             get { return _Alarms; }
             set { _Alarms = value; }
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        virtual internal iCalDateTime EvalStart
-        {
-            get { return _EvalStart; }
-            set { _EvalStart = value; }
-        }
-
-        virtual internal iCalDateTime EvalEnd
-        {
-            get { return _EvalEnd; }
-            set { _EvalEnd = value; }
         }
 
         #endregion
@@ -355,7 +306,58 @@ namespace DDay.iCal.Components
         #endregion
 
         #region Public Overridables
-                
+
+        /// <summary>
+        /// Evaluates this item to determine the dates and times for which it occurs/recurs.
+        /// This method only evaluates items which occur/recur between <paramref name="FromDate"/>
+        /// and <paramref name="ToDate"/>; therefore, if you require a list of items which
+        /// occur outside of this range, you must specify a <paramref name="FromDate"/> and
+        /// <paramref name="ToDate"/> which encapsulate the date(s) of interest.
+        /// <note type="caution">
+        ///     For events with very complex recurrence rules, this method may be a bottleneck
+        ///     during processing time, especially when this method is called for a large number
+        ///     of items, in sequence, or for a very large time span.
+        /// </note>
+        /// </summary>
+        /// <param name="FromDate">The beginning date of the range to evaluate.</param>
+        /// <param name="ToDate">The end date of the range to evaluate.</param>
+        /// <returns>
+        ///     A <see cref="List<Period>"/> containing a <see cref="Period"/> object for
+        ///     each date/time this item occurs/recurs.
+        /// </returns>
+        virtual public List<Period> Evaluate(iCalDateTime FromDate, iCalDateTime ToDate)
+        {
+            // Evaluate extra time periods, without re-evaluating ones that were already evaluated
+            if ((EvalStart == null && EvalEnd == null) ||
+                (ToDate == EvalStart) ||
+                (FromDate == EvalEnd))
+            {
+                EvaluateRRule(FromDate, ToDate);
+                EvaluateRDate(FromDate, ToDate);
+                EvaluateExRule(FromDate, ToDate);
+                EvaluateExDate(FromDate, ToDate);
+                if (EvalStart == null || EvalStart > FromDate)
+                    EvalStart = FromDate.Copy();
+                if (EvalEnd == null || EvalEnd < ToDate)
+                    EvalEnd = ToDate.Copy();
+            }
+
+            if (EvalStart != null && FromDate < EvalStart)
+                Evaluate(FromDate, EvalStart);
+            if (EvalEnd != null && ToDate > EvalEnd)
+                Evaluate(EvalEnd, ToDate);
+
+            Periods.Sort();
+
+            foreach(Period p in Periods)
+            {
+                // Ensure the Kind of time is consistent with DTStart
+                p.StartTime.IsUniversalTime = DTStart.IsUniversalTime;
+            }
+            
+            return Periods;
+        }
+
         /// <summary>
         /// Clears a previous evaluation, usually because one of the 
         /// key elements used for evaluation has changed 
@@ -454,61 +456,6 @@ namespace DDay.iCal.Components
             foreach (Alarm alarm in Alarms)
                 Occurrences.AddRange(alarm.Poll(Start, End));
             return Occurrences;
-        }
-
-        #endregion
-
-        #region Internal Overridables
-
-        /// <summary>
-        /// Evaluates this item to determine the dates and times for which it occurs/recurs.
-        /// This method only evaluates items which occur/recur between <paramref name="FromDate"/>
-        /// and <paramref name="ToDate"/>; therefore, if you require a list of items which
-        /// occur outside of this range, you must specify a <paramref name="FromDate"/> and
-        /// <paramref name="ToDate"/> which encapsulate the date(s) of interest.
-        /// <note type="caution">
-        ///     For events with very complex recurrence rules, this method may be a bottleneck
-        ///     during processing time, especially when this method is called for a large number
-        ///     of items, in sequence, or for a very large time span.
-        /// </note>
-        /// </summary>
-        /// <param name="FromDate">The beginning date of the range to evaluate.</param>
-        /// <param name="ToDate">The end date of the range to evaluate.</param>
-        /// <returns>
-        ///     A <see cref="List<Period>"/> containing a <see cref="Period"/> object for
-        ///     each date/time this item occurs/recurs.
-        /// </returns>
-        virtual internal List<Period> Evaluate(iCalDateTime FromDate, iCalDateTime ToDate)
-        {
-            // Evaluate extra time periods, without re-evaluating ones that were already evaluated
-            if ((EvalStart == null && EvalEnd == null) ||
-                (ToDate == EvalStart) ||
-                (FromDate == EvalEnd))
-            {
-                EvaluateRRule(FromDate, ToDate);
-                EvaluateRDate(FromDate, ToDate);
-                EvaluateExRule(FromDate, ToDate);
-                EvaluateExDate(FromDate, ToDate);
-                if (EvalStart == null || EvalStart > FromDate)
-                    EvalStart = FromDate.Copy();
-                if (EvalEnd == null || EvalEnd < ToDate)
-                    EvalEnd = ToDate.Copy();
-            }
-
-            if (EvalStart != null && FromDate < EvalStart)
-                Evaluate(FromDate, EvalStart);
-            if (EvalEnd != null && ToDate > EvalEnd)
-                Evaluate(EvalEnd, ToDate);
-
-            Periods.Sort();
-
-            foreach (Period p in Periods)
-            {
-                // Ensure the Kind of time is consistent with DTStart
-                p.StartTime.IsUniversalTime = DTStart.IsUniversalTime;
-            }
-
-            return Periods;
         }
 
         #endregion

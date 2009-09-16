@@ -2,18 +2,12 @@ using System;
 using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {    
     /// <summary>
     /// An iCalendar status code.
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "StatusCode", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public class StatusCode : iCalDataType
     {
         #region Private Fields
@@ -24,9 +18,6 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public int[] Parts
         {
             get { return m_Parts; }

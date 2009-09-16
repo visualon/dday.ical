@@ -51,10 +51,10 @@ namespace DDay.iCal.Serialization.iCalendar.DataTypes
                     if (!m_Binary.Parameters.ContainsKey("ENCODING"))
                     {
                         Parameter p = new Parameter("ENCODING", "BASE64");
-                        m_Binary.Parameters.Add(p);
+                        m_Binary.Parameters.Add("ENCODING", p);
                     }
 
-                    parameters.Add(m_Binary.Parameters["ENCODING"]);
+                    parameters.Add(m_Binary.Parameters["ENCODING"] as Parameter);
                 }
                 return parameters;
             }

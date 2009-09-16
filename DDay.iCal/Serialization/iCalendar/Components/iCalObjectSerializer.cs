@@ -14,47 +14,25 @@ namespace DDay.iCal.Serialization.iCalendar.Components
 
         /// <summary>
         /// Unwraps lines from the RFC 2445 "line folding" technique.
-        /// NOTE: this method makes the line/col numbers output from
-        /// antlr incorrect.
-        /// </summary>
+        /// </summary>        
         static public string UnwrapLines(string s)
         {
-            return Regex.Replace(s, @"(\r\n[ \t])", string.Empty);
+            return Regex.Replace(s, @"(\r\n )", string.Empty);
         }
 
         /// <summary>
-        /// Removes blank lines from a string with normalized (\r\n)
-        /// line endings.
-        /// NOTE: this method makes the line/col numbers output from
-        /// antlr incorrect.
+        /// Normalizes line endings, converting "\r" into "\r\n" and "\n" into "\r\n".
         /// </summary>
-        static public string RemoveEmptyLines(string s)
-        {
-            int len = -1;
-            while (len != s.Length)
-            {
-                s = s.Replace("\r\n\r\n", "\r\n");
-                len = s.Length;
-            }
-            return s;
-        }
-
-        /// <summary>
-        /// Normalizes line endings, converting "\r" into "\r\n" and "\n" into "\r\n".        
-        /// </summary>
-        static public TextReader NormalizeLineEndings(string s, bool maintainLineAccuracy)
+        static public TextReader NormalizeLineEndings(string s)
         {
             // Replace \r and \n with \r\n.
-            s = Regex.Replace(s, @"((\r(?=[^\n]))|((?<=[^\r])\n))", "\r\n");
-            if (!maintainLineAccuracy)
-                s = RemoveEmptyLines(UnwrapLines(s));
-            return new StringReader(s);
+            return new StringReader(UnwrapLines(Regex.Replace(s, @"((\r(?=[^\n]))|((?<=[^\r])\n))", "\r\n")));
         }
 
-        static public TextReader NormalizeLineEndings(TextReader tr, bool maintainLineAccuracy)
+        static public TextReader NormalizeLineEndings(TextReader tr)
         {
             string s = tr.ReadToEnd();
-            TextReader reader = NormalizeLineEndings(s, maintainLineAccuracy);
+            TextReader reader = NormalizeLineEndings(s);
             tr.Close();
 
             return reader;
@@ -114,19 +92,21 @@ namespace DDay.iCal.Serialization.iCalendar.Components
                     serializer.Serialize(stream, encoding);
             }
 
-            foreach (Property p in Object.Properties)
+            foreach (DictionaryEntry de in Object.Properties)
             {
                 // Don't serialize "VERSION" again, we've already done it above.
-                if (p.Key.Equals("VERSION"))
-                    continue;
-                                
+                if (de.Key.Equals("VERSION"))
+                    continue; 
+
+                Property p = (Property)de.Value;
                 ISerializable serializer = SerializerFactory.Create(p);
                 if (serializer != null)
                     serializer.Serialize(stream, encoding);
             }
 
-            foreach (Parameter p in Object.Parameters)
-            {                
+            foreach (DictionaryEntry de in Object.Parameters)
+            {
+                Parameter p = (Parameter)de.Value;
                 ISerializable serializer = SerializerFactory.Create(p);
                 if (serializer != null)
                     serializer.Serialize(stream, encoding);

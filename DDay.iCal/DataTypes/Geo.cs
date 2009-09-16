@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
@@ -11,12 +10,6 @@ namespace DDay.iCal.DataTypes
     /// <see cref="Event"/> or <see cref="Todo"/> item.
     /// </summary>
     [DebuggerDisplay("{Latitude};{Longitude}")]
-#if DATACONTRACT
-    [DataContract(Name = "Geo", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(Float))]
-#else
-    [Serializable]
-#endif
     public class Geo : iCalDataType
     {
         #region Private Fields
@@ -28,18 +21,12 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public Float Latitude
         {
             get { return m_Latitude; }
             set { m_Latitude = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
         public Float Longitude
         {
             get { return m_Longitude; }

@@ -6,23 +6,12 @@ using System.Reflection;
 using DDay.iCal.DataTypes;
 using DDay.iCal.Serialization;
 using System.ComponentModel;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
     /// <summary>
     /// The base class for all iCalendar objects, components, and data types.
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "iCalObject", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(iCalObject))]
-    [KnownType(typeof(KeyedList<Property, string>))]
-    [KnownType(typeof(KeyedList<Parameter, string>))]
-    [KnownType(typeof(List<iCalObject>))]
-    [KnownType(typeof(iCalendar))]
-#else
-    [Serializable]
-#endif
     public class iCalObject        
     {
         #region Public Events
@@ -36,8 +25,8 @@ namespace DDay.iCal.Components
         private iCalObject _Parent = null;
         private List<iCalObject> _Children = new List<iCalObject>();
         private string _Name;
-        private IKeyedList<Property, string> _Properties = new KeyedList<Property, string>();
-        private IKeyedList<Parameter, string> _Parameters = new KeyedList<Parameter, string>();
+        private Hashtable _Properties = new Hashtable();
+        private Hashtable _Parameters = new Hashtable();
 
         #endregion
 
@@ -46,10 +35,7 @@ namespace DDay.iCal.Components
         /// <summary>
         /// Returns the parent <see cref="iCalObject"/> that owns this one.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
-        virtual public iCalObject Parent
+        public iCalObject Parent
         {
             get { return _Parent; }
             set { _Parent = value; }
@@ -58,47 +44,29 @@ namespace DDay.iCal.Components
         /// <summary>
         /// Returns a list of properties that are associated with the iCalendar object.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
-        virtual public IKeyedList<Property, string> Properties
+        public Hashtable Properties
         {
             get { return _Properties; }
-            protected set
-            {
-                this._Properties = value;
-            }
+            set { _Properties = value; }
         }
 
         /// <summary>
         /// Returns a list of parameters that are associated with the iCalendar object.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 3)]
-#endif
-        virtual public IKeyedList<Parameter, string> Parameters
+        public Hashtable Parameters
         {
             get { return _Parameters; }
-            protected set
-            {
-                this._Parameters = value;
-            }
+            set { _Parameters = value; }
         }
 
         /// <summary>
         /// A collection of <see cref="iCalObject"/>s that are children 
         /// of the current object.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 4)]
-#endif
-        virtual public List<iCalObject> Children
+        public List<iCalObject> Children
         {
             get { return _Children; }
-            protected set
-            {
-                this._Children = value;
-            }
+            set { _Children = value; }
         }
 
         /// <summary>
@@ -113,9 +81,6 @@ namespace DDay.iCal.Components
         ///     </list>
         /// </example>
         /// </summary>        
-#if DATACONTRACT
-        [DataMember(Order = 5)]
-#endif
         virtual public string Name
         {
             get { return _Name; }
@@ -126,10 +91,7 @@ namespace DDay.iCal.Components
         /// Returns the <see cref="DDay.iCal.iCalendar"/> that this <see cref="iCalObject"/>
         /// belongs to.
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 6)]
-#endif
-        virtual public iCalendar iCalendar
+        public iCalendar iCalendar
         {
             get
             {
@@ -140,10 +102,6 @@ namespace DDay.iCal.Components
                 if (obj is iCalendar)
                     return obj as iCalendar;
                 return null;
-            }
-            protected set
-            {
-                this._Parent = value;
             }
         }
 
@@ -257,12 +215,12 @@ namespace DDay.iCal.Components
                 obj = (iCalObject)Activator.CreateInstance(type);
 
             // Add properties
-            foreach (Property p in Properties)
-                p.Copy(obj);
+            foreach (DictionaryEntry de in Properties)
+                ((Property)(de.Value)).Copy(obj);
 
             // Add parameters
-            foreach (Parameter p in Parameters)
-                p.Copy(obj);
+            foreach (DictionaryEntry de in Parameters)
+                ((Parameter)(de.Value)).Copy(obj);
 
             // Add each child
             foreach (iCalObject child in Children)
@@ -323,7 +281,7 @@ namespace DDay.iCal.Components
         /// </summary>
         virtual public void AddParameter(Parameter p)
         {
-            Parameters.Add(p);
+            Parameters[p.Name] = p;
         }
 
         #endregion

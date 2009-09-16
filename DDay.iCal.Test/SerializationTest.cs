@@ -272,10 +272,7 @@ namespace DDay.iCal.Test
             ComponentBaseSerializer compSerializer = new ComponentBaseSerializer(evt);
             string evtString = compSerializer.SerializeToString();
 
-            Assert.IsTrue(evtString.Equals("BEGIN:VEVENT\r\nCREATED:20070319T000000Z\r\nDTEND;VALUE=DATE:20070320\r\nDTSTAMP:20070319T000000Z\r\nDTSTART;VALUE=DATE:20070319\r\nRRULE:FREQ=WEEKLY;INTERVAL=3;COUNT=4;BYDAY=TU,FR,SU\r\nSEQUENCE:0\r\nSUMMARY:Test event title\r\nUID:123456789\r\nEND:VEVENT\r\n"), "ComponentBaseSerializer.SerializeToString() serialized incorrectly");
-
-            serializer.Serialize(@"Calendars\Serialization\SERIALIZE18.ics");
-            SerializeTest("SERIALIZE18.ics", typeof(iCalendarSerializer));            
+            Assert.IsTrue(evtString.Equals("BEGIN:VEVENT\r\nCREATED:20070319T000000Z\r\nDTEND;VALUE=DATE:20070320\r\nDTSTAMP:20070319T000000Z\r\nDTSTART;VALUE=DATE:20070319\r\nDURATION:P1D\r\nRRULE:FREQ=WEEKLY;INTERVAL=3;COUNT=4;BYDAY=TU,FR,SU\r\nSEQUENCE:0\r\nSUMMARY:Test event title\r\nUID:123456789\r\nEND:VEVENT\r\n"), "ComponentBaseSerializer.SerializeToString() serialized incorrectly");
         }
 
         [Test, Category("Serialization")]
@@ -485,70 +482,6 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             SerializeTest("SERIALIZE30.ics", typeof(iCalendarSerializer));
         }
 
-        /// <summary>
-        /// Tests adding custom properties to a calendar.
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void SERIALIZE31()
-        {
-            iCalendar iCal = new iCalendar();
-            Event evt = iCal.Create<Event>();
-
-            StringBuilder htmlBuilder = new StringBuilder();
-            htmlBuilder.Append("<HTML><HEAD><META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html;charset=iso-8859-1\"></HEAD><BODY>");
-            htmlBuilder.Append("<B>Test</B>");
-            htmlBuilder.Append("</BODY></HTML>");
-
-            // This adds the property to the event automatically
-            Property p = new Property(evt, "X-ALT-DESC", htmlBuilder.ToString());
-            p.AddParameter("FMTTYPE", "text/html");
-
-            iCalendarSerializer serializer = new iCalendarSerializer(iCal);
-            serializer.Serialize(@"Calendars\Serialization\SERIALIZE31.ics");
-
-            SerializeTest("SERIALIZE31.ics", typeof(iCalendarSerializer));
-        }
-
-        [Test, Category("Serialization")]
-        public void SERIALIZE32()
-        {
-            iCalendar iCal = new iCalendar();
-            iCal.AddProperty("X-WR-CALNAME", "DDay Test");
-            iCal.AddProperty("X-WR-CALDESC", "Events for a DDay Test");
-            iCal.AddProperty("X-PUBLISHED-TTL", "PT30M");
-            iCal.ProductID = "-//DDAYTEST//NONSGML www.test.com//EN";
-
-            // Create an event in the iCalendar
-            Event evt = iCal.Create<Event>();
-            
-            //Populate the properties
-            evt.Start = new iCalDateTime(2009, 6, 28, 8, 0, 0);
-            evt.Duration = TimeSpan.FromHours(1);
-            evt.Url = new URI("http://www.ftb.pl/news/59941_0_1/tunnel-electrocity-2008-timetable.htm");
-            evt.Summary = "This is a title";
-            evt.Description = "This is a description";
-
-            iCalendarSerializer serializer = new iCalendarSerializer(iCal);
-            string output = serializer.SerializeToString();
-            serializer.Serialize(@"Calendars\Serialization\SERIALIZE32.ics");
-
-            Assert.IsFalse(Regex.IsMatch(output, @"\r\n[\r\n]"));
-
-            SerializeTest("SERIALIZE32.ics", typeof(iCalendarSerializer));
-        }
-
-        [Test, Category("Serialization")]
-        public void SERIALIZE33()
-        {            
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\SERIALIZE33.ics");
-            Event evt = iCal.Events["edb7a48a-d846-47f8-bad2-9ea3f29bcda5"];
-            
-            Assert.IsNotNull(evt);
-            Assert.AreEqual(new Duration(TimeSpan.FromDays(12) + TimeSpan.FromHours(1)), evt.Duration, "Duration should be 12 days, 1 hour");
-
-            SerializeTest("SERIALIZE33.ics", typeof(iCalendarSerializer));
-        }
-
         //[Test, Category("Serialization")]
         public void XCAL1()
         {
@@ -585,35 +518,6 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
         public void LANGUAGE2()
         {
             SerializeTest("LANGUAGE2.ics", typeof(iCalendarSerializer));
-        }
-
-        [Test, Category("Serialization")]
-        public void LANGUAGE3()
-        {
-            SerializeTest("RussiaHolidays.ics", typeof(iCalendarSerializer));
-
-            string calendarPath = Path.Combine(Environment.CurrentDirectory, "Calendars");
-            calendarPath = Path.Combine(calendarPath, "Serialization");
-
-            // Ensure that LoadFromUri() and LoadFromFile() produce identical results.
-            // Thanks to Eugene, a student from Russia, who helped track down this bug.
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            iCalendar russia1 = iCalendar.LoadFromUri(new Uri(Path.Combine(calendarPath, "RussiaHolidays.ics")));
-            iCalendar russia2 = iCalendar.LoadFromFile(Path.Combine(calendarPath, "RussiaHolidays.ics"));
-
-            CompareCalendars(russia1, russia2);
-        }
-
-        [Test, Category("Serialization")]
-        public void LANGUAGE4()
-        {
-            string calendarPath = Path.Combine(Environment.CurrentDirectory, "Calendars");
-            calendarPath = Path.Combine(calendarPath, "Serialization");
-
-            iCalendar russia1 = iCalendar.LoadFromUri(new Uri("http://www.mozilla.org/projects/calendar/caldata/RussiaHolidays.ics"));
-            iCalendar russia2 = iCalendar.LoadFromFile(Path.Combine(calendarPath, "RussiaHolidays.ics"));
-
-            CompareCalendars(russia1, russia2);
         }
 
         [Test]
@@ -661,7 +565,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\TIMEZONE2.ics");
 
             iCalTimeZone tz = iCal.TimeZones[0];
-            foreach (iCalTimeZoneInfo tzi in tz.TimeZoneInfos)
+            foreach (TimeZoneInfo tzi in tz.TimeZoneInfos)
                 tzi.Start = new iCalDateTime(2007, 1, 1);
 
             iCalendarSerializer serializer = new iCalendarSerializer(iCal);
@@ -670,7 +574,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\Temp\TIMEZONE2.ics");
             tz = iCal.TimeZones[0];
 
-            foreach (iCalTimeZoneInfo tzi in tz.TimeZoneInfos)
+            foreach (TimeZoneInfo tzi in tz.TimeZoneInfos)
             {
                 ContentLine cl = tzi.Start.ContentLine;
                 Assert.IsFalse(cl.Parameters.ContainsKey("VALUE"), "\"DTSTART\" property MUST be represented in local time in timezones");
@@ -682,7 +586,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\TIMEZONE2.ics");
 
             tz = iCal.TimeZones[0];
-            foreach (iCalTimeZoneInfo tzi in tz.TimeZoneInfos)
+            foreach (TimeZoneInfo tzi in tz.TimeZoneInfos)
                 tzi.Start = DateTime.Now.ToUniversalTime();
 
             serializer = new iCalendarSerializer(iCal);
@@ -691,7 +595,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\Temp\TIMEZONE2.ics");
             tz = iCal.TimeZones[0];
 
-            foreach (iCalTimeZoneInfo tzi in tz.TimeZoneInfos)
+            foreach (TimeZoneInfo tzi in tz.TimeZoneInfos)
             {
                 ContentLine cl = tzi.Start.ContentLine;
                 Assert.IsFalse(cl.Parameters.ContainsKey("VALUE"), "\"DTSTART\" property MUST be represented in local time in timezones");
@@ -729,133 +633,6 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
         public void PARSE3()
         {
             iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\PARSE3.ics");            
-        }
-
-        /// <summary>
-        /// Verifies that blank lines between components are allowed
-        /// (as occurs with some applications/parsers - i.e. KOrganizer)
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void PARSE4()
-        {
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\PARSE4.ics");
-        }
-
-        /// <summary>
-        /// Verifies that a calendar will load without a VERSION or PRODID
-        /// specification.
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void PARSE5()
-        {
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\PARSE5.ics");
-        }
-
-        /// <summary>
-        /// Tests a calendar that should fail to properly parse.
-        /// </summary>
-        [Test, Category("Serialization"), ExpectedException("antlr.MismatchedTokenException")]
-        public void PARSE6()
-        {
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\PARSE6.ics");
-        }
-
-        /// <summary>
-        /// Similar to PARSE4 and PARSE5 tests.
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void PARSE7()
-        {
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\PARSE7.ics");
-        }
-
-        /// <summary>
-        /// Tests that a mixed-case VERSION property is loaded properly
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void PARSE8()
-        {
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\PARSE8.ics");
-            Assert.AreEqual("2.5", iCal.Version);
-        }
-
-        /// <summary>
-        /// Tests that multiple properties are allowed in iCalObjects
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void PARSE9()
-        {
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\PARSE9.ics");
-            
-            IList<Property> props = iCal.Properties.AllOf("VERSION");
-            Assert.AreEqual(2, props.Count);
-
-            for (int i = 0; i < props.Count; i++)
-                Assert.AreEqual("2." + i, props[i].Value);
-        }
-
-        /// <summary>
-        /// Tests that multiple parameters are allowed in iCalObjects
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void PARSE10()
-        {
-            iCalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\PARSE10.ics");
-
-            Event evt = iCal.Events[0];
-            IList<Parameter> parms = evt.DTStart.Parameters.AllOf("VALUE");
-            Assert.AreEqual(2, parms.Count);
-            Assert.AreEqual("DATE", parms[0].Values[0]);
-            Assert.AreEqual("OTHER", parms[1].Values[0]);
-        }
-
-        /// <summary>
-        /// Tests that a Google calendar is correctly loaded and parsed.
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void PARSE11()
-        {
-            iCalendar iCal = iCalendar.LoadFromUri(new Uri("http://www.google.com/calendar/ical/tvhot064q4p48frqdalgo3fb2k%40group.calendar.google.com/public/basic.ics"));
-            Assert.IsNotNull(iCal);
-            Assert.AreEqual(1, iCal.Events.Count);
-            Assert.AreEqual(1, iCal.TimeZones.Count);
-
-            TZID tzid = iCal.TimeZones[0].TZID;
-            IList<Occurrence> occurrences = iCal.GetOccurrences(new iCalDateTime(2009, 8, 24, tzid, iCal), new iCalDateTime(2009, 9, 28, tzid, iCal));
-            Assert.AreEqual(5, occurrences.Count);
-            Assert.AreEqual(new iCalDateTime(2009, 8, 26, 8, 0, 0, tzid, iCal), occurrences[0].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 2, 8, 0, 0, tzid, iCal), occurrences[1].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 9, 8, 0, 0, tzid, iCal), occurrences[2].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 16, 8, 0, 0, tzid, iCal), occurrences[3].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 23, 8, 0, 0, tzid, iCal), occurrences[4].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 8, 26, 10, 0, 0, tzid, iCal), occurrences[0].Period.EndTime);
-        }
-
-        /// <summary>
-        /// Tests that string escaping works with Text elements.
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void PARSE12()
-        {
-            string value = @"test\with\;characters";
-            Text v1 = value;
-            Text v2 = new Text(value, true);
-
-            Assert.AreEqual(value, v1.Value, "String escaping was incorrect.");
-            Assert.AreEqual(@"test\with;characters", v2.Value, "String escaping was incorrect.");
-
-            value = @"C:\Path\To\My\New\Information";
-            v1 = value;
-            v2 = new Text(value, true);
-            Assert.AreEqual(value, v1.Value, "String escaping was incorrect.");
-            Assert.AreEqual("C:\\Path\\To\\My\new\\Information", v2.Value, "String escaping was incorrect.");
-
-            value = @"\""This\r\nis\Na\, test\""\;\\;,";
-            v1 = value;
-            v2 = new Text(value, true);
-
-            Assert.AreEqual(value, v1.Value, "String escaping was incorrect.");
-            Assert.AreEqual("\"This\\r\nis\na, test\";\\;,", v2.Value, "String escaping was incorrect.");
         }
 
         private static byte[] ReadBinary(string fileName)

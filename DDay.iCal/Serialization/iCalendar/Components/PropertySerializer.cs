@@ -12,14 +12,14 @@ namespace DDay.iCal.Serialization.iCalendar.Components
     {
         #region Private Fields
 
-        private Property m_Property;        
+        private Property m_Property;
 
         #endregion
 
         #region Constructors
 
         public PropertySerializer(Property property)
-        {            
+        {
             this.m_Property = property;
         }
 
@@ -29,7 +29,7 @@ namespace DDay.iCal.Serialization.iCalendar.Components
 
         public string SerializeToString()
         {
-            StringBuilder sb = new StringBuilder(m_Property.Name);
+            string value = m_Property.Name;
             if (m_Property.Parameters.Count > 0)
             {
                 List<string> parameters = new List<string>();
@@ -41,19 +41,16 @@ namespace DDay.iCal.Serialization.iCalendar.Components
                 // }
                 //
                 // Since m_Property.Parameters is a Hashtable, this would always fail.
-                foreach (Parameter p in m_Property.Parameters)
-                {   
-                    parameters.Add(p.Name + "=" + string.Join(",", p.Values.ToArray()));
+                foreach (DictionaryEntry de in m_Property.Parameters)
+                {
+                    Parameter p = de.Value as Parameter;
+                    if (p != null)
+                        parameters.Add(p.Name + "=" + string.Join(",", p.Values.ToArray()));
                 }
 
-                sb.Append(";");
-                sb.Append(string.Join(";", parameters.ToArray()));
+                value += ";" + string.Join(";", parameters.ToArray());
             }
-            sb.Append(":");
-            sb.Append(m_Property.Value);            
-
-            ContentLineSerializer serializer = new ContentLineSerializer(sb.ToString());
-            return serializer.SerializeToString();
+            return value + ":" + m_Property.Value + "\r\n";
         }
 
         public void Serialize(Stream stream, Encoding encoding)
@@ -76,10 +73,10 @@ namespace DDay.iCal.Serialization.iCalendar.Components
             get
             {
                 List<Parameter> Parameters = new List<Parameter>();
-                foreach (Parameter p in m_Property.Parameters)
+                foreach (DictionaryEntry de in m_Property.Parameters)
                 {
-                    if (!DisallowedParameters.Contains(p))
-                        Parameters.Add(p);
+                    if (!DisallowedParameters.Contains(de.Value as Parameter))
+                        Parameters.Add(de.Value as Parameter);
                 }
                 return Parameters;
             }

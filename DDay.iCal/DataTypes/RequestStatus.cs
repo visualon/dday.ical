@@ -63,9 +63,9 @@ namespace DDay.iCal.DataTypes
                 RequestStatus rs = (RequestStatus)obj;
                 StatusCode = new StatusCode();
                 StatusCode.CopyFrom(rs.StatusCode);
-                StatusDesc = new Text(rs.StatusDesc.Value, true);
+                StatusDesc = new Text(rs.StatusDesc.Value);
                 if (rs.ExtData != null)
-                    ExtData = new Text(rs.ExtData.Value, true);
+                    ExtData = new Text(rs.ExtData.Value);
             }
             base.CopyFrom(obj);
         }
@@ -81,9 +81,9 @@ namespace DDay.iCal.DataTypes
                     return false;
 
                 StatusCode = new StatusCode(match.Groups[1].Value);
-                StatusDesc = new Text(match.Groups[1].Value, true);
+                StatusDesc = new Text(match.Groups[1].Value);
                 if (match.Groups[3].Success)
-                    ExtData = new Text(match.Groups[4].Value, true);
+                    ExtData = new Text(match.Groups[4].Value);
             }
             return false;            
         }

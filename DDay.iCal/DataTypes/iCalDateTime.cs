@@ -4,7 +4,6 @@ using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 using DDay.iCal.Components;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
@@ -17,13 +16,6 @@ namespace DDay.iCal.DataTypes
     /// </remarks>
     /// </summary>
     [DebuggerDisplay("{HasTime ? Value.ToString() : Value.ToShortDateString()}")]
-#if DATACONTRACT
-    [DataContract(Name = "iCalDateTime", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(iCalendar))]
-    [KnownType(typeof(TZID))]
-#else
-    [Serializable]
-#endif
     public class iCalDateTime : 
         iCalDataType,
         IComparable,
@@ -35,7 +27,7 @@ namespace DDay.iCal.DataTypes
         private bool _HasDate = false;
         private bool _HasTime = false;
         private TZID _TZID = null;
-        private iCalTimeZoneInfo _TimeZoneInfo = null;
+        private TimeZoneInfo _TimeZoneInfo = null;
         private bool _IsUniversalTime = false;
 
         #endregion
@@ -70,7 +62,7 @@ namespace DDay.iCal.DataTypes
                 else
                 {
                     DateTime value = Value;
-                    iCalTimeZoneInfo tzi = TimeZoneInfo;
+                    TimeZoneInfo tzi = TimeZoneInfo;
                     if (tzi != null)
                     {
                         int mult = tzi.TZOffsetTo.Positive ? -1 : 1;
@@ -91,10 +83,10 @@ namespace DDay.iCal.DataTypes
         }
 
         /// <summary>
-        /// Retrieves the <see cref="iCalTimeZoneInfo"/> object for the time
+        /// Retrieves the <see cref="TimeZoneInfo"/> object for the time
         /// zone set by <see cref="TZID"/>.
         /// </summary>
-        public iCalTimeZoneInfo TimeZoneInfo
+        public TimeZoneInfo TimeZoneInfo
         {
             get
             {
@@ -112,9 +104,6 @@ namespace DDay.iCal.DataTypes
             }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public bool IsUniversalTime
         {
             get { return _IsUniversalTime; }
@@ -128,9 +117,6 @@ namespace DDay.iCal.DataTypes
         /// has been set for this <see cref="iCalDateTime"/> object.
         /// </note>
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
         public new iCalendar iCalendar
         {
             get { return base.iCalendar; }
@@ -150,36 +136,24 @@ namespace DDay.iCal.DataTypes
             }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 3)]
-#endif
         public DateTime Value
         {
             get { return _Value; }
             set { _Value = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 4)]
-#endif
         public bool HasDate
         {
             get { return _HasDate; }
             set { _HasDate = value; }
-        }
+        }        
 
-#if DATACONTRACT
-        [DataMember(Order = 5)]
-#endif
         public bool HasTime
         {
             get { return _HasTime; }
             set { _HasTime = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 6)]
-#endif
         public TZID TZID
         {
             get
@@ -452,7 +426,7 @@ namespace DDay.iCal.DataTypes
             return (iCalDateTime)base.Copy();
         }
 
-        public DateTime ToTimeZone(iCalTimeZoneInfo tzi)
+        public DateTime ToTimeZone(TimeZoneInfo tzi)
         {
             DateTime value = UTC;
 
@@ -463,7 +437,8 @@ namespace DDay.iCal.DataTypes
             value = DateTime.SpecifyKind(value, DateTimeKind.Unspecified);
             return value;
         }
-                
+
+        // FIXME: what's wrong with this method?? Start here
         public DateTime ToTimeZone(string tzid)
         {
             if (!string.IsNullOrEmpty(tzid))
@@ -473,7 +448,7 @@ namespace DDay.iCal.DataTypes
                     iCalTimeZone tz = iCalendar.GetTimeZone(tzid);
                     if (tz != null)
                     {
-                        iCalTimeZoneInfo tzi = tz.GetTimeZoneInfo(this);
+                        TimeZoneInfo tzi = tz.GetTimeZoneInfo(this);
                         if (tzi != null)
                             return ToTimeZone(tzi);
                     }

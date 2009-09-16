@@ -13,7 +13,6 @@ using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
 using DDay.iCal.Serialization;
 using NUnit.Framework;
-using System.Globalization;
 
 namespace DDay.iCal.Test
 {
@@ -2146,14 +2145,14 @@ namespace DDay.iCal.Test
             tz.TZID = "US-Eastern";
             tz.Last_Modified = new DateTime(1987, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-            iCalTimeZoneInfo standard = new iCalTimeZoneInfo(iCalTimeZone.STANDARD, tz);
+            TimeZoneInfo standard = new TimeZoneInfo(iCalTimeZone.STANDARD, tz);
             standard.Start = new DateTime(1967, 10, 29, 2, 0, 0, DateTimeKind.Utc);
             standard.AddRecurrencePattern(new RecurrencePattern("FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10"));
             standard.TZOffsetFrom = new UTC_Offset("-0400");
             standard.TZOffsetTo = new UTC_Offset("-0500");
             standard.TimeZoneName = "EST";
 
-            iCalTimeZoneInfo daylight = new iCalTimeZoneInfo(iCalTimeZone.DAYLIGHT, tz);
+            TimeZoneInfo daylight = new TimeZoneInfo(iCalTimeZone.DAYLIGHT, tz);
             daylight.Start = new DateTime(1987, 4, 5, 2, 0, 0, DateTimeKind.Utc);
             daylight.AddRecurrencePattern(new RecurrencePattern("FREQ=YEARLY;BYDAY=1SU;BYMONTH=4"));
             daylight.TZOffsetFrom = new UTC_Offset("-0500");
@@ -2759,38 +2758,34 @@ namespace DDay.iCal.Test
         [Test, Category("Recurrence")]
         public void RECURRENCEPATTERN1()
         {
-            // NOTE: recurrence patterns are not generally meant to be used directly like this.
+            // NOTE: recurrence patterns are not meant to be used directly like this.
             // However, this does make a good test to ensure they behave as they should.
             RecurrencePattern pattern = new
             RecurrencePattern("FREQ=SECONDLY;INTERVAL=10");
             pattern.RestrictionType = RecurrenceRestrictionType.NoRestriction;
 
-			CultureInfo us = CultureInfo.CreateSpecificCulture("en-US");
-
-            DateTime startDate = DateTime.Parse("3/30/08 11:59:40 PM", us);
-            DateTime fromDate = DateTime.Parse("3/30/08 11:59:40 PM", us);
-			DateTime toDate = DateTime.Parse("3/31/08 12:00:10 AM", us);			
+            DateTime fromDate = DateTime.Parse("3/30/08 11:59:40 PM");
+            DateTime toDate = DateTime.Parse("3/31/08 12:00:10 AM");
+            DateTime startDate = DateTime.Parse("3/30/08 11:59:40 PM");
 
             List<iCalDateTime> occurrences = pattern.Evaluate(startDate, fromDate, toDate);
             Assert.AreEqual(4, occurrences.Count);
-			Assert.AreEqual(DateTime.Parse("03/30/08 11:59:40 PM", us), occurrences[0].Value);
-			Assert.AreEqual(DateTime.Parse("03/30/08 11:59:50 PM", us), occurrences[1].Value);
-			Assert.AreEqual(DateTime.Parse("03/31/08 12:00:00 AM", us), occurrences[2].Value);
-			Assert.AreEqual(DateTime.Parse("03/31/08 12:00:10 AM", us), occurrences[3].Value);
+            Assert.AreEqual(DateTime.Parse("03/30/08 11:59:40 PM"), occurrences[0].Value);
+            Assert.AreEqual(DateTime.Parse("03/30/08 11:59:50 PM"), occurrences[1].Value);
+            Assert.AreEqual(DateTime.Parse("03/31/08 12:00:00 AM"), occurrences[2].Value);
+            Assert.AreEqual(DateTime.Parse("03/31/08 12:00:10 AM"), occurrences[3].Value);
         }
 
         [Test, Category("Recurrence")]
         public void RECURRENCEPATTERN2()
         {
-            // NOTE: recurrence patterns are generally not meant to be used directly like this.
+            // NOTE: recurrence patterns are not meant to be used directly like this.
             // However, this does make a good test to ensure they behave as they should.
             RecurrencePattern pattern = new RecurrencePattern("FREQ=MINUTELY;INTERVAL=1");
 
-			CultureInfo us = CultureInfo.CreateSpecificCulture("en-US");
-
-            DateTime startDate = DateTime.Parse("3/31/2008 12:00:10 AM", us);
-			DateTime fromDate = DateTime.Parse("4/1/2008 10:08:10 AM", us);
-			DateTime toDate = DateTime.Parse("4/1/2008 10:43:23 AM", us);			
+            DateTime fromDate = DateTime.Parse("4/1/2008 10:08:10 AM");
+            DateTime toDate = DateTime.Parse("4/1/2008 10:43:23 AM");
+            DateTime startDate = DateTime.Parse("3/31/2008 12:00:10 AM");
 
             List<iCalDateTime> occurrences = pattern.Evaluate(startDate, fromDate, toDate);
             Assert.AreNotEqual(0, occurrences.Count);
@@ -2809,7 +2804,7 @@ namespace DDay.iCal.Test
 
             try
             {
-                List<Occurrence> occurrences = evt.GetOccurrences(DateTime.Today.AddDays(1), DateTime.Today.AddDays(2));                
+                List<Period> periods = evt.Evaluate(DateTime.Today.AddDays(1), DateTime.Today.AddDays(2));
                 Assert.Fail("An exception should be thrown when evaluating a recurrence with no specified FREQUENCY");
             }
             catch { }
@@ -2853,33 +2848,6 @@ namespace DDay.iCal.Test
 
             foreach (Occurrence occ in allOcc)
                 Console.WriteLine(occ.Period.StartTime.ToString("d") + " " + occ.Period.StartTime.ToString("t"));
-        }
-
-        [Test, Category("Recurrence")]
-        public void TEST4()
-        {
-            RecurrencePattern rpattern = new RecurrencePattern();
-            rpattern.ByDay.Add(new DaySpecifier(DayOfWeek.Saturday));
-            rpattern.ByDay.Add(new DaySpecifier(DayOfWeek.Sunday));
-
-            rpattern.Frequency = FrequencyType.Weekly;
-
-            DateTime evtStart = new DateTime(2006, 12, 1);
-            DateTime evtEnd = new DateTime(2007, 1, 1);
-
-            // Add the exception dates
-            List<iCalDateTime> listOfDateTime = rpattern.Evaluate(evtStart, evtStart, evtEnd);
-            Assert.AreEqual(10, listOfDateTime.Count);
-            Assert.AreEqual(2, listOfDateTime[0].Day);
-            Assert.AreEqual(3, listOfDateTime[1].Day);
-            Assert.AreEqual(9, listOfDateTime[2].Day);
-            Assert.AreEqual(10, listOfDateTime[3].Day);
-            Assert.AreEqual(16, listOfDateTime[4].Day);
-            Assert.AreEqual(17, listOfDateTime[5].Day);
-            Assert.AreEqual(23, listOfDateTime[6].Day);
-            Assert.AreEqual(24, listOfDateTime[7].Day);
-            Assert.AreEqual(30, listOfDateTime[8].Day);
-            Assert.AreEqual(31, listOfDateTime[9].Day);
         }
     }
 }

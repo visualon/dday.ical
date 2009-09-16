@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 using DDay.iCal.Components;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
@@ -14,14 +13,6 @@ namespace DDay.iCal.DataTypes
     /// <c>MAILTO:email.address@host.com</c>
     /// </summary>
     [DebuggerDisplay("{Value}")]
-#if DATACONTRACT
-    [DataContract(Name = "Cal_Address", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(Cal_Address))]
-    [KnownType(typeof(Text))]
-    [KnownType(typeof(URI))]
-#else
-    [Serializable]
-#endif
     public class Cal_Address : URI
     {
         public const string ORGANIZER = "ORGANIZER";
@@ -37,10 +28,7 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
-        virtual public Cal_Address SentBy
+        public Cal_Address SentBy
         {
             get
             {
@@ -51,42 +39,22 @@ namespace DDay.iCal.DataTypes
                 }
                 return m_SentBy;
             }
-            protected set
-            {
-                if (value != null)
-                    Parameters["SENT-BY"] = new Parameter("SENT-BY", value);
-                else
-                    Parameters.Remove("SENT-BY");
-            }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
-        virtual public Text CommonName
+        public Text CommonName
         {
             get
             {
                 if (m_CN == null && Parameters.ContainsKey("CN"))
                 {
                     Parameter p = (Parameter)Parameters["CN"];
-                    m_CN = new Text(p.Values[0].ToString(), true);                    
+                    m_CN = new Text(p.Values[0].ToString());                    
                 }
                 return m_CN;
             }
-            protected set
-            {
-                if (value != null)
-                    Parameters["CN"] = new Parameter("CN", value);
-                else
-                    Parameters.Remove("CN");
-            }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 3)]
-#endif
-        virtual public URI DirectoryEntry
+        public URI DirectoryEntry
         {
             get
             {
@@ -97,16 +65,9 @@ namespace DDay.iCal.DataTypes
                 }
                 return m_DirectoryEntry;
             }
-            protected set
-            {
-                if (value != null)
-                    Parameters["DIR"] = new Parameter("DIR", value.ToString());
-                else
-                    Parameters.Remove("DIR");
-            }
         }
 
-        virtual public string EmailAddress
+        public string EmailAddress
         {
             get
             {
@@ -116,7 +77,7 @@ namespace DDay.iCal.DataTypes
                     return Authority;
                 }
                 return null;
-            }            
+            }
         }
 
         #endregion
@@ -140,7 +101,7 @@ namespace DDay.iCal.DataTypes
 
         static public implicit operator string(Cal_Address addr)
         {
-            return addr != null ? addr.Value : null;            
+            return addr.Value;
         }
 
         static public implicit operator Cal_Address(string s)

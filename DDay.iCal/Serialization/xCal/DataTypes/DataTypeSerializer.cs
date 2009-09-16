@@ -120,10 +120,10 @@ namespace DDay.iCal.Serialization.xCal.DataTypes
             get
             {
                 List<Parameter> Parameters = new List<Parameter>();
-                foreach (Parameter p in m_dataType.Parameters)
+                foreach (DictionaryEntry de in m_dataType.Parameters)
                 {
-                    if (!this.DisallowedParameters.Contains(p))
-                        Parameters.Add(p);
+                    if (!this.DisallowedParameters.Contains(de.Value as Parameter))
+                        Parameters.Add(de.Value as Parameter);
                 }
                 return Parameters;
             }

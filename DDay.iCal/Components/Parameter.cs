@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -14,15 +13,7 @@ namespace DDay.iCal.Components
     /// The <c>VALUE=DATE</c> portion is a <see cref="Parameter"/> of the DTSTART value.
     /// </example>
     /// </remarks>
-#if DATACONTRACT
-    [DataContract(Name = "Parameter", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(List<string>))]
-#else
-    [Serializable]
-#endif
-    public class Parameter : 
-        iCalObject,
-        IKeyedObject<string>
+    public class Parameter : iCalObject
     {
         #region Private Fields
 
@@ -32,9 +23,6 @@ namespace DDay.iCal.Components
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public List<string> Values
         {
             get { return m_Values; }
@@ -79,8 +67,9 @@ namespace DDay.iCal.Components
         public void AddToParent()
         {
             if (Parent != null &&
-                Name != null)
-                Parent.Parameters.Add(this);
+                Name != null &&
+                !Parent.Parameters.ContainsKey(Name))
+                Parent.Parameters[Name] = this;
         }
 
         #endregion
@@ -110,15 +99,6 @@ namespace DDay.iCal.Components
             else return base.GetHashCode();
         }
         
-        #endregion
-
-        #region IKeyedObject Members
-
-        public string Key
-        {
-            get { return Name; }
-        }
-
         #endregion
     }
 }

@@ -3,18 +3,12 @@ using System.Collections;
 using System.Text;
 using System.Reflection;
 using DDay.iCal.Components;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
     /// <summary>
     /// An abstract class from which all iCalendar data types inherit.
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "iCalDataType", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public abstract class iCalDataType : iCalObject
     {
         #region Protected Fields
@@ -26,9 +20,6 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public object[] Attributes
         {
             get { return m_Attributes; }
@@ -48,8 +39,8 @@ namespace DDay.iCal.DataTypes
                 if (value != null)
                 {
                     // Assign parameters from the content line
-                    foreach (Parameter p in value.Parameters)
-                        Parameters.Add(p);
+                    foreach (DictionaryEntry de in value.Parameters)
+                        Parameters[de.Key] = de.Value;
 
                     // Assign the NAME of the object from the content line
                     Name = value.Name;
@@ -66,10 +57,6 @@ namespace DDay.iCal.DataTypes
                     {
                         // Set the parent on the copied object
                         icdt.Parent = value.Parent;
-
-                        // Unescape values within the data type.
-                        if (icdt is IEscapable)
-                            ((IEscapable)icdt).Unescape();
 
                         CopyFrom(icdt);
 
@@ -108,7 +95,7 @@ namespace DDay.iCal.DataTypes
         {
             if (Parameters.ContainsKey("VALUE"))
             {
-                Parameter p = Parameters["VALUE"];
+                Parameter p = (Parameter)Parameters["VALUE"];
                 if (p.Values.Count > 0)
                 {
                     string type = p.Values[0].ToString().ToUpper();
@@ -138,8 +125,8 @@ namespace DDay.iCal.DataTypes
             icdt.CopyFrom(this);
 
             // Add parameters
-            foreach (Parameter p in Parameters)
-                p.Copy(icdt);
+            foreach (DictionaryEntry de in Parameters)
+                ((Parameter)(de.Value)).Copy(icdt);
 
             icdt.Parent = parent;
             return icdt;            

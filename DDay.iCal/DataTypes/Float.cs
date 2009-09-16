@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
@@ -11,11 +10,6 @@ namespace DDay.iCal.DataTypes
     /// </summary>
     [DebuggerDisplay("{Value}")]
     [Encodable("BASE64,8BIT,7BIT")]
-#if DATACONTRACT
-    [DataContract(Name = "Float", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public class Float : EncodableDataType
     {
         #region Private Fields
@@ -26,9 +20,6 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public new double Value
         {
             get { return m_Value; }
@@ -103,7 +94,7 @@ namespace DDay.iCal.DataTypes
 
         static public implicit operator double(Float i)
         {
-            return i != null ? i.Value : default(double);            
+            return i.Value;
         }
 
         static public implicit operator Float(double d)

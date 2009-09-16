@@ -4,7 +4,6 @@ using System.Text;
 using System.Reflection;
 using DDay.iCal.Components;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {    
@@ -12,11 +11,6 @@ namespace DDay.iCal.DataTypes
     /// An abstract class that represents an iCalendar data type which
     /// accepts the ENCODING parameter.
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "EncodableDataType", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public abstract class EncodableDataType : iCalDataType
     {
         #region Private Fields
@@ -28,10 +22,7 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
-        virtual public string Encoding
+        public string Encoding
         {
             get
             {
@@ -82,18 +73,12 @@ namespace DDay.iCal.DataTypes
             }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
         public string Value
         {
             get { return m_Value; }
             set { m_Value = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 3)]
-#endif
         public byte[] Data
         {
             get { return m_Data; }

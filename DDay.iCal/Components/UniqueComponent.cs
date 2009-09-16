@@ -5,7 +5,6 @@ using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
 using DDay.iCal.Serialization;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -13,31 +12,13 @@ namespace DDay.iCal.Components
     /// Represents a unique component, a component with a unique UID,
     /// which can be used to uniquely identify the component.    
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "UniqueComponent", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(Text))]
-    [KnownType(typeof(Binary))]
-    [KnownType(typeof(Binary[]))]
-    [KnownType(typeof(Cal_Address))]
-    [KnownType(typeof(Cal_Address[]))]
-    [KnownType(typeof(TextCollection))]
-    [KnownType(typeof(TextCollection[]))]
-    [KnownType(typeof(iCalDateTime))]
-    [KnownType(typeof(Integer))]
-    [KnownType(typeof(Text[]))]
-    [KnownType(typeof(RequestStatus))]
-    [KnownType(typeof(RequestStatus[]))]
-    [KnownType(typeof(URI))]
-#else
-    [Serializable]
-#endif
     public class UniqueComponent : ComponentBase
     {
-        // TODO: Add AddRelationship() public method.
+        // FIXME: Add AddRelationship() public method.
         // This method will add the UID of a related component
         // to the Related_To property, along with any "RELTYPE"
         // parameter ("PARENT", "CHILD", "SIBLING", or other)
-        // TODO: Add RemoveRelationship() public method.        
+        // FIXME: Add RemoveRelationship() public method.        
 
         #region Constructors
 
@@ -80,9 +61,6 @@ namespace DDay.iCal.Components
         #region Public Properties
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         virtual public Binary[] Attach
         {
             get { return _Attach; }
@@ -90,9 +68,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
         virtual public Cal_Address[] Attendee
         {
             get { return _Attendee; }
@@ -113,9 +88,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 3)]
-#endif
         virtual public TextCollection[] Categories
         {
             get { return _Categories; }                    
@@ -123,9 +95,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 4)]
-#endif
         virtual public Text Class
         {
             get { return _Class; }
@@ -138,9 +107,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 5)]
-#endif
         virtual public Text[] Comment
         {
             get { return _Comment; }
@@ -148,9 +114,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 6)]
-#endif
         virtual public Text[] Contact
         {
             get { return _Contact; }
@@ -158,9 +121,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized, DefaultValueType("DATE-TIME"), ForceUTC]
-#if DATACONTRACT
-        [DataMember(Order = 7)]
-#endif
         virtual public iCalDateTime Created
         {
             get { return _Created; }
@@ -173,9 +133,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 8)]
-#endif
         virtual public Text Description
         {
             get { return _Description; }
@@ -188,9 +145,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized, DefaultValueType("DATE-TIME"), ForceUTC]
-#if DATACONTRACT
-        [DataMember(Order = 9)]
-#endif
         virtual public iCalDateTime DTStamp
         {
             get { return _DTStamp; }
@@ -203,9 +157,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized, DefaultValueType("DATE-TIME"), ForceUTC]
-#if DATACONTRACT
-        [DataMember(Order = 10)]
-#endif
         virtual public iCalDateTime Last_Modified
         {
             get { return _Last_Modified; }
@@ -218,9 +169,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 11)]
-#endif
         virtual public Cal_Address Organizer
         {
             get { return _Organizer; }
@@ -238,9 +186,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 12)]
-#endif
         virtual public Integer Priority
         {
             get { return _Priority; }
@@ -253,9 +198,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 13)]
-#endif
         virtual public Text[] Related_To
         {
             get { return _Related_To; }
@@ -263,9 +205,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 14)]
-#endif
         virtual public RequestStatus[] Request_Status
         {
             get { return _Request_Status; }
@@ -273,9 +212,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 15)]
-#endif
         virtual public Integer Sequence
         {
             get { return _Sequence; }
@@ -288,9 +224,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 16)]
-#endif
         virtual public Text Summary
         {
             get { return _Summary; }
@@ -303,9 +236,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 17)]
-#endif
         virtual public Text UID
         {
             get
@@ -332,9 +262,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 18)]
-#endif
         virtual public URI Url
         {
             get { return _Url; }
@@ -449,7 +376,7 @@ namespace DDay.iCal.Components
 
         virtual public void AddCategory(string categoryName)
         {
-            Text cn = categoryName;
+            Text cn = new Text(categoryName);
             if (Categories != null)
             {
                 foreach (TextCollection tc in Categories)
@@ -477,7 +404,7 @@ namespace DDay.iCal.Components
         {
             if (Categories != null)
             {
-                Text cn = categoryName;
+                Text cn = new Text(categoryName);
                 foreach (TextCollection tc in Categories)
                 {
                     if (tc.Values.Contains(cn))
@@ -567,7 +494,7 @@ namespace DDay.iCal.Components
 
         virtual public void AddRelatedTo(string uid, string relationshipType)
         {
-            Text text = uid;
+            Text text = new Text(uid);
             if (relationshipType != null)
                 text.AddParameter(new Parameter("RELTYPE", relationshipType));
 
@@ -617,7 +544,7 @@ namespace DDay.iCal.Components
 
         static public Text NewUID()
         {
-            return Guid.NewGuid().ToString();
+            return new Text(Guid.NewGuid().ToString());
         }
 
         #endregion

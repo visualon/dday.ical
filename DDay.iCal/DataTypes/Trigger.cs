@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using DDay.iCal.Components;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
@@ -10,13 +9,6 @@ namespace DDay.iCal.DataTypes
     /// A class that is used to specify exactly when an <see cref="Alarm"/> component will trigger.
     /// Usually this date/time is relative to the component to which the Alarm is associated.
     /// </summary>    
-#if DATACONTRACT
-    [DataContract(Name = "Trigger", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(iCalDateTime))]
-    [KnownType(typeof(Duration))]
-#else
-    [Serializable]
-#endif
     public class Trigger : iCalDataType
     {
         public enum TriggerRelation
@@ -35,10 +27,7 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
-        virtual public iCalDateTime DateTime
+        public iCalDateTime DateTime
         {
             get { return m_DateTime; }
             set
@@ -60,10 +49,7 @@ namespace DDay.iCal.DataTypes
             }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
-        virtual public Duration Duration
+        public Duration Duration
         {
             get { return m_Duration; }
             set
@@ -79,10 +65,7 @@ namespace DDay.iCal.DataTypes
             }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 3)]
-#endif
-        virtual public TriggerRelation Related
+        public TriggerRelation Related
         {
             get
             {       
@@ -99,7 +82,7 @@ namespace DDay.iCal.DataTypes
                 m_Related = value;
             }
         }
-        
+
         public bool IsRelative
         {
             get { return m_Duration != null; }

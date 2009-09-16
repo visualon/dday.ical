@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using DDay.iCal.Components;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -25,14 +24,7 @@ namespace DDay.iCal.Components
     /// There may be other, custom X-properties applied to the calendar,
     /// and X-properties may be applied to calendar components.
     /// </remarks>
-#if DATACONTRACT
-    [DataContract(Name = "Property", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
-    public class Property : 
-        iCalObject,
-        IKeyedObject<string>
+    public class Property : iCalObject
     {
         #region Private Fields
 
@@ -56,8 +48,8 @@ namespace DDay.iCal.Components
         {
             this.Name = cl.Name;
             this.Value = cl.Value;
-            foreach (Parameter p in cl.Parameters)
-                AddParameter(p);
+            foreach (DictionaryEntry de in cl.Parameters)
+                this.Parameters[de.Key] = de.Value;
         }
         public Property(iCalObject parent) : base(parent) { }
         public Property(iCalObject parent, string name) : base(parent, name)
@@ -106,19 +98,9 @@ namespace DDay.iCal.Components
         public void AddToParent()
         {
             if (Parent != null &&
-                Name != null)
-            {
-                Parent.Properties.Add(this);
-            }
-        }
-
-        #endregion
-
-        #region IKeyedObject Members
-
-        public string Key
-        {
-            get { return Name; }
+                Name != null &&
+                !Parent.Properties.ContainsKey(Name))
+                Parent.Properties[Name] = this;
         }
 
         #endregion

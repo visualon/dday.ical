@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using DDay.iCal.DataTypes;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
@@ -14,13 +13,6 @@ namespace DDay.iCal.Components
     /// the alarm occurs, the <see cref="Alarm"/> that fired, and the 
     /// component on which the alarm fired.
     /// </remarks>
-#if DATACONTRACT
-    [DataContract(Name = "AlarmOccurrence", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(Alarm))]
-    [KnownType(typeof(iCalDateTime))]
-#else
-    [Serializable]
-#endif
     public class AlarmOccurrence : 
         Occurrence,
         IComparable<AlarmOccurrence>
@@ -33,19 +25,13 @@ namespace DDay.iCal.Components
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
-        virtual public Alarm Alarm
+        public Alarm Alarm
         {
             get { return m_Alarm; }
             set { m_Alarm = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
-        virtual public iCalDateTime DateTime
+        public iCalDateTime DateTime
         {
             get
             {

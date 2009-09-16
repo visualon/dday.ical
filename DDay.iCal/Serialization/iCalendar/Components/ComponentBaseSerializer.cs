@@ -15,7 +15,6 @@ namespace DDay.iCal.Serialization.iCalendar.Components
         #region Private Fields
 
         private DDay.iCal.Components.ComponentBase m_Component;
-        private bool _OptimizeForSpeed = true;
         
         #endregion
 
@@ -31,16 +30,6 @@ namespace DDay.iCal.Serialization.iCalendar.Components
                     m_Component = value;
                     base.Object = value;
                 }
-            }
-        }
-
-        public bool OptimizeForSpeed
-        {
-            get { return _OptimizeForSpeed; }
-            set
-            {
-                if (!object.Equals(_OptimizeForSpeed, value))
-                    _OptimizeForSpeed = value;
             }
         }
 
@@ -193,7 +182,7 @@ namespace DDay.iCal.Serialization.iCalendar.Components
         {
             // Normalize line endings, so "\r" is treated the same as "\r\n"
             // NOTE: fixed bug #1773194 - Some applications emit mixed line endings
-            TextReader textReader = NormalizeLineEndings(tr, !OptimizeForSpeed);
+            TextReader textReader = NormalizeLineEndings(tr);
 
             // Create a lexer for our text stream
             iCalLexer lexer = new iCalLexer(textReader);

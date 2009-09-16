@@ -6,7 +6,6 @@ using System.Configuration;
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
 using DDay.iCal.Serialization;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {    
@@ -14,15 +13,7 @@ namespace DDay.iCal.Components
     /// A class that contains time zone information, and is usually accessed
     /// from an iCalendar object using the <see cref="DDay.iCal.iCalendar.GetTimeZone"/> method.        
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "iCalTimeZoneInfo", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(UTC_Offset))]
-    [KnownType(typeof(Text[]))]
-    [KnownType(typeof(Text))]    
-#else
-    [Serializable]
-#endif
-    public class iCalTimeZoneInfo : RecurringComponent
+    public class TimeZoneInfo : RecurringComponent
     {
         #region Disabled Properties and Methods
 
@@ -334,9 +325,6 @@ namespace DDay.iCal.Components
         ///     </list>
         /// </example>
         /// </summary>
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         public string TimeZoneName
         {
             get
@@ -349,15 +337,12 @@ namespace DDay.iCal.Components
             {
                 if (TZName == null)
                     TZName = new Text[1];
-                TZName[0] = (Text)value;
+                TZName[0] = new Text(value);
                 TZName[0].Name = "TZNAME";
             }
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
         public UTC_Offset TZOffsetFrom
         {
             get { return m_TZOffsetFrom; }
@@ -365,9 +350,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 3)]
-#endif
         public UTC_Offset TZOffsetTo
         {
             get { return m_TZOffsetTo; }
@@ -375,9 +357,6 @@ namespace DDay.iCal.Components
         }
 
         [Serialized]
-#if DATACONTRACT
-        [DataMember(Order = 4)]
-#endif
         public Text[] TZName
         {
             get { return m_TZName; }
@@ -420,18 +399,18 @@ namespace DDay.iCal.Components
 
         #region Constructors
 
-        public iCalTimeZoneInfo() : base()
+        public TimeZoneInfo() : base()
         {
-            base.Sequence = null; // iCalTimeZoneInfo does not allow for sequence numbers
+            base.Sequence = null; // TimeZoneInfo does not allow for sequence numbers
         }
-        public iCalTimeZoneInfo(iCalObject parent) : base(parent)
+        public TimeZoneInfo(iCalObject parent) : base(parent)
         {
-            base.Sequence = null; // iCalTimeZoneInfo does not allow for sequence numbers
+            base.Sequence = null; // TimeZoneInfo does not allow for sequence numbers
         }
-        public iCalTimeZoneInfo(string name, iCalObject parent)
+        public TimeZoneInfo(string name, iCalObject parent)
             : base(parent)
         {
-            base.Sequence = null; // iCalTimeZoneInfo does not allow for sequence numbers
+            base.Sequence = null; // TimeZoneInfo does not allow for sequence numbers
             this.Name = name;
         }
 
@@ -439,25 +418,25 @@ namespace DDay.iCal.Components
 
         #region Overrides
 
-        internal override List<Period> Evaluate(iCalDateTime FromDate, iCalDateTime ToDate)
+        public override List<Period> Evaluate(iCalDateTime FromDate, iCalDateTime ToDate)
         {
             List<Period> periods = base.Evaluate(FromDate, ToDate);
             // Add the initial specified date/time for the time zone entry
             periods.Insert(0, new Period(Start, null));
             return periods;
-        }
+        }            
 
         /// <summary>
-        /// Returns a typed copy of the iCalTimeZoneInfo object.
+        /// Returns a typed copy of the TimeZoneInfo object.
         /// </summary>
-        /// <returns>A typed copy of the iCalTimeZoneInfo object.</returns>
-        public new iCalTimeZoneInfo Copy()
+        /// <returns>A typed copy of the TimeZoneInfo object.</returns>
+        public new TimeZoneInfo Copy()
         {
-            return (iCalTimeZoneInfo)base.Copy();
+            return (TimeZoneInfo)base.Copy();
         }
 
         /// <summary>
-        /// Creates a copy of the <see cref="iCalTimeZoneInfo"/> object.
+        /// Creates a copy of the <see cref="TimeZoneInfo"/> object.
         /// </summary>
         public override iCalObject Copy(iCalObject parent)
         {
@@ -473,7 +452,7 @@ namespace DDay.iCal.Components
 
         public override bool Equals(object obj)
         {
-            iCalTimeZoneInfo tzi = obj as iCalTimeZoneInfo;
+            TimeZoneInfo tzi = obj as TimeZoneInfo;
             if (tzi != null)
             {
                 return object.Equals(TZName, tzi.TZName) &&

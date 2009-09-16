@@ -1,7 +1,6 @@
-// $ANTLR 2.7.6 (20061021): "iCal.g" -> "iCalLexer.cs"$
+// $ANTLR 2.7.6 (2005-12-22): "iCal.g" -> "iCalLexer.cs"$
     
-    using DDay.iCal.Components; 
-    using System.Text;   
+    using DDay.iCal.Components;    
 
 namespace DDay.iCal.Serialization.iCalendar
 {
@@ -37,33 +36,37 @@ namespace DDay.iCal.Serialization.iCalendar
 	 {
 		public const int EOF = 1;
 		public const int NULL_TREE_LOOKAHEAD = 3;
-		public const int CRLF = 4;
-		public const int BEGIN = 5;
-		public const int COLON = 6;
-		public const int VCALENDAR = 7;
+		public const int BEGIN = 4;
+		public const int COLON = 5;
+		public const int VCALENDAR = 6;
+		public const int CRLF = 7;
 		public const int END = 8;
 		public const int IANA_TOKEN = 9;
 		public const int X_NAME = 10;
-		public const int SEMICOLON = 11;
-		public const int EQUAL = 12;
-		public const int COMMA = 13;
-		public const int DQUOTE = 14;
-		public const int CTL = 15;
-		public const int BACKSLASH = 16;
-		public const int NUMBER = 17;
-		public const int DOT = 18;
-		public const int CR = 19;
-		public const int LF = 20;
-		public const int ALPHA = 21;
-		public const int DIGIT = 22;
-		public const int DASH = 23;
-		public const int UNICODE = 24;
-		public const int SPECIAL = 25;
-		public const int SPACE = 26;
-		public const int HTAB = 27;
-		public const int SLASH = 28;
-		public const int ESCAPED_CHAR = 29;
-		public const int LINEFOLDER = 30;
+		public const int PRODID = 11;
+		public const int SEMICOLON = 12;
+		public const int VERSION = 13;
+		public const int CALSCALE = 14;
+		public const int METHOD = 15;
+		public const int EQUAL = 16;
+		public const int COMMA = 17;
+		public const int DQUOTE = 18;
+		public const int CTL = 19;
+		public const int BACKSLASH = 20;
+		public const int NUMBER = 21;
+		public const int DOT = 22;
+		public const int CR = 23;
+		public const int LF = 24;
+		public const int ALPHA = 25;
+		public const int DIGIT = 26;
+		public const int DASH = 27;
+		public const int SPECIAL = 28;
+		public const int UNICODE = 29;
+		public const int SPACE = 30;
+		public const int HTAB = 31;
+		public const int SLASH = 32;
+		public const int ESCAPED_CHAR = 33;
+		public const int LINEFOLDER = 34;
 		
 		public iCalLexer(Stream ins) : this(new ByteBuffer(ins))
 		{
@@ -163,6 +166,27 @@ tryAgain:
 							theRetToken = returnToken_;
 							break;
 						}
+						case '-':  case '0':  case '1':  case '2':
+						case '3':  case '4':  case '5':  case '6':
+						case '7':  case '8':  case '9':  case 'A':
+						case 'B':  case 'C':  case 'D':  case 'E':
+						case 'F':  case 'G':  case 'H':  case 'I':
+						case 'J':  case 'K':  case 'L':  case 'M':
+						case 'N':  case 'O':  case 'P':  case 'Q':
+						case 'R':  case 'S':  case 'T':  case 'U':
+						case 'V':  case 'W':  case 'X':  case 'Y':
+						case 'Z':  case 'a':  case 'b':  case 'c':
+						case 'd':  case 'e':  case 'f':  case 'g':
+						case 'h':  case 'i':  case 'j':  case 'k':
+						case 'l':  case 'm':  case 'n':  case 'o':
+						case 'p':  case 'q':  case 'r':  case 's':
+						case 't':  case 'u':  case 'v':  case 'w':
+						case 'x':  case 'y':  case 'z':
+						{
+							mIANA_TOKEN(true);
+							theRetToken = returnToken_;
+							break;
+						}
 						default:
 							if ((cached_LA1=='\r') && (cached_LA2=='\n') && (LA(3)=='\t'||LA(3)==' '))
 							{
@@ -177,16 +201,20 @@ tryAgain:
 								mESCAPED_CHAR(true);
 								theRetToken = returnToken_;
 							}
+							else if ((tokenSet_1_.member(cached_LA1))) {
+								mSPECIAL(true);
+								theRetToken = returnToken_;
+							}
+							else if (((cached_LA1 >= '\u0100' && cached_LA1 <= '\ufffe'))) {
+								mUNICODE(true);
+								theRetToken = returnToken_;
+							}
 							else if ((cached_LA1=='\\') && (true)) {
 								mBACKSLASH(true);
 								theRetToken = returnToken_;
 							}
-							else if ((tokenSet_1_.member(cached_LA1)) && (true)) {
+							else if ((tokenSet_2_.member(cached_LA1)) && (true)) {
 								mCTL(true);
-								theRetToken = returnToken_;
-							}
-							else if ((tokenSet_2_.member(cached_LA1))) {
-								mIANA_TOKEN(true);
 								theRetToken = returnToken_;
 							}
 						else
@@ -315,21 +343,7 @@ tryAgain:
 		returnToken_ = _token;
 	}
 	
-	protected void mUNICODE(bool _createToken) //throws RecognitionException, CharStreamException, TokenStreamException
-{
-		int _ttype; IToken _token=null; int _begin=text.Length;
-		_ttype = UNICODE;
-		
-		matchRange('\u0100','\uFFFE');
-		if (_createToken && (null == _token) && (_ttype != Token.SKIP))
-		{
-			_token = makeToken(_ttype);
-			_token.setText(text.ToString(_begin, text.Length-_begin));
-		}
-		returnToken_ = _token;
-	}
-	
-	protected void mSPECIAL(bool _createToken) //throws RecognitionException, CharStreamException, TokenStreamException
+	public void mSPECIAL(bool _createToken) //throws RecognitionException, CharStreamException, TokenStreamException
 {
 		int _ttype; IToken _token=null; int _begin=text.Length;
 		_ttype = SPECIAL;
@@ -383,6 +397,20 @@ tryAgain:
 			throw new NoViableAltForCharException(cached_LA1, getFilename(), getLine(), getColumn());
 		}
 		break; }
+		if (_createToken && (null == _token) && (_ttype != Token.SKIP))
+		{
+			_token = makeToken(_ttype);
+			_token.setText(text.ToString(_begin, text.Length-_begin));
+		}
+		returnToken_ = _token;
+	}
+	
+	public void mUNICODE(bool _createToken) //throws RecognitionException, CharStreamException, TokenStreamException
+{
+		int _ttype; IToken _token=null; int _begin=text.Length;
+		_ttype = UNICODE;
+		
+		matchRange('\u0100','\uFFFE');
 		if (_createToken && (null == _token) && (_ttype != Token.SKIP))
 		{
 			_token = makeToken(_ttype);
@@ -683,14 +711,6 @@ tryAgain:
 					break;
 				}
 				default:
-					if ((tokenSet_3_.member(cached_LA1)))
-					{
-						mSPECIAL(false);
-					}
-					else if (((cached_LA1 >= '\u0100' && cached_LA1 <= '\ufffe'))) {
-						mUNICODE(false);
-					}
-				else
 				{
 					if (_cnt109 >= 1) { goto _loop109_breakloop; } else { throw new NoViableAltForCharException(cached_LA1, getFilename(), getLine(), getColumn());; }
 				}
@@ -710,12 +730,16 @@ _loop109_breakloop:			;
 		{
 		case "BEGIN": _ttype = BEGIN; break;
 		case "END": _ttype = END; break;
-		case "VCALENDAR": _ttype = VCALENDAR; break;            
+		case "VCALENDAR": _ttype = VCALENDAR; break;
+		case "PRODID": _ttype = PRODID; break;
+		case "VERSION": _ttype = VERSION; break;
+		case "CALSCALE": _ttype = CALSCALE; break;
+		case "METHOD": _ttype = METHOD; break;
 		default: 
 		if (s.Length > 2 && s.Substring(0,2).Equals("X-"))
 		_ttype = X_NAME;
 		break;                
-		}
+		}        
 		}
 		
 		if (_createToken && (null == _token) && (_ttype != Token.SKIP))
@@ -773,33 +797,22 @@ _loop109_breakloop:			;
 	private static long[] mk_tokenSet_1_()
 	{
 		long[] data = new long[1025];
-		data[0]=4294965759L;
-		data[1]=-9223372036854775808L;
-		for (int i = 2; i<=1024; i++) { data[i]=0L; }
-		return data;
-	}
-	public static readonly BitSet tokenSet_1_ = new BitSet(mk_tokenSet_1_());
-	private static long[] mk_tokenSet_2_()
-	{
-		long[] data = new long[2560];
-		data[0]=-3170762861857210368L;
-		data[1]=9223372036586340351L;
-		for (int i = 2; i<=1022; i++) { data[i]=-1L; }
-		data[1023]=9223372036854775807L;
-		for (int i = 1024; i<=2559; i++) { data[i]=0L; }
-		return data;
-	}
-	public static readonly BitSet tokenSet_2_ = new BitSet(mk_tokenSet_2_());
-	private static long[] mk_tokenSet_3_()
-	{
-		long[] data = new long[1025];
 		data[0]=-3458746947404300288L;
 		data[1]=8646911292738633729L;
 		for (int i = 2; i<=3; i++) { data[i]=-1L; }
 		for (int i = 4; i<=1024; i++) { data[i]=0L; }
 		return data;
 	}
-	public static readonly BitSet tokenSet_3_ = new BitSet(mk_tokenSet_3_());
+	public static readonly BitSet tokenSet_1_ = new BitSet(mk_tokenSet_1_());
+	private static long[] mk_tokenSet_2_()
+	{
+		long[] data = new long[1025];
+		data[0]=4294965759L;
+		data[1]=-9223372036854775808L;
+		for (int i = 2; i<=1024; i++) { data[i]=0L; }
+		return data;
+	}
+	public static readonly BitSet tokenSet_2_ = new BitSet(mk_tokenSet_2_());
 	
 }
 }

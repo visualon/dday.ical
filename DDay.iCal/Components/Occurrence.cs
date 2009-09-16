@@ -3,18 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using DDay.iCal.DataTypes;
 using System.Diagnostics;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
     [DebuggerDisplay("{Component.Summary} ({Period.StartTime} - {Period.EndTime})")]
-#if DATACONTRACT
-    [DataContract(Name = "Occurrence", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(Period))]
-    [KnownType(typeof(RecurringComponent))]
-#else
-    [Serializable]
-#endif
     public class Occurrence :
         IComparable<Occurrence>
     {
@@ -27,18 +19,12 @@ namespace DDay.iCal.Components
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
         virtual public Period Period
         {
             get { return _Period; }
             set { _Period = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
         virtual public RecurringComponent Component
         {
             get { return _Component; }

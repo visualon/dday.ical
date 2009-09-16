@@ -6,7 +6,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using DDay.iCal.Components;
 using DDay.iCal.DataTypes;
-using DDay.iCal.Serialization.xCal.Components;
 
 namespace DDay.iCal.Serialization.xCal.DataTypes
 {
@@ -37,9 +36,9 @@ namespace DDay.iCal.Serialization.xCal.DataTypes
             {
                 case "BASE64": return Convert.ToBase64String(encoding.GetBytes(value));
                 case "7BIT":
-                case "8BIT":
+                case "8BIT":                
                     value = Regex.Replace(value, @"[^\r]\n", "\r\n");
-                    value = Regex.Replace(value, @"\r[^\n]", "\r\n");
+                    value = Regex.Replace(value, @"\r[^\n]", "\r\n");                    
 
                     bool is7Bit = _DataType.Encoding.Equals("7BIT");
 
@@ -53,7 +52,7 @@ namespace DDay.iCal.Serialization.xCal.DataTypes
                             data.RemoveAt(i);
                     }
 
-                    return encoding.GetString(data.ToArray(), 0, data.Count);
+                    return encoding.GetString(data.ToArray());
                 default:
                     return value;
             }

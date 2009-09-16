@@ -2,18 +2,12 @@ using System;
 using System.Data;
 using System.Configuration;
 using DDay.iCal.Components;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.Components
 {
     /// <summary>
     /// <note>This class has not yet been implemented.</note>
     /// </summary>
-#if DATACONTRACT
-    [DataContract(Name = "FreeBusy", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-#else
-    [Serializable]
-#endif
     public class FreeBusy : ComponentBase
     {
         public FreeBusy(iCalObject parent) : base(parent)

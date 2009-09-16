@@ -74,19 +74,21 @@ namespace DDay.iCal.Serialization.xCal.Components
                         serializer.Serialize(xtw);
                 }
 
-                foreach (Property p in Object.Properties)
+                foreach (DictionaryEntry de in Object.Properties)
                 {
                     // Don't serialize "VERSION" again, we've already done it above.
-                    if (p.Key.Equals("VERSION"))
+                    if (de.Key.Equals("VERSION"))
                         continue;
-                                        
+
+                    Property p = (Property)de.Value;
                     IXCalSerializable serializer = SerializerFactory.Create(p);
                     if (serializer != null)
                         serializer.Serialize(xtw);
                 }
 
-                foreach (Parameter p in Object.Parameters)
-                {                    
+                foreach (DictionaryEntry de in Object.Parameters)
+                {
+                    Parameter p = (Parameter)de.Value;
                     IXCalSerializable serializer = SerializerFactory.Create(p);
                     if (serializer != null)
                         serializer.Serialize(xtw);

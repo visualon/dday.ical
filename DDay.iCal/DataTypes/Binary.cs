@@ -3,7 +3,6 @@ using System.Net;
 using System.Collections.Generic;
 using System.Text;
 using DDay.iCal.Components;
-using System.Runtime.Serialization;
 
 namespace DDay.iCal.DataTypes
 {
@@ -11,13 +10,6 @@ namespace DDay.iCal.DataTypes
     /// A class to handle binary attachments, or URIs as binary attachments, within an iCalendar. 
     /// </summary>
     [Encodable("BASE64")]
-#if DATACONTRACT
-    [DataContract(Name = "Binary", Namespace = "http://www.ddaysoftware.com/dday.ical/2009/07/")]
-    [KnownType(typeof(URI))]
-    [KnownType(typeof(Text))]
-#else
-    [Serializable]
-#endif
     public class Binary : EncodableDataType
     {
         #region Private Fields
@@ -28,36 +20,23 @@ namespace DDay.iCal.DataTypes
 
         #region Public Properties
 
-#if DATACONTRACT
-        [DataMember(Order = 1)]
-#endif
-        virtual public URI Uri
+        public URI Uri
         {
             get { return m_Uri; }
             set { m_Uri = value; }
         }
 
-#if DATACONTRACT
-        [DataMember(Order = 2)]
-#endif
-        virtual public Text FormatType
+        public Text FormatType
         {
             get
             {                
                 if (Parameters.ContainsKey("FMTYPE"))
                 {
                     Parameter p = (Parameter)Parameters["FMTYPE"];
-                    Text fmtype = new Text(p.Values[0].ToString(), true);
+                    Text fmtype = new Text(p.Values[0].ToString());
                     return fmtype;
                 }
                 return null;
-            }
-            protected set
-            {
-                if (value != null)
-                    Parameters["FMTYPE"] = new Parameter("FMTYPE", value);
-                else
-                    Parameters.Remove("FMTYPE");
             }
         }
 
@@ -178,9 +157,10 @@ namespace DDay.iCal.DataTypes
                 if (Uri == null)
                     throw new ArgumentException("A URI was not provided for the Binary::LoadDataFromUri() method");
                 uri = new Uri(Uri.Value);
-            }                       
-            
+            }
+
             Data = client.DownloadData(uri);
+            
         }
 
         #endregion
