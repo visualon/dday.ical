@@ -19,7 +19,7 @@ namespace DDay.iCal
 
         virtual public string Encoding
         {
-            get { return Parameters.Get("ENCODING"); }
+            get { return Parameters.Get<string>("ENCODING"); }
             set { Parameters.Set("ENCODING", value); }
         }
 

@@ -6,10 +6,9 @@ namespace DDay.iCal
 {
     public interface ICalendarProperty :        
         ICalendarParameterListContainer,
-        ICalendarObject        
+        ICalendarObject,
+        IValueObject<object>
     {
-        event EventHandler<ValueChangedEventArgs> ValueChanged;
-
         object Value { get; set; }
     }    
 }

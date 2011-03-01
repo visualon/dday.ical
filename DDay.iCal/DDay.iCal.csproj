@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -11,6 +11,17 @@
     <RootNamespace>DDay.iCal</RootNamespace>
     <AssemblyName>DDay.iCal</AssemblyName>
     <IsWebBootstrapper>true</IsWebBootstrapper>
+    <StartupObject>
+    </StartupObject>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <PublishUrl>http://localhost/DDay.iCal/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -21,21 +32,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>0.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <StartupObject>
-    </StartupObject>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>2.0</OldToolsVersion>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkSubset>
-    </TargetFrameworkSubset>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,6 +46,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\DDay.iCal.XML</DocumentationFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -56,6 +57,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\DDay.iCal.XML</DocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="antlr.runtime, Version=2.7.6.2, Culture=neutral, processorArchitecture=MSIL">
@@ -113,18 +115,13 @@
     <Compile Include="Evaluation\TimeZoneInfoEvaluator.cs" />
     <Compile Include="Evaluation\TodoEvaluator.cs" />
     <Compile Include="Exceptions\EvaluationEngineException.cs" />
-    <Compile Include="General\AssociatedCalendarParameterList.cs" />
-    <Compile Include="General\CalendarParameterCompositeList.cs" />
-    <Compile Include="General\CalendarPropertyCompositeList.cs" />
-    <Compile Include="General\CalendarComponentCompositeList.cs" />
+    <Compile Include="General\CalendarObjectList.cs" />
     <Compile Include="General\FilteredCalendarObjectList.cs" />
+    <Compile Include="General\KeyedValueList.cs" />
     <Compile Include="General\ServiceProvider.cs" />
     <Compile Include="Interfaces\DataTypes\IFreeBusyEntry.cs" />
     <Compile Include="Interfaces\Evaluation\IGetFreeBusy.cs" />
     <Compile Include="Interfaces\Evaluation\IGetOccurrences.cs" />
-    <Compile Include="Interfaces\General\ICalendarParameterCompositeList.cs" />
-    <Compile Include="Interfaces\General\ICalendarPropertyCompositeList.cs" />
-    <Compile Include="Interfaces\General\IFilteredCalendarObjectList.cs" />
     <Compile Include="Interfaces\Components\IAlarmContainer.cs" />
     <Compile Include="Interfaces\DataTypes\ICalendarDataType.cs" />
     <Compile Include="Interfaces\DataTypes\IDateTime.cs" />
@@ -134,13 +131,16 @@
     <Compile Include="Interfaces\DataTypes\IPeriod.cs" />
     <Compile Include="Interfaces\Evaluation\IEvaluator.cs" />
     <Compile Include="Interfaces\Evaluation\IRecurrable.cs" />
+    <Compile Include="Interfaces\General\ICalendarObjectList.cs" />
+    <Compile Include="Interfaces\General\IKeyedValueList.cs" />
     <Compile Include="Interfaces\General\IServiceProvider.cs" />
-    <Compile Include="Interfaces\Serialization\IDataTypeMapper.cs" />
-    <Compile Include="Interfaces\Serialization\IEncodingProvider.cs" />
-    <Compile Include="Interfaces\Serialization\IEncodingStack.cs" />
-    <Compile Include="Interfaces\Serialization\ISerializationProcessor.cs" />
-    <Compile Include="Interfaces\Serialization\ISerializationSettings.cs" />
-    <Compile Include="Interfaces\Serialization\IStringSerializer.cs" />
+    <Compile Include="Interfaces\General\IValueObject.cs" />
+    <Compile Include="Structs\Serialization\IDataTypeMapper.cs" />
+    <Compile Include="Structs\Serialization\IEncodingProvider.cs" />
+    <Compile Include="Structs\Serialization\IEncodingStack.cs" />
+    <Compile Include="Structs\Serialization\ISerializationProcessor.cs" />
+    <Compile Include="Structs\Serialization\ISerializationSettings.cs" />
+    <Compile Include="Structs\Serialization\IStringSerializer.cs" />
     <Compile Include="Serialization\EncodingStack.cs" />
     <Compile Include="Serialization\iCalendar\Factory\DataTypeSerializerFactory.cs" />
     <Compile Include="Serialization\iCalendar\Processors\ComponentPropertyConsolidator.cs" />
@@ -214,13 +214,12 @@
     <Compile Include="Interfaces\DataTypes\ITrigger.cs" />
     <Compile Include="Interfaces\DataTypes\IUTCOffset.cs" />
     <Compile Include="Interfaces\IICalendarCollection.cs" />
-    <Compile Include="Interfaces\Serialization\Factory\ISerializerFactory.cs" />
+    <Compile Include="Structs\Serialization\Factory\ISerializerFactory.cs" />
     <Compile Include="Interfaces\General\IUniqueComponentList.cs" />
     <Compile Include="Interfaces\Components\IRecurringComponent.cs" />
     <Compile Include="Interfaces\Components\IUniqueComponent.cs" />
     <Compile Include="Interfaces\Components\ICalendarComponent.cs" />
-    <Compile Include="Interfaces\Serialization\Factory\ICalendarComponentFactory.cs" />
-    <Compile Include="Interfaces\General\ICalendarObjectList.cs" />
+    <Compile Include="Structs\Serialization\Factory\ICalendarComponentFactory.cs" />
     <Compile Include="Interfaces\General\ICalendarPropertyList.cs" />
     <Compile Include="Interfaces\General\ICalendarObject.cs" />
     <Compile Include="Interfaces\General\ICalendarParameter.cs" />
@@ -232,13 +231,13 @@
     <Compile Include="Interfaces\General\ILoadable.cs" />
     <Compile Include="Interfaces\General\IMergeable.cs" />
     <Compile Include="Interfaces\IICalendar.cs" />
-    <Compile Include="Interfaces\Serialization\ISerializationContext.cs" />
+    <Compile Include="Structs\Serialization\ISerializationContext.cs" />
     <Compile Include="Interfaces\General\IKeyedList.cs" />
     <Compile Include="Interfaces\General\IKeyedObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Properties\AssemblyInfo.cs.template" />
     <None Include="Serialization\iCalendar\iCal.g" />
-    <Compile Include="Interfaces\Serialization\ISerializer.cs" />
+    <Compile Include="Structs\Serialization\ISerializer.cs" />
     <Compile Include="Serialization\DataTypeMapper.cs" />
     <Compile Include="Serialization\iCalendar\Serializers\DataMapSerializer.cs" />
     <Compile Include="Serialization\iCalendar\Serializers\DataTypes\DateTimeSerializer.cs" />
@@ -264,10 +263,20 @@
     <Compile Include="General\UniqueComponentList.cs" />
   </ItemGroup>
   <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0</ProductName>
       <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>

@@ -398,7 +398,7 @@ namespace DDay.iCal
         private IUniqueComponentList<ITodo> m_Todos;
         private IUniqueComponentList<IJournal> m_Journals;
         private IUniqueComponentList<IFreeBusy> m_FreeBusy;
-        private IFilteredCalendarObjectList<ITimeZone> m_TimeZones;
+        private IList<ITimeZone> m_TimeZones;
 
         #endregion
 
@@ -525,7 +525,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="DDay.iCal.TimeZone"/> components in the iCalendar.
         /// </summary>
-        virtual public IFilteredCalendarObjectList<ITimeZone> TimeZones
+        virtual public IList<ITimeZone> TimeZones
         {
             get { return m_TimeZones; }
         }
