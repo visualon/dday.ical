@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Diagnostics;
 
@@ -88,7 +89,8 @@ namespace DDay.iCal
         private void Initialize()
         {
             m_Parameters = new CalendarParameterList(this, true);
-        }
+            ValueChanged += new EventHandler<ValueChangedEventArgs<object>>(CalendarProperty_ValueChanged);
+        }        
 
         #endregion
                
@@ -98,7 +100,7 @@ namespace DDay.iCal
         /// Adds a parameter to the iCalendar object.
         /// </summary>
         virtual public void AddParameter(string name, string value)
-        {
+        {            
             CalendarParameter p = new CalendarParameter(name, value);
             Parameters.Add(p);
         }
@@ -107,8 +109,23 @@ namespace DDay.iCal
         /// Adds a parameter to the iCalendar object.
         /// </summary>
         virtual public void AddParameter(ICalendarParameter p)
-        {
+        {            
             Parameters.Add(p);
+        }
+
+        #endregion
+
+        #region Event Handlers
+
+        void CalendarProperty_ValueChanged(object sender, ValueChangedEventArgs<object> e)
+        {
+            // Deassociate the old values
+            foreach (object removed in e.RemovedValues)
+                AssociationUtil.DeassociateItem(removed);
+
+            // Associate the new values with the parent object
+            foreach (object added in e.AddedValues)
+                AssociationUtil.AssociateItem(added, Parent);
         }
 
         #endregion
@@ -144,37 +161,65 @@ namespace DDay.iCal
 
         #endregion
 
-        #region ICalendarProperty Members
+        #region IValueObject<object> Members
 
-        public event EventHandler<ValueChangedEventArgs> ValueChanged;
+        [field: NonSerialized]
+        public event EventHandler<ValueChangedEventArgs<object>> ValueChanged;
 
-        protected void OnValueChanged(object oldValue, object newValue)
+        protected void OnValueChanged(object removedValue, object addedValue)
         {
             if (ValueChanged != null)
-                ValueChanged(this, new ValueChangedEventArgs(oldValue, newValue));
+            {
+                ValueChanged(this, new ValueChangedEventArgs<object>(
+                    removedValue != null ? new object[] { removedValue } : null,
+                    addedValue != null ? new object[] { addedValue } : null
+                ));
+            }
         }
 
         virtual public object Value
         {
             get { return m_Value; }
-            set 
+            set { SetValue(value); }
+        }
+
+        virtual public IEnumerable<object> Values
+        {
+            get 
+            { 
+                if (m_Value != null)
+                    return new object[] { m_Value };
+                return null;
+            }
+        }
+
+        virtual public void SetValue(object value)
+        {
+            object oldValue = m_Value;
+            m_Value = value;
+            OnValueChanged(oldValue, value);
+        }
+
+        virtual public void SetValue(IEnumerable<object> values)
+        {
+            if (values != null)
+                SetValue(values.FirstOrDefault());
+            SetValue(null);
+        }
+
+        virtual public void AddValue(object value)
+        {
+            // NOTE: we only support a single value for properties,
+            // So adding a value is synonymous with setting the value here.
+            SetValue(value);
+        }
+        
+        virtual public void RemoveValue(object value)
+        {
+            if (object.Equals(value, m_Value))
             {
-                if (!object.Equals(m_Value, value))
-                {
-                    object old = m_Value;
-                    m_Value = value;
-
-                    // Deassociate the old value
-                    if (old != null)
-                        AssociationUtil.DeassociateItem(old);
-
-                    // Associate the new value
-                    if (m_Value != null)
-                        AssociationUtil.AssociateItem(m_Value, Parent);
-
-                    // Notify that the value changed
-                    OnValueChanged(old, m_Value);
-                }
+                m_Value = null;
+                OnValueChanged(value, null);
             }
         }
 

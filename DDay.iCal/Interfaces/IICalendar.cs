@@ -78,7 +78,7 @@ namespace DDay.iCal
         /// <summary>
         /// Gets a list of time zones contained in the calendar.
         /// </summary>
-        IFilteredCalendarObjectList<ITimeZone> TimeZones { get; }
+        IList<ITimeZone> TimeZones { get; }
 
         /// <summary>
         /// Gets a list of To-do items contained in the calendar.

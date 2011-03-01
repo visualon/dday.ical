@@ -6,10 +6,8 @@ using System.Collections;
 namespace DDay.iCal
 {
     public interface IUniqueComponentList<T> :
-        IFilteredCalendarObjectList<T>
-        where T : IUniqueComponent
+        IKeyedList<string, T>
+        where T : class, IUniqueComponent
     {
-        bool ContainsKey(string UID);
-        T this[string uid] { get; set; }
     }
 }

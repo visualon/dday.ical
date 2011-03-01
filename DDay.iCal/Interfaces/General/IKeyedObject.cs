@@ -6,6 +6,7 @@ namespace DDay.iCal
 {
     public interface IKeyedObject<T>
     {
+        event EventHandler<ObjectEventArgs<T, T>> KeyChanged;
         T Key { get; }
     }
 }

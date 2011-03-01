@@ -1,229 +1,259 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace DDay.iCal
 {
     /// <summary>
-    /// A list of objects that are keyed.  This is similar to a 
-    /// Dictionary<T,U> object, except 
+    /// A list of objects that are keyed.  Note that keys are not ordered.
     /// </summary>
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class KeyedList<T, U> :
-        IKeyedList<T, U> where T : IKeyedObject<U>
+    public class KeyedList<TKey, TObject> :
+        IKeyedList<TKey, TObject>
+        where TObject : class, IKeyedObject<TKey>
     {
         #region Private Fields
 
-        List<T> _Items = new List<T>();
+        SortedDictionary<TKey, IList<TObject>> _Items = new SortedDictionary<TKey, IList<TObject>>();
 
         #endregion
 
-        #region IKeyedList<T, U> Members
+        #region Private Methods
 
-        public event EventHandler<ObjectEventArgs<T>> ItemAdded;
-        public event EventHandler<ObjectEventArgs<T>> ItemRemoved;
+        TObject SubscribeToKeyChanges(TObject item)
+        {
+            if (item != null)
+                item.KeyChanged += item_KeyChanged;
+            return item;
+        }
 
-        protected void OnItemAdded(T obj)
+        TObject UnsubscribeFromKeyChanges(TObject item)
+        {
+            if (item != null)
+                item.KeyChanged -= item_KeyChanged;
+            return item;
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        virtual protected TKey KeyModifier(TKey key)
+        {
+            return key;
+        }        
+
+        #endregion
+
+        #region Event Handlers
+
+        void item_KeyChanged(object sender, ObjectEventArgs<TKey, TKey> e)
+        {
+            TKey oldValue = e.First;
+            TKey newValue = e.Second;
+            TObject obj = sender as TObject;
+
+            if (obj != null)
+            {
+                // Remove the object from the hash table
+                // based on the old key.
+                if (!object.Equals(oldValue, default(TKey)))
+                {
+                    // Find the specific item and remove it
+                    TKey key = KeyModifier(oldValue);
+                    if (_Items.ContainsKey(key))
+                    {
+                        IList<TObject> items = _Items[key];
+                        int index = items.IndexOf(obj);
+                        if (index >= 0)
+                        {
+                            items.RemoveAt(index);
+                        }
+                    }
+                }
+
+                // If a new key exists, then re-add this item into the hash
+                if (!object.Equals(newValue, default(TKey)))
+                    Add(obj);
+            }
+        }
+
+        #endregion
+
+        #region IKeyedList<TKey, TObject> Members
+
+        [field: NonSerialized]
+        public event EventHandler<ObjectEventArgs<TObject>> ItemAdded;
+
+        [field: NonSerialized]
+        public event EventHandler<ObjectEventArgs<TObject>> ItemRemoved;
+
+        protected void OnItemAdded(TObject obj)
         {
             if (ItemAdded != null)
-                ItemAdded(this, new ObjectEventArgs<T>(obj));
+                ItemAdded(this, new ObjectEventArgs<TObject>(obj));
         }
 
-        protected void OnItemRemoved(T obj)
+        protected void OnItemRemoved(TObject obj)
         {
             if (ItemRemoved != null)
-                ItemRemoved(this, new ObjectEventArgs<T>(obj));
+                ItemRemoved(this, new ObjectEventArgs<TObject>(obj));
         }
 
-        /// <summary>
-        /// Returns true if the list contains at least one 
-        /// object with a matching key, false otherwise.
-        /// </summary>
-        public bool ContainsKey(U key)
+        virtual public void Add(TObject item)
         {
-            return IndexOf(key) >= 0;
-        }
-
-        /// <summary>
-        /// Returns the index of the first object
-        /// with the matching key.
-        /// </summary>
-        public int IndexOf(U key)
-        {
-            return _Items.FindIndex(
-                delegate(T obj)
-                {
-                    return object.Equals(obj.Key, key);
-                }
-            );
-        }
-
-        public int CountOf(U key)
-        {
-            return AllOf(key).Count;
-        }
-
-        public IList<T> AllOf(U key)
-        {
-            return _Items.FindAll(
-                delegate(T obj)
-                {
-                    return object.Equals(obj.Key, key);
-                }
-            );
-        }
-
-        public T this[U key]
-        {
-            get
+            if (item != null)
             {
-                for (int i = 0; i < Count; i++)
-                {
-                    T obj = _Items[i];
-                    if (object.Equals(obj.Key, key))
-                        return obj;
-                }
-                return default(T);
+                TKey key = KeyModifier(item.Key);
+                if (!_Items.ContainsKey(key))
+                    _Items[key] = new List<TObject>();
+
+                _Items[key].Add(SubscribeToKeyChanges(item));
+                OnItemAdded(item);
             }
-            set
+        }
+
+        virtual public void Insert(int index, TObject item)
+        {
+            if (index >= 0)
             {
-                int index = IndexOf(key);
-                if (index >= 0)
+                TKey key = KeyModifier(item.Key);
+                if (!_Items.ContainsKey(key))
                 {
-                    OnItemRemoved(_Items[index]);
-                    _Items[index] = value;
-                    OnItemAdded(value);
+                    if (index != 0)
+                        return;
+                    _Items[key] = new List<TObject>();
                 }
-                else
+
+                IList<TObject> list = _Items[key];
+                if (index >= 0 && index < list.Count)
                 {
-                    Add(value);
+                    list.Insert(index, item);
+                    OnItemAdded(item);
                 }
             }
         }
 
-        public bool Remove(U key)
+        virtual public int IndexOf(TObject item)
         {
-            int index = IndexOf(key);
-            bool removed = false;
+            TKey key = KeyModifier(item.Key);
+            if (_Items.ContainsKey(key))
+                return _Items[key].IndexOf(item);
+            return -1;
+        }
 
-            while (index >= 0)
+        virtual public void Clear(TKey key)
+        {
+            if (_Items.ContainsKey(key))
             {
-                T item = _Items[index];
-                RemoveAt(index);
-                OnItemRemoved(item);
-                removed = true;
-                index = IndexOf(key);
-            }
-
-            return removed;
-        }
-
-        #endregion
-
-        #region IKeyedList<T,U> Members
-
-        public T[] ToArray()
-        {
-            return _Items.ToArray();
-        }
-
-        #endregion
-
-        #region IList<T> Members
-
-        public int IndexOf(T item)
-        {
-            return _Items.IndexOf(item);
-        }
-
-        public void Insert(int index, T item)
-        {
-            _Items.Insert(index, item);
-            OnItemAdded(item);
-        }
-
-        public void RemoveAt(int index)
-        {
-            if (index >= 0 && index < Count)
-            {
-                T item = _Items[index];
-                _Items.RemoveAt(index);
-                OnItemRemoved(item);
-            }
-        }
-
-        public T this[int index]
-        {
-            get
-            {
-                return _Items[index];
-            }
-            set
-            {
-                if (index >= 0 && index < Count)
-                {
-                    T item = _Items[index];                    
-                    _Items[index] = value;
+                var items = _Items[key].ToArray();
+                _Items[key].Clear();
+                foreach (var item in items)
                     OnItemRemoved(item);
+            }
+        }
+
+        virtual public void Clear()
+        {
+            var items = _Items.Values.SelectMany(i => i).ToArray();
+            _Items.Clear();
+            foreach (var item in items)
+                OnItemRemoved(item);
+        }
+
+        virtual public bool ContainsKey(TKey key)
+        {
+            return _Items.ContainsKey(key);
+        }
+
+        virtual public int CountOf(TKey key)
+        {
+            if (_Items.ContainsKey(key))
+                return _Items[key].Count;
+            return 0;
+        }
+
+        virtual public IEnumerable<TObject> Values()
+        {
+            return _Items.Values.SelectMany(i => i);
+        }
+
+        virtual public IEnumerable<TObject> AllOf(TKey key)
+        {
+            if (_Items.ContainsKey(key))
+                return _Items[key];
+            return null;
+        }
+
+        virtual public TObject this[TKey key]
+        {
+            get
+            {
+                if (_Items.ContainsKey(key) &&
+                    _Items[key].Count > 0)
+                    return _Items[key][0];
+                return default(TObject);
+            }
+            set
+            {
+                if (!_Items.ContainsKey(key))
+                    _Items[key] = new List<TObject>();
+                
+                if (value != null)
+                {
+                    if (_Items[key].Count > 0)
+                    {
+                        if (_Items[key][0] != null)
+                            UnsubscribeFromKeyChanges(_Items[key][0]);
+                        _Items[key][0] = SubscribeToKeyChanges(value);
+                    }
+                    else
+                    {
+                        _Items[key].Add(SubscribeToKeyChanges(value));
+                    }
+
                     OnItemAdded(value);
+                }
+                else if (_Items[key].Count > 0)
+                {
+                    TObject item = UnsubscribeFromKeyChanges(_Items[key][0]);
+                    _Items[key].RemoveAt(0);
+                    OnItemRemoved(item);
                 }
             }
         }
 
-        #endregion
-
-        #region ICollection<T> Members
-
-        public void Add(T item)
+        virtual public bool Remove(TObject obj)
         {
-            _Items.Add(item);
-            OnItemAdded(item);
+            TKey key = KeyModifier(obj.Key);
+            if (_Items.ContainsKey(key))
+            {
+                IList<TObject> items = _Items[key];
+                if (items.Remove(obj))
+                {
+                    OnItemRemoved(UnsubscribeFromKeyChanges(obj));
+                    return true;
+                }
+            }
+            return false;
         }
 
-        public void Clear()
-        {
-            foreach (T obj in _Items)
-                OnItemRemoved(obj);
-            _Items.Clear();
-        }
-
-        public bool Contains(T item)
-        {
-            return _Items.Contains(item);
-        }
-
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            _Items.CopyTo(array, arrayIndex);
-        }
-
-        public int Count
-        {
-            get { return _Items.Count; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-
-        public bool Remove(T item)
-        {
-            bool removed = _Items.Remove(item);
-            OnItemRemoved(item);
-            return removed;
+        virtual public TObject[] ToArray()
+        {            
+            return _Items.Values.SelectMany(i => i).ToArray();
         }
 
         #endregion
 
-        #region IEnumerable<T> Members
+        #region IEnumerable<U> Members
 
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<TObject> GetEnumerator()
         {
-            return _Items.GetEnumerator();
+            return new KeyedCollectionEnumerator<TKey, TObject>(this);
         }
 
         #endregion
@@ -232,7 +262,101 @@ namespace DDay.iCal
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return _Items.GetEnumerator();
+            return new KeyedCollectionEnumerator<TKey, TObject>(this);
+        }
+
+        #endregion
+
+        #region Helper Classes
+
+        private class KeyedCollectionEnumerator<T, U> :
+            IEnumerator<U>
+            where U : class, IKeyedObject<T>
+        {
+            KeyedList<T, U> _KeyedCollection;
+            IEnumerator<T> _KeyEnumerator;
+            IEnumerator<U> _ValueEnumerator;
+
+            public KeyedCollectionEnumerator(KeyedList<T, U> collection)
+            {
+                _KeyedCollection = collection;
+            }
+
+            #region IEnumerator<U> Members
+
+            public U Current
+            {
+                get
+                {
+                    if (_ValueEnumerator != null)
+                        return _ValueEnumerator.Current;
+                    return default(U);
+                }
+            }
+
+            #endregion
+
+            #region IDisposable Members
+
+            public void Dispose()
+            {
+                _KeyEnumerator.Dispose();
+                _KeyEnumerator = null;
+                _ValueEnumerator.Dispose();
+                _ValueEnumerator = null;
+            }
+
+            #endregion
+
+            #region IEnumerator Members
+
+            object System.Collections.IEnumerator.Current
+            {
+                get
+                {
+                    if (_ValueEnumerator != null)
+                        return _ValueEnumerator.Current;
+                    return default(U);
+                }
+            }
+
+            bool MoveNextKey()
+            {
+                if (_KeyEnumerator == null)
+                    _KeyEnumerator = _KeyedCollection._Items.Keys.GetEnumerator();
+                return _KeyEnumerator.MoveNext();                
+            }
+
+            virtual public bool MoveNext()
+            {
+                if (_KeyEnumerator == null)
+                    MoveNextKey();
+
+                if (_ValueEnumerator == null)
+                {
+                    T key = _KeyedCollection.KeyModifier(_KeyEnumerator.Current);
+                    _ValueEnumerator = _KeyedCollection._Items[key].GetEnumerator();
+                }
+
+                if (_ValueEnumerator.MoveNext())
+                    return true;
+                else
+                {
+                    if (MoveNextKey())
+                        return MoveNext();
+                }
+                return false;
+            }
+
+            virtual public void Reset()
+            {
+                _KeyEnumerator.Dispose();
+                _KeyEnumerator = null;
+                _ValueEnumerator.Dispose();
+                _ValueEnumerator = null;
+            }
+
+            #endregion
         }
 
         #endregion

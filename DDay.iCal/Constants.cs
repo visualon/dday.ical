@@ -311,18 +311,31 @@ namespace DDay.iCal
         }
     }
 
-    public class ValueChangedEventArgs :
+    public class ObjectEventArgs<T, U> :
         EventArgs
     {
-        public object OldValue { get; set; }
-        public object NewValue { get; set; }
+        public T First { get; set; }
+        public U Second { get; set; }
 
-        public ValueChangedEventArgs(object oldValue, object newValue)
+        public ObjectEventArgs(T first, U second)
         {
-            OldValue = oldValue;
-            NewValue = newValue;
+            First = first;
+            Second = second;
         }
     }
 
+    public class ValueChangedEventArgs<T> :
+        EventArgs
+    {
+        public IList<T> RemovedValues { get; protected set; }
+        public IList<T> AddedValues { get; protected set; }
+
+        public ValueChangedEventArgs(IEnumerable<T> removedValues, IEnumerable<T> addedValues)
+        {
+            RemovedValues = removedValues.ToList().AsReadOnly();
+            AddedValues = addedValues.ToList().AsReadOnly();
+        }
+    }
+    
     #endregion
 }

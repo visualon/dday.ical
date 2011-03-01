@@ -4,11 +4,9 @@ using System.Text;
 
 namespace DDay.iCal
 {
-    public interface ICalendarObjectList :
-        IList<ICalendarObject>,
-        ICopyable,
-        IMergeable
+    public interface ICalendarObjectList<T> : 
+        IKeyedList<string, T>
+        where T : class, ICalendarObject
     {
-        ICalendarObject Parent { get; set; }
     }
 }

@@ -4,35 +4,74 @@ using System.Text;
 
 namespace DDay.iCal
 {
-    public interface IKeyedList<T, U> :
-        IList<T> where T : IKeyedObject<U>
+    public interface IKeyedList<TKey, TObject> :
+        IEnumerable<TObject>
+        where TObject : class, IKeyedObject<TKey>
     {
-        event EventHandler<ObjectEventArgs<T>> ItemAdded;
-        event EventHandler<ObjectEventArgs<T>> ItemRemoved;
+        /// <summary>
+        /// Fired after an item is added to the collection.
+        /// </summary>
+        event EventHandler<ObjectEventArgs<TObject>> ItemAdded;
 
+        /// <summary>
+        /// Fired after an item is removed from the collection.
+        /// </summary>
+        event EventHandler<ObjectEventArgs<TObject>> ItemRemoved;
+
+        /// <summary>
+        /// Adds a keyed item to the collection.
+        /// </summary>
+        void Add(TObject item);
+
+        /// <summary>
+        /// Inserts a keyed item into the collection at the given index.
+        /// </summary>
+        void Insert(int index, TObject item);
+
+        /// <summary>
+        /// Removes a keyed item from the collection.
+        /// <returns>True if the object was removed, false otherwise.</returns>
+        /// </summary>
+        bool Remove(TObject item);
+
+        /// <summary>
+        /// Returns the index of the given object within the list
+        /// matching the object's key, or -1 if no match could be found.
+        /// </summary>
+        int IndexOf(TObject item);
+
+        /// <summary>
+        /// Clears all items matching the specified key.
+        /// </summary>
+        void Clear(TKey key);
+
+        /// <summary>
+        /// Clears the entire list.
+        /// </summary>
+        void Clear();
+        
         /// <summary>
         /// Returns true if the list contains at least one 
         /// object with a matching key, false otherwise.
         /// </summary>
-        bool ContainsKey(U key);
-
-        /// <summary>
-        /// Returns the index of the first object
-        /// with the matching key.
-        /// </summary>
-        int IndexOf(U key);
+        bool ContainsKey(TKey key);
 
         /// <summary>
         /// Returns the number of objects in the list
         /// with a matching key.
         /// </summary>
-        int CountOf(U key);
+        int CountOf(TKey key);
 
         /// <summary>
-        /// Returns an enumerable list of objects that
+        /// Returns all values contained in the list.
+        /// </summary>
+        IEnumerable<TObject> Values();
+
+        /// <summary>
+        /// Returns a list of objects that
         /// match the specified key.
         /// </summary>
-        IList<T> AllOf(U key);
+        IEnumerable<TObject> AllOf(TKey key);
 
         /// <summary>
         /// Gets/sets an object with the matching key to
@@ -41,17 +80,11 @@ namespace DDay.iCal
         /// it will be overwritten.  If overwriting is
         /// not desired, use the Add() method instead.
         /// </summary>
-        T this[U key] { get; set; }
-
-        /// <summary>
-        /// Removes all objects with the matching <paramref name="key"/>.
-        /// </summary>
-        /// <returns>True if any objects were removed, false otherwise.</returns>
-        bool Remove(U key);
+        TObject this[TKey key] { get; set; }
 
         /// <summary>
         /// Converts the list to an array of the values contained therein.
         /// </summary>
-        T[] ToArray();
+        TObject[] ToArray();        
     }    
 }

@@ -232,7 +232,7 @@ namespace DDay.iCal
 
         #endregion
 
-        #region IKeyedList<ICalendarParameter,string> Members
+        #region IKeyedCollection<ICalendarParameter,string> Members
 
         public event EventHandler<ObjectEventArgs<ICalendarParameter>> ItemAdded;
         public event EventHandler<ObjectEventArgs<ICalendarParameter>> ItemRemoved;
