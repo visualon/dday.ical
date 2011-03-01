@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -1413,7 +1414,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
             IICalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\Parameter1.ics")[0];
 
             IEvent evt = iCal.Events[0];
-            IList<ICalendarParameter> parms = evt.Properties["DTSTART"].Parameters.AllOf("VALUE");
+            IList<ICalendarParameter> parms = evt.Properties["DTSTART"].Parameters.AllOf("VALUE").ToList();
             Assert.AreEqual(2, parms.Count);
             Assert.AreEqual("DATE", parms[0].Values[0]);
             Assert.AreEqual("OTHER", parms[1].Values[0]);
@@ -1458,7 +1459,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
         {
             IICalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\Property1.ics")[0];
 
-            IList<ICalendarProperty> props = iCal.Properties.AllOf("VERSION");
+            IList<ICalendarProperty> props = iCal.Properties.AllOf("VERSION").ToList();
             Assert.AreEqual(2, props.Count);
 
             for (int i = 0; i < props.Count; i++)

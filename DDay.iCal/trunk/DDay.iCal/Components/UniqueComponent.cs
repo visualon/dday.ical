@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -69,14 +70,14 @@ namespace DDay.iCal
 
         virtual public IList<IAttendee> Attendees
         {
-            get { return Properties.GetList<IAttendee>("ATTENDEE"); }
-            set { Properties.SetList("ATTENDEE", value); }
+            get { return Properties.GetMany<IAttendee>("ATTENDEE"); }
+            set { Properties.Set("ATTENDEE", value); }
         }
 
         virtual public IList<string> Comments
         {
-            get { return Properties.GetList<string>("COMMENT"); }
-            set { Properties.SetList("COMMENT", value); }
+            get { return Properties.GetMany<string>("COMMENT"); }
+            set { Properties.Set("COMMENT", value); }
         }
 
         virtual public IDateTime DTStamp
@@ -93,24 +94,14 @@ namespace DDay.iCal
 
         virtual public IList<IRequestStatus> RequestStatuses
         {
-            get { return Properties.GetList<IRequestStatus>("REQUEST-STATUS"); }
-            set { Properties.SetList("REQUEST-STATUS", value); }
+            get { return Properties.GetMany<IRequestStatus>("REQUEST-STATUS"); }
+            set { Properties.Set("REQUEST-STATUS", value); }
         }
 
         virtual public Uri Url
         {
             get { return Properties.Get<Uri>("URL"); }
             set { Properties.Set("URL", value); }
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected void OnUIDChanged(string oldUID, string newUID)
-        {
-            if (UIDChanged != null)
-                UIDChanged(this, oldUID, newUID);
         }
 
         #endregion
@@ -123,8 +114,8 @@ namespace DDay.iCal
                 e.Object.Name != null &&
                 string.Equals(e.Object.Name.ToUpper(), "UID"))
             {
-                OnUIDChanged(e.Object.Value != null ? e.Object.Value.ToString() : null, null);
-                e.Object.ValueChanged -= new EventHandler<ValueChangedEventArgs>(UID_ValueChanged);
+                OnKeyChanged(e.Object.Values.Cast<string>().FirstOrDefault(), null);
+                e.Object.ValueChanged -= Object_ValueChanged;
             }
         }
 
@@ -134,22 +125,29 @@ namespace DDay.iCal
                 e.Object.Name != null &&
                 string.Equals(e.Object.Name.ToUpper(), "UID"))
             {
-                OnUIDChanged(null, e.Object.Value != null ? e.Object.Value.ToString() : null);
-                e.Object.ValueChanged += new EventHandler<ValueChangedEventArgs>(UID_ValueChanged);
+                OnKeyChanged(null, e.Object.Values.Cast<string>().FirstOrDefault());
+                e.Object.ValueChanged += Object_ValueChanged;
             }
         }
 
-        void UID_ValueChanged(object sender, ValueChangedEventArgs e)
+        void Object_ValueChanged(object sender, ValueChangedEventArgs<object> e)
         {
-            OnUIDChanged(
-                e.OldValue != null ? e.OldValue.ToString() : null,
-                e.NewValue != null ? e.NewValue.ToString() : null
-            );
+            string oldValue = e.RemovedValues.Cast<string>().FirstOrDefault();
+            string newValue = e.AddedValues.Cast<string>().FirstOrDefault();
+            OnKeyChanged(oldValue, newValue);
         }
 
         #endregion
 
         #region Overrides
+
+        public override string Key
+        {
+            get
+            {
+                return UID;
+            }            
+        }
 
         protected override void OnDeserializing(StreamingContext context)
         {
@@ -188,9 +186,6 @@ namespace DDay.iCal
         #endregion
 
         #region IUniqueComponent Members
-
-        [field: NonSerialized]
-        public event UIDChangedEventHandler UIDChanged;
 
         virtual public string UID
         {
