@@ -446,33 +446,33 @@ namespace DDay.iCal
             IICalendar iCal = obj as iCalendar;
             if (iCal != null)
             {
-                bool isEqual =
-                    object.Equals(Version, iCal.Version) &&
-                    object.Equals(ProductID, iCal.ProductID) &&
-                    object.Equals(Scale, iCal.Scale) &&
-                    object.Equals(Method, iCal.Method) &&
-                    (
-                        (UniqueComponents == null && iCal.UniqueComponents == null) ||
-                        (UniqueComponents != null && iCal.UniqueComponents != null && object.Equals(UniqueComponents.Count, iCal.UniqueComponents.Count))
-                    );
+                //bool isEqual =
+                //    object.Equals(Version, iCal.Version) &&
+                //    object.Equals(ProductID, iCal.ProductID) &&
+                //    object.Equals(Scale, iCal.Scale) &&
+                //    object.Equals(Method, iCal.Method) &&
+                //    (
+                //        (UniqueComponents == null && iCal.UniqueComponents == null) ||
+                //        (UniqueComponents != null && iCal.UniqueComponents != null && object.Equals(UniqueComponents.Count, iCal.UniqueComponents.Count))
+                //    );
 
-                if (isEqual)
-                {
-                    if (UniqueComponents.Count != iCal.UniqueComponents.Count)
-                        return false;
+                //if (isEqual)
+                //{
+                //    if (UniqueComponents.Count != iCal.UniqueComponents.Count)
+                //        return false;
 
-                    IEnumerator<IUniqueComponent> e1 = UniqueComponents.GetEnumerator();
-                    IEnumerator<IUniqueComponent> e2 = iCal.UniqueComponents.GetEnumerator();
-                    while (e1.MoveNext())
-                    {
-                        if (!e2.MoveNext())
-                            return false;
-                        if (!object.Equals(e1.Current, e2.Current))
-                            return false;
-                    }
-                    return !e2.MoveNext();                    
-                }
-                return false;
+                //    IEnumerator<IUniqueComponent> e1 = UniqueComponents.GetEnumerator();
+                //    IEnumerator<IUniqueComponent> e2 = iCal.UniqueComponents.GetEnumerator();
+                //    while (e1.MoveNext())
+                //    {
+                //        if (!e2.MoveNext())
+                //            return false;
+                //        if (!object.Equals(e1.Current, e2.Current))
+                //            return false;
+                //    }
+                //    return !e2.MoveNext();                    
+                //}
+                //return false;
             }
             return base.Equals(obj);
         }

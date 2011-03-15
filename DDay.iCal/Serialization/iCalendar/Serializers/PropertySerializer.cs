@@ -85,7 +85,7 @@ namespace DDay.iCal.Serialization.iCalendar
                             parameterList = ((ICalendarDataType)v).Parameters;
 
                         StringBuilder sb = new StringBuilder(prop.Name);
-                        if (parameterList.Count > 0)
+                        if (parameterList.Values > 0)
                         {
                             // Get a serializer for parameters
                             IStringSerializer parameterSerializer = sf.Build(typeof(ICalendarParameter), SerializationContext) as IStringSerializer;
