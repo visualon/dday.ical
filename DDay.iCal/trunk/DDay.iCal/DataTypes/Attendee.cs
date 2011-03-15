@@ -45,13 +45,13 @@ namespace DDay.iCal
         
         virtual public string Type
         {
-            get { return Parameters.Get("CUTYPE"); }
+            get { return Parameters.GetMany("CUTYPE"); }
             set { Parameters.Set("CUTYPE", value); }
         }
         
         virtual public IList<string> Members
         {
-            get { return Parameters.GetList("MEMBER"); }
+            get { return Parameters.GetMany("MEMBER"); }
             set { Parameters.Set("MEMBER", value); }
         }
         
@@ -88,13 +88,13 @@ namespace DDay.iCal
         
         virtual public IList<string> DelegatedTo
         {
-            get { return Parameters.GetList("DELEGATED-TO"); }
+            get { return Parameters.GetMany("DELEGATED-TO"); }
             set { Parameters.Set("DELEGATED-TO", value); }
         }
          
         virtual public IList<string> DelegatedFrom
         {
-            get { return Parameters.GetList("DELEGATED-FROM"); }
+            get { return Parameters.GetMany("DELEGATED-FROM"); }
             set { Parameters.Set("DELEGATED-FROM", value); }
         }
         
