@@ -16,7 +16,7 @@ namespace DDay.iCal
     [Serializable]
 #endif
     public class UniqueComponentList<T> :
-        FilteredCalendarObjectList<IUniqueComponent>,
+        //FilteredCalendarObjectList<IUniqueComponent>,
         IUniqueComponentList<T>
         where T : class, IUniqueComponent
     {
@@ -29,7 +29,7 @@ namespace DDay.iCal
         #region Constructors
 
         public UniqueComponentList(ICalendarObject attached) : base(attached)
-        {            
+        {
             ResolveUIDs();
         }
 
@@ -49,6 +49,99 @@ namespace DDay.iCal
             }
         }
                         
+        #endregion
+
+        #region IKeyedList<string,T> Members
+
+        public event EventHandler<ObjectEventArgs<T>> ItemAdded;
+
+        public event EventHandler<ObjectEventArgs<T>> ItemRemoved;
+
+        public void Add(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Insert(int index, T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Remove(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int IndexOf(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Clear(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ContainsKey(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int CountOf(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<T> Values()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<T> AllOf(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public T this[string key]
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public T[] ToArray()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region IEnumerable<T> Members
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region IEnumerable Members
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

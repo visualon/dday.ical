@@ -67,7 +67,7 @@ namespace DDay.iCal
 
         virtual public void Add(T item)
         {
-            Attached.Children.Add(item);
+            Attached.AddChild(item);
         }
 
         virtual public void Insert(int index, T item)
