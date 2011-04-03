@@ -133,7 +133,7 @@ namespace DDay.iCal
                 // Add each child
                 this.Children.Clear();
                 foreach (ICalendarObject child in obj.Children)
-                    AddChild(child.Copy<ICalendarObject>());
+                    this.AddChild(child.Copy<ICalendarObject>());
             }
         }        
 

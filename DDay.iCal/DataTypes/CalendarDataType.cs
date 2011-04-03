@@ -17,8 +17,9 @@ namespace DDay.iCal
         ICalendarDataType
     {
         #region Private Fields
-        
-        ICalendarParameterList _Parameters;
+
+        ICalendarParameterList _InternalParameters;
+        CalendarParameterListProxy _Parameters;
         ServiceProvider _ServiceProvider;
 
         #endregion
@@ -38,8 +39,9 @@ namespace DDay.iCal
 
         void Initialize()
         {
-             _Parameters = new AssociatedCalendarParameterList(null, null);
-             _ServiceProvider = new ServiceProvider();
+            _InternalParameters = new CalendarParameterList();
+            _Parameters = new CalendarParameterListProxy(_InternalParameters, null);
+            _ServiceProvider = new ServiceProvider();
         }
 
         #endregion
@@ -119,7 +121,17 @@ namespace DDay.iCal
                 if (!object.Equals(_AssociatedObject, value))
                 {
                     _AssociatedObject = value;
-                    _Parameters = new AssociatedCalendarParameterList(_Parameters, _AssociatedObject, _AssociatedObject as ICalendarParameterListContainer);
+                    if (_AssociatedObject != null)
+                    {
+                        _Parameters.SetParent(_AssociatedObject);
+                        if (_AssociatedObject is ICalendarParameterListContainer)
+                            _Parameters.SetProxiedObject(((ICalendarParameterListContainer)_AssociatedObject).Parameters);
+                    }
+                    else
+                    {
+                        _Parameters.SetParent(null);
+                        _Parameters.SetProxiedObject(_InternalParameters);
+                    }
                 }
             }
         }
@@ -154,7 +166,8 @@ namespace DDay.iCal
             {
                 ICalendarDataType dt = (ICalendarDataType)obj;                
                 _AssociatedObject = dt.AssociatedObject;
-                _Parameters = new AssociatedCalendarParameterList(dt.Parameters, _AssociatedObject, _AssociatedObject as ICalendarParameterListContainer);
+                _Parameters.SetParent(_AssociatedObject);
+                _Parameters.SetProxiedObject(dt.Parameters);
             }
         }
 

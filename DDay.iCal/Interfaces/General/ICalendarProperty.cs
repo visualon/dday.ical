@@ -8,7 +8,6 @@ namespace DDay.iCal
         ICalendarParameterListContainer,
         ICalendarObject,
         IValueObject<object>
-    {
-        object Value { get; set; }
+    {        
     }    
 }

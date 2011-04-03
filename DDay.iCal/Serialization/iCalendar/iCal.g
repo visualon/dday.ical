@@ -233,7 +233,7 @@ EQUAL v=param_value { values.Add(v); }
 	COMMA v=param_value { values.Add(v); }
 )*
 {
-	p.Values = values.ToArray();
+	p.SetValue(values);
 	
 	if (container != null)
 	{

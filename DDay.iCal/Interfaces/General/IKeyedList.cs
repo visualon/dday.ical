@@ -35,6 +35,12 @@ namespace DDay.iCal
         bool Remove(TObject item);
 
         /// <summary>
+        /// Removes all items with the matching key from the collection.
+        /// </summary>        
+        /// <returns>True if the object was removed, false otherwise.</returns>
+        bool Remove(TKey key);
+
+        /// <summary>
         /// Returns the index of the given object within the list
         /// matching the object's key, or -1 if no match could be found.
         /// </summary>

@@ -11,5 +11,10 @@ namespace DDay.iCal
         {
             return parameterList.Get<string>(name);
         }
+
+        static public IList<string> GetMany(this ICalendarParameterList parameterList, string name)
+        {
+            return parameterList.GetMany<string>(name);
+        }
     }
 }

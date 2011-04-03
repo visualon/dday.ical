@@ -80,6 +80,11 @@ namespace DDay.iCal
             return Attached.Children.Remove(item);
         }
 
+        virtual public bool Remove(string key)
+        {
+            return Attached.Children.Remove(key);
+        }
+
         virtual public int IndexOf(T item)
         {
             return Attached.Children.IndexOf(item);
@@ -127,7 +132,7 @@ namespace DDay.iCal
         {
             get
             {
-                return Attached.Children[key];
+                return Attached.Children[key] as T;
             }
             set
             {

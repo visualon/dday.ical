@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -31,8 +32,7 @@ namespace DDay.iCal.Serialization.iCalendar
         public override string SerializeToString(object obj)
         {
             ICalendarProperty prop = obj as ICalendarProperty;
-            if (prop != null &&
-                prop.Value != null)
+            if (prop != null && !prop.Values.Any())
             {
                 // Don't serialize the property if the value is null                
 
@@ -42,23 +42,12 @@ namespace DDay.iCal.Serialization.iCalendar
                 IDataTypeMapper mapper = GetService<IDataTypeMapper>();
                 Type serializedType = mapper.GetPropertyMapping(prop);
                 
-                // Build a list of values that are to be serialized.
-                List<object> objs = new List<object>();
-                if (!(prop.Value is string) && 
-                    !(typeof(IEnumerable<string>).IsAssignableFrom(serializedType)) && 
-                    prop.Value is IEnumerable)
-                {
-                    foreach (object v in (IEnumerable)prop.Value)
-                        objs.Add(v);
-                }
-                else objs.Add(prop.Value);
-
                 // Get a serializer factory that we can use to serialize
                 // the property and parameter values
                 ISerializerFactory sf = GetService<ISerializerFactory>();
 
                 StringBuilder result = new StringBuilder();                               
-                foreach (object v in objs)
+                foreach (object v in prop.Values)
                 {
                     // Get a serializer to serialize the property's value.
                     // If we can't serialize the property's value, the next step is worthless anyway.
@@ -85,7 +74,7 @@ namespace DDay.iCal.Serialization.iCalendar
                             parameterList = ((ICalendarDataType)v).Parameters;
 
                         StringBuilder sb = new StringBuilder(prop.Name);
-                        if (parameterList.Values > 0)
+                        if (parameterList.Any())
                         {
                             // Get a serializer for parameters
                             IStringSerializer parameterSerializer = sf.Build(typeof(ICalendarParameter), SerializationContext) as IStringSerializer;
