@@ -45,7 +45,7 @@ namespace DDay.iCal
         
         virtual public string Type
         {
-            get { return Parameters.GetMany("CUTYPE"); }
+            get { return Parameters.Get("CUTYPE"); }
             set { Parameters.Set("CUTYPE", value); }
         }
         

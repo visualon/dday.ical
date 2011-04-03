@@ -9,7 +9,8 @@ namespace DDay.iCal
     {
         event EventHandler<ValueChangedEventArgs<T>> ValueChanged;
         IEnumerable<T> Values { get; }
-        
+
+        bool ContainsValue(T value);
         void SetValue(T value);
         void SetValue(IEnumerable<T> values);
         void AddValue(T value);

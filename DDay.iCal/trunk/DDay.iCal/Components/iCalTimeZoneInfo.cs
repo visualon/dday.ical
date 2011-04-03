@@ -139,7 +139,7 @@ namespace DDay.iCal
         virtual public IList<string> TimeZoneNames
         {
             get { return Properties.GetMany<string>("TZNAME"); }
-            set { Properties.Set<string>("TZNAME", value); }
+            set { Properties.Set("TZNAME", value); }
         }
 
         virtual public TimeZoneObservance? GetObservance(IDateTime dt)

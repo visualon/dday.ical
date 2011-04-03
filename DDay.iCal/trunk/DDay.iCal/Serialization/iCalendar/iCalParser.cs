@@ -551,8 +551,8 @@ _loop20_breakloop:			;
 			}
 _loop30_breakloop:			;
 		}    // ( ... )*
-		
-			p.Values = values.ToArray();
+
+            p.SetValue(values);
 			
 			if (container != null)
 			{

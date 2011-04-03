@@ -27,15 +27,18 @@ namespace DDay.iCal
         {
             Initialize();
         }
+
         public CalendarParameter(string name) : base(name)
         {
             Initialize();
         }
+
         public CalendarParameter(string name, string value) : base(name)
         {
             Initialize();
             AddValue(value);
         }
+
         public CalendarParameter(string name, string[] values) : base(name)
         {
             Initialize();
@@ -89,15 +92,22 @@ namespace DDay.iCal
             get { return _Values; }
         }
 
+        virtual public bool ContainsValue(string value)
+        {
+            return _Values.Contains(value);
+        }
+
         virtual public void SetValue(string value)
         {
             if (_Values.Count == 0)
             {
+                // Our list doesn't contain any values.  Let's add one!
                 _Values.Add(value);
                 OnValueChanged(null, new string[] { value });
             }
             else if (value != null)
-            {
+            {                
+                // Our list contains values.  Let's set the first value!
                 string oldValue = _Values[0];
                 _Values[0] = value;
                 OnValueChanged(new string[] { oldValue }, new string[] { value });
@@ -114,7 +124,7 @@ namespace DDay.iCal
         virtual public void SetValue(IEnumerable<string> values)
         {                        
             // Remove all previous values
-            List<string> removedValues = new List<string>(_Values);
+            var removedValues = _Values.ToList();
             _Values.Clear();
             _Values.AddRange(values);
             OnValueChanged(removedValues, values);
