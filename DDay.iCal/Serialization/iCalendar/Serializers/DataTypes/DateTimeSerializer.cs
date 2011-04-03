@@ -87,7 +87,7 @@ namespace DDay.iCal.Serialization.iCalendar
                 string[] values = value.Split('T');
 
                 bool hasTime = true;
-                if (dt.Parameters.ContainsKey("VALUE") && string.Equals(dt.Parameters["VALUE"].Values[0], "DATE"))
+                if (dt.Parameters.ContainsKey("VALUE") && string.Equals(dt.Parameters["VALUE"].Value, "DATE"))
                     hasTime = false;
 
                 string dateOnlyPattern = @"^((\d{4})(\d{2})(\d{2}))?$";

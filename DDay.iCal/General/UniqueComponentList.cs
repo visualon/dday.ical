@@ -16,7 +16,7 @@ namespace DDay.iCal
     [Serializable]
 #endif
     public class UniqueComponentList<T> :
-        //FilteredCalendarObjectList<IUniqueComponent>,
+        FilteredCalendarObjectList<IUniqueComponent>,
         IUniqueComponentList<T>
         where T : class, IUniqueComponent
     {

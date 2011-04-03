@@ -215,12 +215,12 @@ namespace DDay.iCal
 
         public void Insert(int index, IPeriod item)
         {
-            return m_Periods.Insert(index, item);
+            m_Periods.Insert(index, item);
         }
 
         public void RemoveAt(int index)
         {
-            return m_Periods.RemoveAt(index);
+            m_Periods.RemoveAt(index);
         }
 
         #endregion

@@ -118,6 +118,11 @@
     <Compile Include="ExtensionMethods\CalendarObjectExtensions.cs" />
     <Compile Include="ExtensionMethods\CalendarParameterListExtensions.cs" />
     <Compile Include="General\CalendarObjectList.cs" />
+    <Compile Include="General\CalendarPropertyCompositeValueCollection.cs" />
+    <Compile Include="General\Proxy\CalendarKeyedValueListProxy.cs" />
+    <Compile Include="General\Proxy\CalendarParameterListProxy.cs" />
+    <Compile Include="General\Proxy\KeyedValueListProxy.cs" />
+    <Compile Include="General\Proxy\KeyedListProxy.cs" />
     <Compile Include="General\FilteredCalendarObjectList.cs" />
     <Compile Include="General\KeyedValueList.cs" />
     <Compile Include="General\ServiceProvider.cs" />
@@ -134,6 +139,7 @@
     <Compile Include="Interfaces\Evaluation\IEvaluator.cs" />
     <Compile Include="Interfaces\Evaluation\IRecurrable.cs" />
     <Compile Include="Interfaces\General\ICalendarObjectList.cs" />
+    <Compile Include="Interfaces\General\ICompositeValueCollection.cs" />
     <Compile Include="Interfaces\General\IKeyedValueList.cs" />
     <Compile Include="Interfaces\General\IServiceProvider.cs" />
     <Compile Include="Interfaces\General\IValueObject.cs" />

@@ -242,6 +242,23 @@ namespace DDay.iCal
             return false;
         }
 
+        virtual public bool Remove(TKey key)
+        {
+            key = KeyModifier(key);
+            if (_Items.ContainsKey(key))
+            {
+                var list = _Items[key];
+                while (list.Any())
+                {
+                    var obj = list[0];
+                    list.RemoveAt(0);
+                    OnItemRemoved(UnsubscribeFromKeyChanges(obj));
+                }
+                return true;
+            }
+            return false;
+        }
+
         virtual public TObject[] ToArray()
         {            
             return _Items.Values.SelectMany(i => i).ToArray();

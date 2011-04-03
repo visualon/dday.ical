@@ -582,7 +582,7 @@ namespace DDay.iCal
         /// <returns>The time zone added to the calendar.</returns>
         public ITimeZone AddTimeZone(ITimeZone tz)
         {
-            AddChild(tz);
+            this.AddChild(tz);
             return tz;
         }
 
@@ -597,14 +597,14 @@ namespace DDay.iCal
         public ITimeZone AddTimeZone(System.TimeZoneInfo tzi)
         {
             ITimeZone tz = iCalTimeZone.FromSystemTimeZone(tzi);
-            AddChild(tz);
+            this.AddChild(tz);
             return tz;
         }
 
         public ITimeZone AddTimeZone(System.TimeZoneInfo tzi, DateTime earliestDateTimeToSupport, bool includeHistoricalData)
         {
             ITimeZone tz = iCalTimeZone.FromSystemTimeZone(tzi, earliestDateTimeToSupport, includeHistoricalData);
-            AddChild(tz);
+            this.AddChild(tz);
             return tz;
         }
 
@@ -617,14 +617,14 @@ namespace DDay.iCal
         public ITimeZone AddLocalTimeZone()
         {
             ITimeZone tz = iCalTimeZone.FromLocalTimeZone();
-            AddChild(tz);
+            this.AddChild(tz);
             return tz;
         }
 
         public ITimeZone AddLocalTimeZone(DateTime earliestDateTimeToSupport, bool includeHistoricalData)
         {
             ITimeZone tz = iCalTimeZone.FromLocalTimeZone(earliestDateTimeToSupport, includeHistoricalData);
-            AddChild(tz);
+            this.AddChild(tz);
             return tz;
         }
 #endif
@@ -791,7 +791,7 @@ namespace DDay.iCal
             ICalendarObject obj = Activator.CreateInstance(typeof(T)) as ICalendarObject;
             if (obj is T)
             {
-                AddChild(obj);
+                this.AddChild(obj);
                 return (T)obj;
             }
             return default(T);
@@ -833,17 +833,17 @@ namespace DDay.iCal
                     if (child is IUniqueComponent)
                     {
                         if (!UniqueComponents.ContainsKey(((IUniqueComponent)child).UID))
-                            AddChild(child.Copy<ICalendarObject>());
+                            this.AddChild(child.Copy<ICalendarObject>());
                     }
                     else if (child is ITimeZone)
                     {
                         ITimeZone tz = GetTimeZone(((ITimeZone)child).TZID);
                         if (tz == null)
-                            AddChild(child.Copy<ICalendarObject>());
+                            this.AddChild(child.Copy<ICalendarObject>());
                     }
                     else
                     {
-                        AddChild(child.Copy<ICalendarObject>());
+                        this.AddChild(child.Copy<ICalendarObject>());
                     }
                 }
             }

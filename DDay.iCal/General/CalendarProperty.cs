@@ -37,8 +37,8 @@ namespace DDay.iCal
     {
         #region Private Fields
 
-        private object m_Value;        
-        private ICalendarParameterList m_Parameters;
+        private IList<object> _Values;        
+        private ICalendarParameterList _Parameters;
 
         #endregion
 
@@ -49,10 +49,10 @@ namespace DDay.iCal
         /// </summary>
         virtual public ICalendarParameterList Parameters
         {
-            get { return m_Parameters; }
+            get { return _Parameters; }
             protected set
             {
-                this.m_Parameters = value;
+                this._Parameters = value;
             }
         }
 
@@ -78,7 +78,8 @@ namespace DDay.iCal
         public CalendarProperty(string name, object value) : base(name)
         {
             Initialize();
-            m_Value = value;
+            _Values = new List<object>();
+            _Values.Add(value);
         }
 
         public CalendarProperty(int line, int col) : base(line, col)
@@ -88,7 +89,7 @@ namespace DDay.iCal
 
         private void Initialize()
         {
-            m_Parameters = new CalendarParameterList(this, true);
+            _Parameters = new CalendarParameterList(this, true);
             ValueChanged += new EventHandler<ValueChangedEventArgs<object>>(CalendarProperty_ValueChanged);
         }        
 
@@ -146,16 +147,17 @@ namespace DDay.iCal
             ICalendarProperty p = obj as ICalendarProperty;
             if (p != null)
             {
-                if (p.Value is ICopyable)
-                    Value = ((ICopyable)p.Value).Copy<object>();
-                else if (p.Value is ICloneable)
-                    Value = ((ICloneable)p.Value).Clone();
+                // Copy/clone the object if possible (deep copy)
+                if (p.Values is ICopyable)
+                    SetValue(((ICopyable)p.Values).Copy<object>());
+                else if (p.Values is ICloneable)
+                    SetValue(((ICloneable)p.Values).Clone());
                 else
-                    Value = p.Value;
+                    SetValue(p.Values);
 
                 // Copy parameters
                 foreach (ICalendarParameter parm in p.Parameters)
-                    AddChild(parm.Copy<ICalendarParameter>());
+                    this.AddChild(parm.Copy<ICalendarParameter>());
             }
         }
 
@@ -177,49 +179,68 @@ namespace DDay.iCal
             }
         }
 
-        virtual public object Value
-        {
-            get { return m_Value; }
-            set { SetValue(value); }
-        }
-
         virtual public IEnumerable<object> Values
         {
             get 
-            { 
-                if (m_Value != null)
-                    return new object[] { m_Value };
-                return null;
+            {
+                return _Values;
             }
+        }
+
+        virtual public bool ContainsValue(object value)
+        {
+            return _Values.Contains(value);
         }
 
         virtual public void SetValue(object value)
         {
-            object oldValue = m_Value;
-            m_Value = value;
-            OnValueChanged(oldValue, value);
+            if (_Values.Count == 0)
+            {
+                // Our list doesn't contain any values.  Let's add one!
+                _Values.Add(value);
+                OnValueChanged(null, new object[] { value });
+            }
+            else if (value != null)
+            {
+                // Our list contains values.  Let's set the first value!
+                object oldValue = _Values[0];
+                _Values[0] = value;
+                OnValueChanged(new object[] { oldValue }, new object[] { value });
+            }
+            else
+            {
+                // Remove all values
+                List<object> values = new List<object>(Values);
+                _Values.Clear();
+                OnValueChanged(values, null);
+            }
         }
 
         virtual public void SetValue(IEnumerable<object> values)
         {
-            if (values != null)
-                SetValue(values.FirstOrDefault());
-            SetValue(null);
+            // Remove all previous values
+            var removedValues = _Values.ToList();
+            _Values.Clear();
+            _Values.AddRange(values);
+            OnValueChanged(removedValues, values);
         }
 
         virtual public void AddValue(object value)
         {
-            // NOTE: we only support a single value for properties,
-            // So adding a value is synonymous with setting the value here.
-            SetValue(value);
+            if (value != null)
+            {
+                _Values.Add(value);
+                OnValueChanged(null, new object[] { value });
+            }
         }
         
         virtual public void RemoveValue(object value)
         {
-            if (object.Equals(value, m_Value))
+            if (value != null &&
+                _Values.Contains(value) &&
+                _Values.Remove(value))
             {
-                m_Value = null;
-                OnValueChanged(value, null);
+                OnValueChanged(new string[] { value }, null);
             }
         }
 
