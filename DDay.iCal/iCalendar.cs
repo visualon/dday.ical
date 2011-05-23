@@ -88,7 +88,7 @@ namespace DDay.iCal
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class iCalendar : 
+    public class iCalendar :
         CalendarComponent,
         IICalendar,
         IDisposable
@@ -217,7 +217,7 @@ namespace DDay.iCal
         }
 
         static public new IICalendarCollection LoadFromStream<T>(TextReader tr) where T : IICalendar
-        {            
+        {
             return LoadFromStream(typeof(T), tr);
         }
 
@@ -254,8 +254,8 @@ namespace DDay.iCal
         }
 
         static public IICalendarCollection LoadFromUri<T>(Uri uri) where T : IICalendar
-        {            
-            return LoadFromUri(typeof(T), uri, null, null, null);            
+        {
+            return LoadFromUri(typeof(T), uri, null, null, null);
         }
 
         static public IICalendarCollection LoadFromUri(Type iCalendarType, Uri uri)
@@ -393,12 +393,12 @@ namespace DDay.iCal
 
         #region Private Fields
 
-        private IUniqueComponentList<IUniqueComponent> m_UniqueComponents;
-        private IUniqueComponentList<IEvent> m_Events;
-        private IUniqueComponentList<ITodo> m_Todos;
-        private IUniqueComponentList<IJournal> m_Journals;
-        private IUniqueComponentList<IFreeBusy> m_FreeBusy;
-        private IList<ITimeZone> m_TimeZones;
+        private IKeyedList<string, IUniqueComponent> m_UniqueComponents;
+        private IKeyedList<string, IEvent> m_Events;
+        private IKeyedList<string, ITodo> m_Todos;
+        private IKeyedList<string, IJournal> m_Journals;
+        private IKeyedList<string, IFreeBusy> m_FreeBusy;
+        private IKeyedList<string, ITimeZone> m_TimeZones;
 
         #endregion
 
@@ -420,14 +420,14 @@ namespace DDay.iCal
 
         private void Initialize()
         {
-            this.Name = Components.CALENDAR;            
+            this.Name = Components.CALENDAR;
 
-            m_UniqueComponents = new UniqueComponentList<IUniqueComponent>(this);
-            m_Events = new UniqueComponentList<IEvent>(this);
-            m_Todos = new UniqueComponentList<ITodo>(this);
-            m_Journals = new UniqueComponentList<IJournal>(this);
-            m_FreeBusy = new UniqueComponentList<IFreeBusy>(this);
-            m_TimeZones = new FilteredCalendarObjectList<ITimeZone>(this);            
+            m_UniqueComponents = Children.Filter<IUniqueComponent>(o => o is IUniqueComponent);
+            m_Events = Children.Filter<IEvent>(o => o is IEvent);
+            m_Todos = Children.Filter<ITodo>(o => o is ITodo);
+            m_Journals = Children.Filter<IJournal>(o => o is IJournal);
+            m_FreeBusy = Children.Filter<IFreeBusy>(o => o is IFreeBusy);
+            m_TimeZones = Children.Filter<ITimeZone>(o => o is ITimeZone);
         }
 
         #endregion
@@ -477,11 +477,11 @@ namespace DDay.iCal
             return base.Equals(obj);
         }
 
-        #endregion        
+        #endregion
 
         #region IICalendar Members
 
-        virtual public IUniqueComponentList<IUniqueComponent> UniqueComponents
+        virtual public IKeyedList<string, IUniqueComponent> UniqueComponents
         {
             get { return m_UniqueComponents; }
         }
@@ -501,7 +501,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="Event"/> components in the iCalendar.
         /// </summary>
-        virtual public IUniqueComponentList<IEvent> Events
+        virtual public IKeyedList<string, IEvent> Events
         {
             get { return m_Events; }
         }
@@ -509,7 +509,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="DDay.iCal.FreeBusy"/> components in the iCalendar.
         /// </summary>
-        virtual public IUniqueComponentList<IFreeBusy> FreeBusy
+        virtual public IKeyedList<string, IFreeBusy> FreeBusy
         {
             get { return m_FreeBusy; }
         }
@@ -517,7 +517,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="Journal"/> components in the iCalendar.
         /// </summary>
-        virtual public IUniqueComponentList<IJournal> Journals
+        virtual public IKeyedList<string, IJournal> Journals
         {
             get { return m_Journals; }
         }
@@ -525,7 +525,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="DDay.iCal.TimeZone"/> components in the iCalendar.
         /// </summary>
-        virtual public IList<ITimeZone> TimeZones
+        virtual public IKeyedList<string, ITimeZone> TimeZones
         {
             get { return m_TimeZones; }
         }
@@ -533,7 +533,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="Todo"/> components in the iCalendar.
         /// </summary>
-        virtual public IUniqueComponentList<ITodo> Todos
+        virtual public IKeyedList<string, ITodo> Todos
         {
             get { return m_Todos; }
         }
@@ -694,7 +694,7 @@ namespace DDay.iCal
         virtual public IList<Occurrence> GetOccurrences(IDateTime dt)
         {
             return GetOccurrences<IRecurringComponent>(
-                new iCalDateTime(dt.Local.Date), 
+                new iCalDateTime(dt.Local.Date),
                 new iCalDateTime(dt.Local.Date.AddDays(1).AddSeconds(-1)));
         }
         virtual public IList<Occurrence> GetOccurrences(DateTime dt)
@@ -735,7 +735,7 @@ namespace DDay.iCal
         virtual public IList<Occurrence> GetOccurrences<T>(IDateTime dt) where T : IRecurringComponent
         {
             return GetOccurrences<T>(
-                new iCalDateTime(dt.Local.Date), 
+                new iCalDateTime(dt.Local.Date),
                 new iCalDateTime(dt.Local.Date.AddDays(1).AddTicks(-1)));
         }
         virtual public IList<Occurrence> GetOccurrences<T>(DateTime dt) where T : IRecurringComponent
@@ -744,7 +744,7 @@ namespace DDay.iCal
                 new iCalDateTime(dt.Date),
                 new iCalDateTime(dt.Date.AddDays(1).AddTicks(-1)));
         }
-        
+
         /// <summary>
         /// Returns all occurrences of components of type T that start within the date range provided.
         /// All components occurring between <paramref name="startTime"/> and <paramref name="endTime"/>
@@ -806,8 +806,8 @@ namespace DDay.iCal
             Children.Clear();
         }
 
-        #endregion        
-    
+        #endregion
+
         #region IMergeable Members
 
         virtual public void MergeWith(IMergeable obj)
@@ -855,7 +855,7 @@ namespace DDay.iCal
 
         virtual public IFreeBusy GetFreeBusy(IFreeBusy freeBusyRequest)
         {
-            return DDay.iCal.FreeBusy.Create(this, freeBusyRequest);            
+            return DDay.iCal.FreeBusy.Create(this, freeBusyRequest);
         }
 
         virtual public IFreeBusy GetFreeBusy(IDateTime fromInclusive, IDateTime toExclusive)

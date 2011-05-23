@@ -18,8 +18,8 @@ namespace DDay.iCal
     {
         #region Private Fields
 
-        ICalendarParameterList _InternalParameters;
-        CalendarParameterListProxy _Parameters;
+        ICalendarParameterList _Parameters;
+        CalendarKeyedListProxy<ICalendarParameter> _Proxy;
         ServiceProvider _ServiceProvider;
 
         #endregion
@@ -39,8 +39,8 @@ namespace DDay.iCal
 
         void Initialize()
         {
-            _InternalParameters = new CalendarParameterList();
-            _Parameters = new CalendarParameterListProxy(_InternalParameters, null);
+            _Parameters = new CalendarParameterList();
+            _Proxy = new CalendarKeyedListProxy<ICalendarParameter>(_Parameters, null, AssociatedObject);
             _ServiceProvider = new ServiceProvider();
         }
 
@@ -80,9 +80,9 @@ namespace DDay.iCal
         virtual public Type GetValueType()
         {
             // See RFC 5545 Section 3.2.20.
-            if (_Parameters != null && _Parameters.ContainsKey("VALUE"))
+            if (_Proxy != null && _Proxy.ContainsKey("VALUE"))
             {
-                switch (_Parameters.Get("VALUE"))
+                switch (_Proxy.Get("VALUE"))
                 {
                     case "BINARY": return typeof(byte[]);
                     case "BOOLEAN": return typeof(bool);
@@ -109,8 +109,8 @@ namespace DDay.iCal
 
         virtual public void SetValueType(string type)
         {
-            if (_Parameters != null)
-                _Parameters.Set("VALUE", type != null ? type : type.ToUpper());
+            if (_Proxy != null)
+                _Proxy.Set("VALUE", type != null ? type : type.ToUpper());
         }
 
         virtual public ICalendarObject AssociatedObject
@@ -123,14 +123,14 @@ namespace DDay.iCal
                     _AssociatedObject = value;
                     if (_AssociatedObject != null)
                     {
-                        _Parameters.SetParent(_AssociatedObject);
+                        _Proxy.SetParent(_AssociatedObject);
                         if (_AssociatedObject is ICalendarParameterListContainer)
-                            _Parameters.SetProxiedObject(((ICalendarParameterListContainer)_AssociatedObject).Parameters);
+                            _Proxy.SetProxiedObject(((ICalendarParameterListContainer)_AssociatedObject).Parameters);
                     }
                     else
                     {
-                        _Parameters.SetParent(null);
-                        _Parameters.SetProxiedObject(_InternalParameters);
+                        _Proxy.SetParent(null);
+                        _Proxy.SetProxiedObject(_Parameters);
                     }
                 }
             }
@@ -166,8 +166,8 @@ namespace DDay.iCal
             {
                 ICalendarDataType dt = (ICalendarDataType)obj;                
                 _AssociatedObject = dt.AssociatedObject;
-                _Parameters.SetParent(_AssociatedObject);
-                _Parameters.SetProxiedObject(dt.Parameters);
+                _Proxy.SetParent(_AssociatedObject);
+                _Proxy.SetProxiedObject(dt.Parameters);
             }
         }
 
@@ -196,7 +196,7 @@ namespace DDay.iCal
 
         public ICalendarParameterList Parameters
         {
-            get { return _Parameters; }
+            get { return _Proxy; }
         }
 
         #endregion
