@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DDay.iCal
+namespace DDay.Collections
 {
     public interface IKeyedValueList<TKey, TObject, TValueType> :
         IKeyedList<TKey, TObject>

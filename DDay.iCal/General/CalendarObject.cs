@@ -50,7 +50,7 @@ namespace DDay.iCal
 
         void Initialize()
         {
-            _Children = new CalendarObjectList();
+            _Children = new CalendarObjectList(this);
             _ServiceProvider = new ServiceProvider();
 
             _Children.ItemAdded += new EventHandler<ObjectEventArgs<ICalendarObject>>(_Children_ItemAdded);

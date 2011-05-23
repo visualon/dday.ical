@@ -4,9 +4,9 @@ using System.Text;
 
 namespace DDay.iCal
 {
-    public interface ICalendarObjectList<T> : 
-        IKeyedList<string, T>
-        where T : class, ICalendarObject
+    public interface ICalendarObjectList<TType> : 
+        IKeyedList<string, TType>
+        where TType : class, ICalendarObject
     {
     }
 }

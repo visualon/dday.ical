@@ -240,7 +240,7 @@ namespace DDay.iCal
                 _Values.Contains(value) &&
                 _Values.Remove(value))
             {
-                OnValueChanged(new string[] { value }, null);
+                OnValueChanged(new object[] { value }, null);
             }
         }
 

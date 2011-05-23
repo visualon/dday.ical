@@ -13,21 +13,22 @@ namespace DDay.iCal
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class KeyedValueListProxy<TKey, TObject, TValueType> :
-        KeyedListProxy<TKey, TObject>,
-        IKeyedValueList<TKey, TObject, TValueType>
-        where TObject : class, IKeyedObject<TKey>, IValueObject<TValueType>
+    public class KeyedValueListProxy<TKey, TOriginal, TNew, TValueType> :
+        KeyedListProxy<TKey, TOriginal, TNew>,
+        IKeyedValueList<TKey, TNew, TValueType>
+        where TOriginal : class, IKeyedObject<TKey>, IValueObject<TValueType>
+        where TNew : class, TOriginal
     {
         #region Private Fields
 
-        IKeyedValueList<TKey, TObject, TValueType> _RealObject;
+        IKeyedValueList<TKey, TOriginal, TValueType> _RealObject;
 
         #endregion
 
         #region Constructors
 
-        public KeyedValueListProxy(IKeyedValueList<TKey, TObject, TValueType> realObject) :
-            base(realObject)
+        public KeyedValueListProxy(IKeyedValueList<TKey, TOriginal, TValueType> realObject, Predicate<TNew> predicate) :
+            base(realObject, predicate)
         {
             _RealObject = realObject;
         }
@@ -36,17 +37,17 @@ namespace DDay.iCal
 
         #region Overrides
 
-        public override void SetProxiedObject(IKeyedList<TKey, TObject> realObject)
+        public override void SetProxiedObject(IKeyedList<TKey, TOriginal> realObject)
         {
             base.SetProxiedObject(realObject);
 
-            if (realObject is IKeyedValueList<TKey, TObject, TValueType>)
-                _RealObject = (IKeyedValueList<TKey, TObject, TValueType>)realObject;
+            if (realObject is IKeyedValueList<TKey, TOriginal, TValueType>)
+                _RealObject = (IKeyedValueList<TKey, TOriginal, TValueType>)realObject;
         }
 
         #endregion
 
-        #region IKeyedValueList<TKey,TObject,TValueType> Members
+        #region IKeyedValueList<TKey,TObject,TNew,TValueType> Members
 
         virtual public void Set(TKey name, TValueType value)
         {
