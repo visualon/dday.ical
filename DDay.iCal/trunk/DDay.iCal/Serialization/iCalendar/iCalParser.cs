@@ -323,7 +323,7 @@ _loop24_breakloop:			;
 			// Deserialize the value of the property
 			// into a concrete iCalendar data type,
 			// or string value.
-            p.Value = dataMapSerializer.Deserialize(new StringReader(v));
+            p.AddValue(dataMapSerializer.Deserialize(new StringReader(v)));
 		
 		{    // ( ... )*
 			for (;;)

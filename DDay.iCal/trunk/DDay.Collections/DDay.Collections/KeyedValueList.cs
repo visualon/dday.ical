@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DDay.iCal
+namespace DDay.Collections
 {
     public class KeyedValueList<TKey, TObject, TValueType> :
         KeyedList<TKey, TObject>,
@@ -14,31 +14,22 @@ namespace DDay.iCal
 
         virtual public void Set(TKey key, TValueType value)
         {
-            List<TValueType> values = new List<TValueType>();
-            values.Add(value);
-            this[key].SetValue(value);
+            throw new NotImplementedException();
         }
 
         virtual public void Set(TKey key, IEnumerable<TValueType> values)
         {
-            this[key].SetValue(values);
+            throw new NotImplementedException();
         }
 
         virtual public TType Get<TType>(TKey key) where TType : TValueType
         {
-            if (ContainsKey(key))
-                return this[key].Values.OfType<TType>().FirstOrDefault();
-            return default(TType);
+            throw new NotImplementedException();
         }
 
         virtual public IList<TType> GetMany<TType>(TKey key) where TType : TValueType
         {
-            // FIXME: return a collection here.
-            // We probably need a concrete class to accomplish this.
-            // (instead of the following commented code)
-            //if (ContainsKey(key))
-            //    return this[key].Values.OfType<TType>();
-            return null;
+            throw new NotImplementedException();
         }
 
         #endregion

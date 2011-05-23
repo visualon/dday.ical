@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DDay.iCal
+namespace DDay.Collections
 {
     public interface IKeyedObject<T>
     {
