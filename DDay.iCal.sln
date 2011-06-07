@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDay.iCal", "DDay.iCal\DDay
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDay.iCal.Test", "DDay.iCal.Test\DDay.iCal.Test.csproj", "{38A02D06-15CC-436A-9C8F-07B84A7E2CE0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDay.Collections", "DDay.Collections\DDay.Collections\DDay.Collections.csproj", "{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,18 @@ Global
 		{38A02D06-15CC-436A-9C8F-07B84A7E2CE0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{38A02D06-15CC-436A-9C8F-07B84A7E2CE0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{38A02D06-15CC-436A-9C8F-07B84A7E2CE0}.Release|x86.ActiveCfg = Release|Any CPU
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Debug|x86.ActiveCfg = Debug|x86
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Debug|x86.Build.0 = Debug|x86
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Release|x86.ActiveCfg = Release|x86
+		{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

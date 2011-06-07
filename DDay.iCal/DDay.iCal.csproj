@@ -138,16 +138,6 @@
     <Compile Include="Interfaces\General\ICalendarObjectList.cs" />
     <Compile Include="Interfaces\General\ICompositeValueCollection.cs" />
     <Compile Include="Interfaces\General\IServiceProvider.cs" />
-    <Compile Include="Interfaces\Lists\IKeyedList.cs" />
-    <Compile Include="Interfaces\Lists\IKeyedObject.cs" />
-    <Compile Include="Interfaces\Lists\IKeyedValueList.cs" />
-    <Compile Include="Interfaces\Lists\IMultiLinkedList.cs" />
-    <Compile Include="Interfaces\Lists\IValueObject.cs" />
-    <Compile Include="Lists\KeyedList.cs" />
-    <Compile Include="Lists\KeyedListProxy.cs" />
-    <Compile Include="Lists\KeyedValueList.cs" />
-    <Compile Include="Lists\KeyedValueListProxy.cs" />
-    <Compile Include="Lists\MultiLinkedList.cs" />
     <Compile Include="Structs\Serialization\IDataTypeMapper.cs" />
     <Compile Include="Structs\Serialization\IEncodingProvider.cs" />
     <Compile Include="Structs\Serialization\IEncodingStack.cs" />
@@ -292,6 +282,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Serialization\iCalendar\iCalParserTokenTypes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DDay.Collections\DDay.Collections\DDay.Collections.csproj">
+      <Project>{E04EFEB6-4625-4D58-AC91-7B8B8A2C97BB}</Project>
+      <Name>DDay.Collections</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
