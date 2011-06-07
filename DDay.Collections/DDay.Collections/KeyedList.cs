@@ -45,6 +45,9 @@ namespace DDay.Collections
 
         virtual protected TKey KeyModifier(TKey key)
         {
+            if (key == null)
+                throw new ArgumentNullException("The item's key cannot be null.");
+
             return key;
         }
 
@@ -255,7 +258,7 @@ namespace DDay.Collections
             key = KeyModifier(key);
             if (_Dictionary.ContainsKey(key))
                 return _Dictionary[key];
-            return null;
+            return new TObject[0];
         }
 
         virtual public TObject this[int index]
