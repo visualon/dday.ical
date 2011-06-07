@@ -1,74 +1,108 @@
-//using System;
-//using System.Collections.Generic;
-//using System.Text;
-//using System.Linq;
-//using System.Runtime.Serialization;
-//using System.Collections;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Collections;
 
-//namespace DDay.Collections
-//{
-//    /// <summary>
-//    /// A proxy for a keyed list.
-//    /// </summary>
-//#if !SILVERLIGHT
-//    [Serializable]
-//#endif
-//    public class KeyedValueListProxy<TKey, TOriginal, TNew, TValueType> :
-//        KeyedListProxy<TKey, TOriginal, TNew>,
-//        IKeyedValueList<TKey, TNew, TValueType>
-//        where TOriginal : class, IKeyedObject<TKey>, IValueObject<TValueType>
-//        where TNew : class, TOriginal
-//    {
-//        #region Private Fields
+namespace DDay.Collections
+{
+    /// <summary>
+    /// A proxy for a keyed list.
+    /// </summary>
+#if !SILVERLIGHT
+    [Serializable]
+#endif
+    public class KeyedValueListProxy<TKey, TOriginal, TOriginalValue, TNewValue> :
+        IList<TNewValue>
+        where TOriginal : class, IKeyedObject<TKey>, IValueObject<TOriginalValue>
+        where TNewValue : TOriginalValue
+    {
+        #region Private Fields
 
-//        IKeyedValueList<TKey, TOriginal, TValueType> _RealObject;
+        IKeyedValueList<TKey, TOriginal, TOriginalValue> _RealObject;
 
-//        #endregion
+        #endregion
 
-//        #region Constructors
+        #region Constructors
 
-//        public KeyedValueListProxy(IKeyedValueList<TKey, TOriginal, TValueType> realObject, Predicate<TNew> predicate = null) :
-//            base(realObject, predicate)
-//        {
-//            _RealObject = realObject;
-//        }
+        public KeyedValueListProxy(IKeyedValueList<TKey, TOriginal, TOriginalValue> realObject)
+        {
+            _RealObject = realObject;
+        }
 
-//        #endregion
+        #endregion
 
-//        #region Overrides
+        virtual public int IndexOf(TNewValue item)
+        {
+            throw new NotImplementedException();
+        }
 
-//        public override void SetProxiedObject(IKeyedList<TKey, TOriginal> realObject)
-//        {
-//            base.SetProxiedObject(realObject);
+        virtual public void Insert(int index, TNewValue item)
+        {
+            throw new NotImplementedException();
+        }
 
-//            if (realObject is IKeyedValueList<TKey, TOriginal, TValueType>)
-//                _RealObject = (IKeyedValueList<TKey, TOriginal, TValueType>)realObject;
-//        }
+        virtual public void RemoveAt(int index)
+        {
+            throw new NotImplementedException();
+        }
 
-//        #endregion
+        virtual public TNewValue this[int index]
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
 
-//        #region IKeyedValueList<TKey,TObject,TNew,TValueType> Members
+        virtual public void Add(TNewValue item)
+        {
+            throw new NotImplementedException();
+        }
 
-//        virtual public void Set(TKey name, TValueType value)
-//        {
-//            _RealObject.Set(name, value);
-//        }
+        virtual public void Clear()
+        {
+            throw new NotImplementedException();
+        }
 
-//        virtual public void Set(TKey name, IEnumerable<TValueType> values)
-//        {
-//            _RealObject.Set(name, values);
-//        }
+        virtual public bool Contains(TNewValue item)
+        {
+            throw new NotImplementedException();
+        }
 
-//        virtual public TType Get<TType>(TKey name) where TType : TValueType
-//        {
-//            return _RealObject.Get<TType>(name);
-//        }
+        virtual public void CopyTo(TNewValue[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
 
-//        virtual public IList<TType> GetMany<TType>(TKey name) where TType : TValueType
-//        {
-//            return _RealObject.GetMany<TType>(name);
-//        }
+        virtual public int Count
+        {
+            get { throw new NotImplementedException(); }
+        }
 
-//        #endregion
-//    }
-//}
+        virtual public bool IsReadOnly
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        virtual public bool Remove(TNewValue item)
+        {
+            throw new NotImplementedException();
+        }
+
+        virtual public IEnumerator<TNewValue> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
