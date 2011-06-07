@@ -14,22 +14,47 @@ namespace DDay.Collections
 
         virtual public void Set(TKey key, TValueType value)
         {
-            throw new NotImplementedException();
+            Set(key, new TValueType[] { value });
         }
 
         virtual public void Set(TKey key, IEnumerable<TValueType> values)
         {
-            throw new NotImplementedException();
+            if (ContainsKey(key))
+            {
+                IEnumerable<TObject> items = AllOf(key);
+                if (items != null)
+                {
+                    // Add a value to the first matching item in the list
+                    items.FirstOrDefault().SetValue(values);
+                    return;
+                }
+            }
+
+            // No matching item was found, add a new item to the list
+            TObject obj = Activator.CreateInstance(typeof(TObject)) as TObject;
+
+            // Set the key for the object
+            obj.Key = key;
+
+            // Add the object to the list
+            Add(obj);
+
+            // Set the list of values for the object
+            obj.SetValue(values);
         }
 
         virtual public TType Get<TType>(TKey key) where TType : TValueType
         {
-            throw new NotImplementedException();
+            return AllOf(key)
+                .FirstOrDefault()
+                .Values
+                .OfType<TType>()
+                .FirstOrDefault();
         }
 
         virtual public IList<TType> GetMany<TType>(TKey key) where TType : TValueType
         {
-            throw new NotImplementedException();
+            return new KeyedValueListProxy<TKey, TObject, TValueType, TType>(this);
         }
 
         #endregion

@@ -7,6 +7,6 @@ namespace DDay.Collections
     public interface IKeyedObject<T>
     {
         event EventHandler<ObjectEventArgs<T, T>> KeyChanged;
-        T Key { get; }
+        T Key { get; set; }
     }
 }
