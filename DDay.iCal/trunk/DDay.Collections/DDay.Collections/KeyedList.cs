@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 namespace DDay.Collections
 {
     /// <summary>
-    /// A list of objects that are keyed.  Note that keys are not ordered.
+    /// A list of objects that are keyed.
     /// </summary>
 #if !SILVERLIGHT
     [Serializable]
