@@ -4,8 +4,8 @@ using System.Text;
 
 namespace DDay.Collections
 {
-    public interface IGroupedCollection<TGroup, TItem> :
-        ICollection<TItem>
+    public interface IGroupedList<TGroup, TItem> :
+        IList<TItem>
         where TItem : class, IGroupedObject<TGroup>
     {
         /// <summary>

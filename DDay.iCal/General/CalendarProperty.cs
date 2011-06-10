@@ -38,7 +38,7 @@ namespace DDay.iCal
         #region Private Fields
 
         private IList<object> _Values;        
-        private ICalendarParameterList _Parameters;
+        private ICalendarParameterCollection _Parameters;
 
         #endregion
 
@@ -47,7 +47,7 @@ namespace DDay.iCal
         /// <summary>
         /// Returns a list of parameters that are associated with the iCalendar object.
         /// </summary>
-        virtual public ICalendarParameterList Parameters
+        virtual public ICalendarParameterCollection Parameters
         {
             get { return _Parameters; }
             protected set
@@ -89,7 +89,7 @@ namespace DDay.iCal
 
         private void Initialize()
         {
-            _Parameters = new CalendarParameterList(this, true);
+            _Parameters = new CalendarParameterCollection(this, true);
             ValueChanged += new EventHandler<ValueChangedEventArgs<object>>(CalendarProperty_ValueChanged);
         }        
 

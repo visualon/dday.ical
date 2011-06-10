@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using System.Runtime.Serialization;
+using DDay.Collections;
 
 namespace DDay.iCal
 {
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class CalendarPropertyList :
-        KeyedValueList<string, ICalendarProperty, object>,
-        ICalendarPropertyList
+    public class CalendarPropertyCollection :
+        GroupedValueCollection<string, ICalendarProperty, object>,
+        ICalendarPropertyCollection
     {
         #region Private Fields
 
@@ -22,11 +23,11 @@ namespace DDay.iCal
 
         #region Constructors
 
-        public CalendarPropertyList()
+        public CalendarPropertyCollection()
         {
         }
 
-        public CalendarPropertyList(ICalendarObject parent, bool caseInsensitive)
+        public CalendarPropertyCollection(ICalendarObject parent, bool caseInsensitive)
         {
             m_Parent = parent;
             m_CaseInsensitive = caseInsensitive;

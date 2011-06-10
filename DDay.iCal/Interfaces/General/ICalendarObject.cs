@@ -25,7 +25,7 @@ namespace DDay.iCal
         /// <summary>
         /// Returns a collection of children of this object.
         /// </summary>
-        ICalendarObjectList<ICalendarObject> Children { get; }
+        ICalendarObjectCollection<ICalendarObject> Children { get; }
 
         /// <summary>
         /// Returns the iCalendar that this object

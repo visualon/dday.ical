@@ -21,7 +21,7 @@ namespace DDay.iCal
         #region Private Fields
 
         private ICalendarObject _Parent = null;
-        private ICalendarObjectList<ICalendarObject> _Children;
+        private ICalendarObjectCollection<ICalendarObject> _Children;
         private ServiceProvider _ServiceProvider;
         private string _Name;
         
@@ -50,7 +50,7 @@ namespace DDay.iCal
 
         void Initialize()
         {
-            _Children = new CalendarObjectList(this);
+            _Children = new CalendarObjectCollection(this);
             _ServiceProvider = new ServiceProvider();
 
             _Children.ItemAdded += new EventHandler<ObjectEventArgs<ICalendarObject>>(_Children_ItemAdded);
@@ -154,7 +154,7 @@ namespace DDay.iCal
         /// A collection of <see cref="iCalObject"/>s that are children 
         /// of the current object.
         /// </summary>
-        virtual public ICalendarObjectList<ICalendarObject> Children
+        virtual public ICalendarObjectCollection<ICalendarObject> Children
         {
             get
             {
