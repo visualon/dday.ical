@@ -69,7 +69,7 @@ namespace DDay.iCal.Serialization.iCalendar
                         string value = valueSerializer.SerializeToString(v);
 
                         // Get the list of parameters we'll be serializing
-                        ICalendarParameterList parameterList = prop.Parameters;
+                        ICalendarParameterCollection parameterList = prop.Parameters;
                         if (v is ICalendarDataType)
                             parameterList = ((ICalendarDataType)v).Parameters;
 

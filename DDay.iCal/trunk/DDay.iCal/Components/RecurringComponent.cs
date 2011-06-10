@@ -170,7 +170,7 @@ namespace DDay.iCal
         /// <summary>
         /// A list of <see cref="Alarm"/>s for this recurring component.
         /// </summary>
-        virtual public ICalendarObjectList<IAlarm> Alarms
+        virtual public ICalendarObjectCollection<IAlarm> Alarms
         {
             get { return new FilteredCalendarObjectList<IAlarm>(this); }
         }

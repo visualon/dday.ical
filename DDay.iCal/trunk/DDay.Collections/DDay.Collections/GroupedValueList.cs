@@ -5,12 +5,12 @@ using System.Text;
 
 namespace DDay.Collections
 {
-    public class GroupedValueCollection<TGroup, TItem, TValueType> :
-        GroupedCollection<TGroup, TItem>,
-        IGroupedValueCollection<TGroup, TItem, TValueType>
-        where TItem : class, IGroupedObject<TGroup>, IValueObject<TValueType>, new()
+    public class GroupedValueList<TGroup, TObject, TValueType> :
+        GroupedList<TGroup, TObject>,
+        IGroupedValueList<TGroup, TObject, TValueType>
+        where TObject : class, IGroupedObject<TGroup>, IValueObject<TValueType>, new()
     {
-        #region IKeyedValueList<TGroup, TItem, TValueType> Members
+        #region IKeyedValueList<TGroup, TObject, TValueType> Members
 
         virtual public void Set(TGroup group, TValueType value)
         {
@@ -21,7 +21,7 @@ namespace DDay.Collections
         {
             if (ContainsKey(group))
             {
-                IEnumerable<TItem> items = AllOf(group);
+                IEnumerable<TObject> items = AllOf(group);
                 if (items != null)
                 {
                     // Add a value to the first matching item in the list
@@ -31,7 +31,7 @@ namespace DDay.Collections
             }
 
             // No matching item was found, add a new item to the list
-            TItem obj = Activator.CreateInstance(typeof(TItem)) as TItem;
+            TObject obj = Activator.CreateInstance(typeof(TObject)) as TObject;
 
             // Set the group for the object
             obj.Group = group;
@@ -59,7 +59,7 @@ namespace DDay.Collections
 
         virtual public ICollection<TType> GetMany<TType>(TGroup group) where TType : TValueType
         {
-            return new GroupedValueCollectionProxy<TGroup, TItem, TValueType, TType>(this, group);
+            return new GroupedValueListProxy<TGroup, TObject, TValueType, TType>(this, group);
         }
 
         #endregion

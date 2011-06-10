@@ -5,14 +5,14 @@ using System.Text;
 
 namespace DDay.Collections
 {
-    public class GroupedCollectionEnumerator<TType> :
+    public class GroupedListEnumerator<TType> :
         IEnumerator<TType>
     {
         IList<IMultiLinkedList<TType>> _Lists;
         IEnumerator<IMultiLinkedList<TType>> _ListsEnumerator;
         IEnumerator<TType> _ListEnumerator;
 
-        public GroupedCollectionEnumerator(IList<IMultiLinkedList<TType>> lists)
+        public GroupedListEnumerator(IList<IMultiLinkedList<TType>> lists)
         {
             _Lists = lists;
         }

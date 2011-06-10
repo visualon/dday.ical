@@ -91,7 +91,7 @@ namespace DDay.iCal
 
         #region Private Fields
                 
-        private ICalendarPropertyList m_Properties;        
+        private ICalendarPropertyCollection m_Properties;        
 
         #endregion
 
@@ -100,7 +100,7 @@ namespace DDay.iCal
         /// <summary>
         /// Returns a list of properties that are associated with the iCalendar object.
         /// </summary>
-        virtual public ICalendarPropertyList Properties
+        virtual public ICalendarPropertyCollection Properties
         {
             get { return m_Properties; }
             protected set
@@ -118,7 +118,7 @@ namespace DDay.iCal
 
         private void Initialize()
         {            
-            m_Properties = new CalendarPropertyList(this, true);
+            m_Properties = new CalendarPropertyCollection(this, true);
         }
 
         #endregion
