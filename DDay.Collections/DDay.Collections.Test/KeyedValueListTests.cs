@@ -39,6 +39,8 @@ namespace DDay.Collections.Test
             Assert.AreEqual(0, itemsAdded);
             _Properties.Set("CATEGORIES", new string[] { "Work", "Personal" });
             Assert.AreEqual(1, itemsAdded);
+
+            var items = categories.ToArray();
             Assert.AreEqual(2, categories.Count);
         }
 
@@ -48,12 +50,29 @@ namespace DDay.Collections.Test
             int itemsAdded = 0;
             _Properties.ItemAdded += (s, e) => itemsAdded++;
 
-            IList<string> categories = _Properties.GetMany<string>("CATEGORIES");
+            // Get a collection value proxy
+            ICollection<string> categories = _Properties.GetMany<string>("CATEGORIES");
             Assert.AreEqual(0, itemsAdded);
+            
+            // Add a work category
             categories.Add("Work");
+
+            // Ensure a "CATEGORIES" item was added
             Assert.AreEqual(1, itemsAdded);
+
+            // Ensure the "Work" value is accounted for
+            Assert.AreEqual(1, categories.Count);
+            Assert.AreEqual(1, _Properties.AllOf("CATEGORIES").Sum(o => o.ValueCount));
+
+            // Add a personal category
             categories.Add("Personal");
-            Assert.AreEqual(2, itemsAdded);
+
+            // Ensure only the original "CATEGORY" item was added
+            Assert.AreEqual(1, itemsAdded);
+
+            // Ensure the "Work" and "Personal" categories are accounted for
+            Assert.AreEqual(2, categories.Count);
+            Assert.AreEqual(2, _Properties.AllOf("CATEGORIES").Sum(o => o.ValueCount));
         }
     }
 }
