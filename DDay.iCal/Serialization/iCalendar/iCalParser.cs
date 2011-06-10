@@ -243,7 +243,7 @@ _loop12_breakloop:			;
 	public ICalendarProperty  property(
 		
 	ISerializationContext ctx,	
-	ICalendarPropertyListContainer c
+	ICalendarPropertyCollectionContainer c
 
 	) //throws RecognitionException, TokenStreamException
 {
@@ -491,7 +491,7 @@ _loop20_breakloop:			;
 	public ICalendarParameter  parameter(
 		
 	ISerializationContext ctx,
-	ICalendarParameterListContainer container
+	ICalendarParameterCollectionContainer container
 
 	) //throws RecognitionException, TokenStreamException
 {

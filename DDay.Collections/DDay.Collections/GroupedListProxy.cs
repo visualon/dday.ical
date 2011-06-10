@@ -13,21 +13,21 @@ namespace DDay.Collections
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class GroupedCollectionProxy<TGroup, TOriginal, TNew> :
-        GroupedCollection<TGroup, TNew>
+    public class GroupedListProxy<TGroup, TOriginal, TNew> :
+        GroupedList<TGroup, TNew>
         where TOriginal : class, IGroupedObject<TGroup>
         where TNew : class, TOriginal
     {
         #region Private Fields
 
-        IGroupedCollection<TGroup, TOriginal> _RealObject;        
+        IGroupedList<TGroup, TOriginal> _RealObject;        
         Predicate<TNew> _Predicate;
 
         #endregion
 
         #region Constructors
 
-        public GroupedCollectionProxy(IGroupedCollection<TGroup, TOriginal> realObject, Predicate<TNew> predicate = null)
+        public GroupedListProxy(IGroupedList<TGroup, TOriginal> realObject, Predicate<TNew> predicate = null)
         {
             _Predicate = predicate ?? new Predicate<TNew>(o => true);
             SetProxiedObject(realObject);
@@ -58,7 +58,7 @@ namespace DDay.Collections
 
         #region Public Methods
 
-        virtual public void SetProxiedObject(IGroupedCollection<TGroup, TOriginal> realObject)
+        virtual public void SetProxiedObject(IGroupedList<TGroup, TOriginal> realObject)
         {
             _RealObject = realObject;
             Clear();

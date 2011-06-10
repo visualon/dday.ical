@@ -18,8 +18,8 @@ namespace DDay.iCal
     {
         #region Private Fields
 
-        ICalendarParameterList _Parameters;
-        CalendarKeyedListProxy<ICalendarParameter> _Proxy;
+        ICalendarParameterCollection _Parameters;
+        CalendarObjectCollectionProxy<ICalendarParameter> _Proxy;
         ServiceProvider _ServiceProvider;
 
         #endregion
@@ -39,8 +39,8 @@ namespace DDay.iCal
 
         void Initialize()
         {
-            _Parameters = new CalendarParameterList();
-            _Proxy = new CalendarKeyedListProxy<ICalendarParameter>(_Parameters, null, AssociatedObject);
+            _Parameters = new CalendarParameterCollection();
+            _Proxy = new CalendarObjectCollectionProxy<ICalendarParameter>(_Parameters, null, AssociatedObject);
             _ServiceProvider = new ServiceProvider();
         }
 
@@ -124,8 +124,8 @@ namespace DDay.iCal
                     if (_AssociatedObject != null)
                     {
                         _Proxy.SetParent(_AssociatedObject);
-                        if (_AssociatedObject is ICalendarParameterListContainer)
-                            _Proxy.SetProxiedObject(((ICalendarParameterListContainer)_AssociatedObject).Parameters);
+                        if (_AssociatedObject is ICalendarParameterCollectionContainer)
+                            _Proxy.SetProxiedObject(((ICalendarParameterCollectionContainer)_AssociatedObject).Parameters);
                     }
                     else
                     {
@@ -194,7 +194,7 @@ namespace DDay.iCal
 
         #region ICalendarParameterListContainer Members
 
-        public ICalendarParameterList Parameters
+        public ICalendarParameterCollection Parameters
         {
             get { return _Proxy; }
         }

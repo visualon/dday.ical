@@ -37,14 +37,14 @@ namespace DDay.iCal
     {
         #region Private Fields
 
-        ICalendarPropertyList m_PropertyList;
+        ICalendarPropertyCollection m_PropertyList;
         string m_PropertyName;
 
         #endregion
 
         #region Constructors
 
-        public CalendarPropertyCompositeValueCollection(ICalendarPropertyList propertyList, string propertyName)
+        public CalendarPropertyCompositeValueCollection(ICalendarPropertyCollection propertyList, string propertyName)
         {
             m_PropertyList = propertyList;
             m_PropertyName = propertyName;

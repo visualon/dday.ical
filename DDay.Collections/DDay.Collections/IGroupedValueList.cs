@@ -5,8 +5,8 @@ using System.Text;
 
 namespace DDay.Collections
 {
-    public interface IGroupedValueCollection<TGroup, TItem, TValueType> :
-        IGroupedCollection<TGroup, TItem>
+    public interface IGroupedValueList<TGroup, TItem, TValueType> :
+        IGroupedList<TGroup, TItem>
         where TItem : class, IGroupedObject<TGroup>, IValueObject<TValueType>        
     {        
         void Set(TGroup group, TValueType value);

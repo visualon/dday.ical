@@ -13,14 +13,14 @@ namespace DDay.Collections
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class GroupedValueCollectionProxy<TGroup, TOriginal, TOriginalValue, TNewValue> :
+    public class GroupedValueListProxy<TGroup, TOriginal, TOriginalValue, TNewValue> :
         ICollection<TNewValue>
         where TOriginal : class, IGroupedObject<TGroup>, IValueObject<TOriginalValue>, new()
         where TNewValue : TOriginalValue
     {
         #region Private Fields
 
-        GroupedValueCollection<TGroup, TOriginal, TOriginalValue> _RealObject;
+        GroupedValueList<TGroup, TOriginal, TOriginalValue> _RealObject;
         TGroup _Key;
         TOriginal _Container;
 
@@ -28,7 +28,7 @@ namespace DDay.Collections
 
         #region Constructors
 
-        public GroupedValueCollectionProxy(GroupedValueCollection<TGroup, TOriginal, TOriginalValue> realObject, TGroup group)
+        public GroupedValueListProxy(GroupedValueList<TGroup, TOriginal, TOriginalValue> realObject, TGroup group)
         {
             _RealObject = realObject;
             _Key = group;
@@ -132,12 +132,12 @@ namespace DDay.Collections
 
         virtual public IEnumerator<TNewValue> GetEnumerator()
         {
-            return new GroupedValueCollectionEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
+            return new GroupedValueListEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new GroupedValueCollectionEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
+            return new GroupedValueListEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
         }
     }
 }

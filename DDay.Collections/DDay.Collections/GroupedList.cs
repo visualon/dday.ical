@@ -12,8 +12,8 @@ namespace DDay.Collections
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class GroupedCollection<TGroup, TItem> :
-        IGroupedCollection<TGroup, TItem>
+    public class GroupedList<TGroup, TItem> :
+        IGroupedList<TGroup, TItem>
         where TItem : class, IGroupedObject<TGroup>
     {
         #region Protected Fields
@@ -83,6 +83,22 @@ namespace DDay.Collections
             return null;
         }
 
+        IMultiLinkedList<TItem> ListForIndex(int index, out int relativeIndex)
+        {
+            foreach (var list in _Lists)
+            {
+                var startIndex = list.StartIndex;
+                if (list.StartIndex <= index &&
+                    list.ExclusiveEnd > index)
+                {
+                    relativeIndex = index - list.StartIndex;
+                    return list;
+                }
+            }
+            relativeIndex = -1;
+            return null;
+        }
+
         #endregion
 
         #region Event Handlers
@@ -130,7 +146,7 @@ namespace DDay.Collections
 
         #endregion
 
-        #region IKeyedList<TGroup, TItem> Members
+        #region IKeyedList<TGroup, TObject> Members
 
         [field: NonSerialized]
         public event EventHandler<ObjectEventArgs<TItem, int>> ItemAdded;
@@ -260,23 +276,6 @@ namespace DDay.Collections
                 return _Dictionary[group];
             return new TItem[0];
         }
-
-        virtual public TItem this[int index]
-        {
-            get
-            {
-                foreach (var list in _Lists)
-                {
-                    var startIndex = list.StartIndex;
-                    if (list.StartIndex <= index &&
-                        list.ExclusiveEnd > index)
-                    {
-                        return list[index - list.StartIndex];
-                    }
-                }
-                return default(TItem);
-            }
-        }
         
         virtual public bool Remove(TItem obj)
         {
@@ -343,7 +342,7 @@ namespace DDay.Collections
         
         #endregion
 
-        #region ICollection<TItem> Members
+        #region ICollection<TObject> Members
 
         virtual public bool Contains(TItem item)
         {
@@ -364,12 +363,65 @@ namespace DDay.Collections
         }
 
         #endregion
-        
+
+        #region IList<TObject> Members
+
+        virtual public void Insert(int index, TItem item)
+        {
+            int relativeIndex;
+            IMultiLinkedList<TItem> list = ListForIndex(index, out relativeIndex);
+            if (list != null)
+            {
+                list.Insert(relativeIndex, item);
+                OnItemAdded(item, index);
+            }
+        }
+
+        virtual public void RemoveAt(int index)
+        {
+            int relativeIndex;
+            IMultiLinkedList<TItem> list = ListForIndex(index, out relativeIndex);
+            if (list != null)
+            {
+                TItem item = list[relativeIndex];
+                list.RemoveAt(relativeIndex);
+                OnItemRemoved(item, index);
+            }
+        }
+
+        virtual public TItem this[int index]
+        {
+            get
+            {
+                int relativeIndex;
+                IMultiLinkedList<TItem> list = ListForIndex(index, out relativeIndex);
+                if (list != null)
+                    return list[relativeIndex];
+                return default(TItem);
+            }
+            set
+            {
+                int relativeIndex;
+                IMultiLinkedList<TItem> list = ListForIndex(index, out relativeIndex);
+                if (list != null)
+                {
+                    // Remove the item at that index and replace it
+                    var item = list[relativeIndex];
+                    list.RemoveAt(relativeIndex);
+                    list.Insert(relativeIndex, value);
+                    OnItemRemoved(item, index);
+                    OnItemAdded(item, index);
+                }
+            }
+        }
+
+        #endregion
+
         #region IEnumerable<U> Members
 
         public IEnumerator<TItem> GetEnumerator()
         {
-            return new GroupedCollectionEnumerator<TItem>(_Lists);
+            return new GroupedListEnumerator<TItem>(_Lists);
         }
 
         #endregion
@@ -378,7 +430,7 @@ namespace DDay.Collections
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return new GroupedCollectionEnumerator<TItem>(_Lists);
+            return new GroupedListEnumerator<TItem>(_Lists);
         }
 
         #endregion

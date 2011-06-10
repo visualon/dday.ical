@@ -5,17 +5,17 @@ using System.Text;
 
 namespace DDay.Collections
 {
-    public class GroupedValueCollectionEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue> :
+    public class GroupedValueListEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue> :
         IEnumerator<TNewValue>
         where TOriginal : class, IGroupedObject<TGroup>, IValueObject<TOriginalValue>
         where TNewValue : TOriginalValue
     {
-        GroupedCollection<TGroup, TOriginal> _List;
+        GroupedList<TGroup, TOriginal> _List;
         TGroup _Key;
         IEnumerator<TOriginalValue> _ValueEnumerator;
         IEnumerator<TOriginal> _ObjectEnumerator;
 
-        public GroupedValueCollectionEnumerator(GroupedCollection<TGroup, TOriginal> list, TGroup group)
+        public GroupedValueListEnumerator(GroupedList<TGroup, TOriginal> list, TGroup group)
         {
             _List = list;
             _Key = group;

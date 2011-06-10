@@ -15,13 +15,13 @@ namespace DDay.iCal
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class CalendarObjectList :
-        KeyedList<string, ICalendarObject>,
-        ICalendarObjectList<ICalendarObject>
+    public class CalendarObjectCollection :
+        GroupedCollection<string, ICalendarObject>,
+        ICalendarObjectCollection<ICalendarObject>
     {
         ICalendarObject _Parent;
 
-        public CalendarObjectList(ICalendarObject parent)
+        public CalendarObjectCollection(ICalendarObject parent)
         {
             _Parent = parent;
         }
