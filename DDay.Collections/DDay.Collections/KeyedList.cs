@@ -16,7 +16,7 @@ namespace DDay.Collections
         IKeyedList<TKey, TObject>
         where TObject : class, IKeyedObject<TKey>
     {
-        #region Private Fields
+        #region Protected Fields
 
         List<IMultiLinkedList<TObject>> _Lists = new List<IMultiLinkedList<TObject>>();
         Dictionary<TKey, IMultiLinkedList<TObject>> _Dictionary = new Dictionary<TKey, IMultiLinkedList<TObject>>();
@@ -369,7 +369,7 @@ namespace DDay.Collections
 
         public IEnumerator<TObject> GetEnumerator()
         {
-            return new MultiLinkedListEnumerator<TObject>(_Lists);
+            return new KeyedListEnumerator<TObject>(_Lists);
         }
 
         #endregion
@@ -378,114 +378,7 @@ namespace DDay.Collections
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return new MultiLinkedListEnumerator<TObject>(_Lists);
-        }
-
-        #endregion
-
-        #region Helper Classes
-
-        private class MultiLinkedListEnumerator<TType> :
-            IEnumerator<TType>
-        {
-            IList<IMultiLinkedList<TType>> _Lists;
-            IEnumerator<IMultiLinkedList<TType>> _ListsEnumerator;
-            IEnumerator<TType> _ListEnumerator;
-
-            public MultiLinkedListEnumerator(IList<IMultiLinkedList<TType>> lists)
-            {
-                _Lists = lists;
-            }
-            
-            virtual public TType Current
-            {
-                get 
-                {
-                    if (_ListEnumerator != null)
-                        return _ListEnumerator.Current;
-                    return default(TType);
-                }
-            }
-
-            virtual public void Dispose()
-            {
-                Reset();
-            }
-
-            void DisposeListEnumerator()
-            {
-                if (_ListEnumerator != null)
-                {
-                    _ListEnumerator.Dispose();
-                    _ListEnumerator = null;
-                }
-            }
-
-            object System.Collections.IEnumerator.Current
-            {
-                get
-                {
-                    if (_ListEnumerator != null)
-                        return _ListEnumerator.Current;
-                    return default(TType);
-                }
-            }
-
-            private bool MoveNextList()
-            {
-                if (_ListsEnumerator == null)
-                {
-                    _ListsEnumerator = _Lists.GetEnumerator();
-                }
-
-                if (_ListsEnumerator != null)
-                {
-                    if (_ListsEnumerator.MoveNext())
-                    {
-                        DisposeListEnumerator();
-                        if (_ListsEnumerator.Current != null)
-                        {
-                            _ListEnumerator = _ListsEnumerator.Current.GetEnumerator();
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
-            }
-
-            virtual public bool MoveNext()
-            {
-                if (_ListEnumerator != null)
-                {
-                    if (_ListEnumerator.MoveNext())
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        DisposeListEnumerator();
-                        if (MoveNextList())
-                            return MoveNext();
-                    }
-                }
-                else
-                {
-                    if (MoveNextList())
-                        return MoveNext();
-                }
-                return false;
-            }
-
-            virtual public void Reset()
-            {
-                
-                if (_ListsEnumerator != null)
-                {
-                    _ListsEnumerator.Dispose();
-                    _ListsEnumerator = null;
-                }
-            }
+            return new KeyedListEnumerator<TObject>(_Lists);
         }
 
         #endregion

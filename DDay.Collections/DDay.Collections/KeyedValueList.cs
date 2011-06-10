@@ -8,7 +8,7 @@ namespace DDay.Collections
     public class KeyedValueList<TKey, TObject, TValueType> :
         KeyedList<TKey, TObject>,
         IKeyedValueList<TKey, TObject, TValueType>
-        where TObject : class, IKeyedObject<TKey>, IValueObject<TValueType>
+        where TObject : class, IKeyedObject<TKey>, IValueObject<TValueType>, new()
     {
         #region IKeyedValueList<TKey, TObject, TValueType> Members
 
@@ -45,16 +45,21 @@ namespace DDay.Collections
 
         virtual public TType Get<TType>(TKey key) where TType : TValueType
         {
-            return AllOf(key)
-                .FirstOrDefault()
-                .Values
-                .OfType<TType>()
-                .FirstOrDefault();
+            var firstItem = AllOf(key).FirstOrDefault();
+            if (firstItem != null &&
+                firstItem.Values != null)
+            {
+                return firstItem
+                    .Values
+                    .OfType<TType>()
+                    .FirstOrDefault();
+            }
+            return default(TType);
         }
 
-        virtual public IList<TType> GetMany<TType>(TKey key) where TType : TValueType
+        virtual public ICollection<TType> GetMany<TType>(TKey key) where TType : TValueType
         {
-            return new KeyedValueListProxy<TKey, TObject, TValueType, TType>(this);
+            return new KeyedValueListProxy<TKey, TObject, TValueType, TType>(this, key);
         }
 
         #endregion

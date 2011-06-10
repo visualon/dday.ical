@@ -12,6 +12,6 @@ namespace DDay.Collections
         void Set(TKey key, TValueType value);
         void Set(TKey key, IEnumerable<TValueType> values);
         TType Get<TType>(TKey key) where TType : TValueType;
-        IList<TType> GetMany<TType>(TKey key) where TType : TValueType;
+        ICollection<TType> GetMany<TType>(TKey key) where TType : TValueType;
     }
 }

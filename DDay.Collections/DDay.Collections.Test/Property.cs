@@ -88,6 +88,11 @@ namespace DDay.Collections.Test
             OnValueChanged(new string[] { value }, null);
         }
 
+        virtual public int ValueCount
+        {
+            get { return _InternalValues.Count; }
+        }
+
         #endregion
     }
 }

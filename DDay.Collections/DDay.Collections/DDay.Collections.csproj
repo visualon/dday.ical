@@ -79,6 +79,7 @@
     <Compile Include="Constants.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="KeyedValueListEnumerator.cs" />
     <Compile Include="KeyedListProxy.cs" />
     <Compile Include="IKeyedList.cs" />
     <Compile Include="IKeyedObject.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="KeyedValueList.cs" />
     <Compile Include="KeyedValueListProxy.cs" />
     <Compile Include="MultiLinkedList.cs" />
+    <Compile Include="KeyedListEnumerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
