@@ -5,20 +5,20 @@ using System.Text;
 
 namespace DDay.Collections
 {
-    public class KeyedValueListEnumerator<TKey, TOriginal, TOriginalValue, TNewValue> :
+    public class GroupedValueCollectionEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue> :
         IEnumerator<TNewValue>
-        where TOriginal : class, IKeyedObject<TKey>, IValueObject<TOriginalValue>
+        where TOriginal : class, IGroupedObject<TGroup>, IValueObject<TOriginalValue>
         where TNewValue : TOriginalValue
     {
-        KeyedList<TKey, TOriginal> _List;
-        TKey _Key;
+        GroupedCollection<TGroup, TOriginal> _List;
+        TGroup _Key;
         IEnumerator<TOriginalValue> _ValueEnumerator;
         IEnumerator<TOriginal> _ObjectEnumerator;
 
-        public KeyedValueListEnumerator(KeyedList<TKey, TOriginal> list, TKey key)
+        public GroupedValueCollectionEnumerator(GroupedCollection<TGroup, TOriginal> list, TGroup group)
         {
             _List = list;
-            _Key = key;
+            _Key = group;
         }
 
         virtual public TNewValue Current

@@ -7,14 +7,14 @@ using NUnit.Framework;
 namespace DDay.Collections.Test
 {
     [TestFixture]
-    public class KeyedValueListTests
+    public class GroupedValueCollectionTests
     {
-        IKeyedValueList<string, Property, string> _Properties;
+        IGroupedValueCollection<string, Property, string> _Properties;
         
         [SetUp]
         public void Setup()
         {
-            _Properties = new KeyedValueList<string, Property, string>();
+            _Properties = new GroupedValueCollection<string, Property, string>();
         }
 
         [Test]
