@@ -79,18 +79,18 @@
     <Compile Include="Constants.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="KeyedValueListEnumerator.cs" />
-    <Compile Include="KeyedListProxy.cs" />
-    <Compile Include="IKeyedList.cs" />
-    <Compile Include="IKeyedObject.cs" />
-    <Compile Include="IKeyedValueList.cs" />
+    <Compile Include="GroupedValueCollectionEnumerator.cs" />
+    <Compile Include="GroupedCollectionProxy.cs" />
+    <Compile Include="IGroupedCollection.cs" />
+    <Compile Include="IGroupedObject.cs" />
+    <Compile Include="IGroupedValueCollection.cs" />
     <Compile Include="IMultiLinkedList.cs" />
     <Compile Include="IValueObject.cs" />
-    <Compile Include="KeyedList.cs" />
-    <Compile Include="KeyedValueList.cs" />
-    <Compile Include="KeyedValueListProxy.cs" />
+    <Compile Include="GroupedCollection.cs" />
+    <Compile Include="GroupedValueCollection.cs" />
+    <Compile Include="GroupedValueCollectionProxy.cs" />
     <Compile Include="MultiLinkedList.cs" />
-    <Compile Include="KeyedListEnumerator.cs" />
+    <Compile Include="GroupedCollectionEnumerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
