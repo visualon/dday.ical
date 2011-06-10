@@ -130,7 +130,7 @@ namespace DDay.Collections
 
         #endregion
 
-        #region IKeyedList<TGroup, TObject> Members
+        #region IKeyedList<TGroup, TItem> Members
 
         [field: NonSerialized]
         public event EventHandler<ObjectEventArgs<TItem, int>> ItemAdded;
@@ -343,7 +343,7 @@ namespace DDay.Collections
         
         #endregion
 
-        #region ICollection<TObject> Members
+        #region ICollection<TItem> Members
 
         virtual public bool Contains(TItem item)
         {
