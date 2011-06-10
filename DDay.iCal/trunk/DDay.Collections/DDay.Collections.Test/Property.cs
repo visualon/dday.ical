@@ -6,7 +6,7 @@ using System.Text;
 namespace DDay.Collections.Test
 {
     public class Property :
-        IKeyedObject<string>,
+        IGroupedObject<string>,
         IValueObject<string>
     {
         public Property()
@@ -16,16 +16,16 @@ namespace DDay.Collections.Test
 
         #region IKeyedObject<string> Members
 
-        public event EventHandler<ObjectEventArgs<string, string>> KeyChanged;
+        public event EventHandler<ObjectEventArgs<string, string>> GroupChanged;
 
         protected void OnKeyChanged(string oldKey, string newKey)
         {
-            if (KeyChanged != null)
-                KeyChanged(this, new ObjectEventArgs<string, string>(oldKey, newKey));
+            if (GroupChanged != null)
+                GroupChanged(this, new ObjectEventArgs<string, string>(oldKey, newKey));
         }
 
         string _Key;
-        virtual public string Key
+        virtual public string Group
         {
             get { return _Key; }
             set

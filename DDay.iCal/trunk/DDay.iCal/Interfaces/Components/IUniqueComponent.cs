@@ -10,11 +10,11 @@ namespace DDay.iCal
     {
         string UID { get; set; }
 
-        IList<IAttendee> Attendees { get; set; }
-        IList<string> Comments { get; set; }
+        ICollection<IAttendee> Attendees { get; set; }
+        ICollection<string> Comments { get; set; }
         IDateTime DTStamp { get; set; }
         IOrganizer Organizer { get; set; }
-        IList<IRequestStatus> RequestStatuses { get; set; }
+        ICollection<IRequestStatus> RequestStatuses { get; set; }
         Uri Url { get; set; }
     }
 }

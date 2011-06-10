@@ -13,25 +13,25 @@ namespace DDay.Collections
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class KeyedValueListProxy<TKey, TOriginal, TOriginalValue, TNewValue> :
+    public class GroupedValueCollectionProxy<TGroup, TOriginal, TOriginalValue, TNewValue> :
         ICollection<TNewValue>
-        where TOriginal : class, IKeyedObject<TKey>, IValueObject<TOriginalValue>, new()
+        where TOriginal : class, IGroupedObject<TGroup>, IValueObject<TOriginalValue>, new()
         where TNewValue : TOriginalValue
     {
         #region Private Fields
 
-        KeyedValueList<TKey, TOriginal, TOriginalValue> _RealObject;
-        TKey _Key;
+        GroupedValueCollection<TGroup, TOriginal, TOriginalValue> _RealObject;
+        TGroup _Key;
         TOriginal _Container;
 
         #endregion
 
         #region Constructors
 
-        public KeyedValueListProxy(KeyedValueList<TKey, TOriginal, TOriginalValue> realObject, TKey key)
+        public GroupedValueCollectionProxy(GroupedValueCollection<TGroup, TOriginal, TOriginalValue> realObject, TGroup group)
         {
             _RealObject = realObject;
-            _Key = key;
+            _Key = group;
         }
 
         #endregion
@@ -42,14 +42,14 @@ namespace DDay.Collections
         {
             if (_Container == null)
             {
-                // Find an item that matches our key
+                // Find an item that matches our group
                 _Container = _RealObject.AllOf(_Key).FirstOrDefault();
 
                 // If no item is found, create a new object and add it to the list
                 if (_Container == default(TOriginal))
                 {
                     _Container = new TOriginal();
-                    _Container.Key = _Key;
+                    _Container.Group = _Key;
                     _RealObject.Add(_Container);
                 }
             }
@@ -132,12 +132,12 @@ namespace DDay.Collections
 
         virtual public IEnumerator<TNewValue> GetEnumerator()
         {
-            return new KeyedValueListEnumerator<TKey, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
+            return new GroupedValueCollectionEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new KeyedValueListEnumerator<TKey, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
+            return new GroupedValueCollectionEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
         }
     }
 }

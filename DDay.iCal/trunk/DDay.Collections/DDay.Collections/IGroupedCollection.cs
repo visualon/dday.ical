@@ -4,64 +4,64 @@ using System.Text;
 
 namespace DDay.Collections
 {
-    public interface IKeyedList<TKey, TObject> :
-        ICollection<TObject>
-        where TObject : class, IKeyedObject<TKey>
+    public interface IGroupedCollection<TGroup, TItem> :
+        ICollection<TItem>
+        where TItem : class, IGroupedObject<TGroup>
     {
         /// <summary>
         /// Fired after an item is added to the collection.
         /// </summary>
-        event EventHandler<ObjectEventArgs<TObject, int>> ItemAdded;
+        event EventHandler<ObjectEventArgs<TItem, int>> ItemAdded;
 
         /// <summary>
         /// Fired after an item is removed from the collection.
         /// </summary>
-        event EventHandler<ObjectEventArgs<TObject, int>> ItemRemoved;
+        event EventHandler<ObjectEventArgs<TItem, int>> ItemRemoved;
 
         /// <summary>
-        /// Removes all items with the matching key from the collection.
+        /// Removes all items with the matching group from the collection.
         /// </summary>        
         /// <returns>True if the object was removed, false otherwise.</returns>
-        bool Remove(TKey key);
+        bool Remove(TGroup group);
 
         /// <summary>
-        /// Clears all items matching the specified key.
+        /// Clears all items matching the specified group.
         /// </summary>
-        void Clear(TKey key);
+        void Clear(TGroup group);
         
         /// <summary>
         /// Returns true if the list contains at least one 
-        /// object with a matching key, false otherwise.
+        /// object with a matching group, false otherwise.
         /// </summary>
-        bool ContainsKey(TKey key);
+        bool ContainsKey(TGroup group);
 
         /// <summary>
         /// Returns the number of objects in the list
-        /// with a matching key.
+        /// with a matching group.
         /// </summary>
-        int CountOf(TKey key);
+        int CountOf(TGroup group);
         
         /// <summary>
         /// Returns a list of objects that
-        /// match the specified key.
+        /// match the specified group.
         /// </summary>
-        IEnumerable<TObject> AllOf(TKey key);
+        IEnumerable<TItem> AllOf(TGroup group);
 
         /// <summary>
         /// Returns the index of the given item
         /// within the list, or -1 if the item
         /// is not found in the list.
         /// </summary>
-        int IndexOf(TObject obj);
+        int IndexOf(TItem obj);
 
         /// <summary>
         /// Gets the object at the specified index.
         /// </summary>
-        TObject this[int index] { get; }
+        TItem this[int index] { get; }
 
         /// <summary>
         /// Sort the keys of the list.
         /// </summary>
-        void SortKeys(IComparer<TKey> comparer = null);
+        void SortKeys(IComparer<TGroup> comparer = null);
     }
 }

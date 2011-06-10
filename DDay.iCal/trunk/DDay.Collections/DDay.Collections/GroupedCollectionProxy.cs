@@ -13,21 +13,21 @@ namespace DDay.Collections
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class KeyedListProxy<TKey, TOriginal, TNew> :
-        KeyedList<TKey, TNew>
-        where TOriginal : class, IKeyedObject<TKey>
+    public class GroupedCollectionProxy<TGroup, TOriginal, TNew> :
+        GroupedCollection<TGroup, TNew>
+        where TOriginal : class, IGroupedObject<TGroup>
         where TNew : class, TOriginal
     {
         #region Private Fields
 
-        IKeyedList<TKey, TOriginal> _RealObject;        
+        IGroupedCollection<TGroup, TOriginal> _RealObject;        
         Predicate<TNew> _Predicate;
 
         #endregion
 
         #region Constructors
 
-        public KeyedListProxy(IKeyedList<TKey, TOriginal> realObject, Predicate<TNew> predicate = null)
+        public GroupedCollectionProxy(IGroupedCollection<TGroup, TOriginal> realObject, Predicate<TNew> predicate = null)
         {
             _Predicate = predicate ?? new Predicate<TNew>(o => true);
             SetProxiedObject(realObject);
@@ -58,7 +58,7 @@ namespace DDay.Collections
 
         #region Public Methods
 
-        virtual public void SetProxiedObject(IKeyedList<TKey, TOriginal> realObject)
+        virtual public void SetProxiedObject(IGroupedCollection<TGroup, TOriginal> realObject)
         {
             _RealObject = realObject;
             Clear();
