@@ -7,19 +7,19 @@ using System.Collections;
 namespace DDay.Collections.Test
 {
     public class Person :
-        IKeyedObject<long>,
+        IGroupedObject<long>,
         IComparer
     {
-        public event EventHandler<ObjectEventArgs<long, long>> KeyChanged;
+        public event EventHandler<ObjectEventArgs<long, long>> GroupChanged;
 
         protected void OnKeyChanged(long oldId, long newId)
         {
-            if (KeyChanged != null)
-                KeyChanged(this, new ObjectEventArgs<long, long>(oldId, newId));
+            if (GroupChanged != null)
+                GroupChanged(this, new ObjectEventArgs<long, long>(oldId, newId));
         }
 
         long _Key;
-        virtual public long Key
+        virtual public long Group
         {
             get { return _Key; }
             set

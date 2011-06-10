@@ -12,30 +12,30 @@ namespace DDay.Collections
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class KeyedList<TKey, TObject> :
-        IKeyedList<TKey, TObject>
-        where TObject : class, IKeyedObject<TKey>
+    public class GroupedCollection<TGroup, TItem> :
+        IGroupedCollection<TGroup, TItem>
+        where TItem : class, IGroupedObject<TGroup>
     {
         #region Protected Fields
 
-        List<IMultiLinkedList<TObject>> _Lists = new List<IMultiLinkedList<TObject>>();
-        Dictionary<TKey, IMultiLinkedList<TObject>> _Dictionary = new Dictionary<TKey, IMultiLinkedList<TObject>>();
+        List<IMultiLinkedList<TItem>> _Lists = new List<IMultiLinkedList<TItem>>();
+        Dictionary<TGroup, IMultiLinkedList<TItem>> _Dictionary = new Dictionary<TGroup, IMultiLinkedList<TItem>>();
 
         #endregion
 
         #region Private Methods
 
-        TObject SubscribeToKeyChanges(TObject item)
+        TItem SubscribeToKeyChanges(TItem item)
         {
             if (item != null)
-                item.KeyChanged += item_KeyChanged;
+                item.GroupChanged += item_KeyChanged;
             return item;
         }
 
-        TObject UnsubscribeFromKeyChanges(TObject item)
+        TItem UnsubscribeFromKeyChanges(TItem item)
         {
             if (item != null)
-                item.KeyChanged -= item_KeyChanged;
+                item.GroupChanged -= item_KeyChanged;
             return item;
         }
 
@@ -43,26 +43,26 @@ namespace DDay.Collections
 
         #region Protected Methods
 
-        virtual protected TKey KeyModifier(TKey key)
+        virtual protected TGroup KeyModifier(TGroup group)
         {
-            if (key == null)
-                throw new ArgumentNullException("The item's key cannot be null.");
+            if (group == null)
+                throw new ArgumentNullException("The item's group cannot be null.");
 
-            return key;
+            return group;
         }
 
         #endregion
 
         #region Private Methods
 
-        IMultiLinkedList<TObject> EnsureList(TKey key, bool createIfNecessary)
+        IMultiLinkedList<TItem> EnsureList(TGroup group, bool createIfNecessary)
         {
-            if (!_Dictionary.ContainsKey(key))
+            if (!_Dictionary.ContainsKey(group))
             {
                 if (createIfNecessary)
                 {
-                    MultiLinkedList<TObject> list = new MultiLinkedList<TObject>();
-                    _Dictionary[key] = list;
+                    MultiLinkedList<TItem> list = new MultiLinkedList<TItem>();
+                    _Dictionary[group] = list;
 
                     if (_Lists.Count > 0)
                     {
@@ -78,7 +78,7 @@ namespace DDay.Collections
             }
             else
             {
-                return _Dictionary[key];
+                return _Dictionary[group];
             }
             return null;
         }
@@ -87,30 +87,30 @@ namespace DDay.Collections
 
         #region Event Handlers
 
-        void item_KeyChanged(object sender, ObjectEventArgs<TKey, TKey> e)
+        void item_KeyChanged(object sender, ObjectEventArgs<TGroup, TGroup> e)
         {
-            TKey oldValue = e.First;
-            TKey newValue = e.Second;
-            TObject obj = sender as TObject;
+            TGroup oldValue = e.First;
+            TGroup newValue = e.Second;
+            TItem obj = sender as TItem;
 
             if (obj != null)
             {
                 // Remove the object from the hash table
-                // based on the old key.
-                if (!object.Equals(oldValue, default(TKey)))
+                // based on the old group.
+                if (!object.Equals(oldValue, default(TGroup)))
                 {
                     // Find the specific item and remove it
-                    TKey key = KeyModifier(oldValue);
-                    if (_Dictionary.ContainsKey(key))
+                    TGroup group = KeyModifier(oldValue);
+                    if (_Dictionary.ContainsKey(group))
                     {
-                        IMultiLinkedList<TObject> items = _Dictionary[key];
+                        IMultiLinkedList<TItem> items = _Dictionary[group];
 
                         // Find the item's index within the list
                         int index = items.IndexOf(obj);
                         if (index >= 0)
                         {
                             // Get a reference to the object
-                            TObject item = items[index];
+                            TItem item = items[index];
 
                             // Remove the object
                             items.RemoveAt(index);
@@ -122,57 +122,57 @@ namespace DDay.Collections
                     }
                 }
 
-                // If a new key exists, then re-add this item into the hash
-                if (!object.Equals(newValue, default(TKey)))
+                // If a new group exists, then re-add this item into the hash
+                if (!object.Equals(newValue, default(TGroup)))
                     Add(obj);
             }
         }
 
         #endregion
 
-        #region IKeyedList<TKey, TObject> Members
+        #region IKeyedList<TGroup, TObject> Members
 
         [field: NonSerialized]
-        public event EventHandler<ObjectEventArgs<TObject, int>> ItemAdded;
+        public event EventHandler<ObjectEventArgs<TItem, int>> ItemAdded;
 
         [field: NonSerialized]
-        public event EventHandler<ObjectEventArgs<TObject, int>> ItemRemoved;
+        public event EventHandler<ObjectEventArgs<TItem, int>> ItemRemoved;
 
-        protected void OnItemAdded(TObject obj, int index)
+        protected void OnItemAdded(TItem obj, int index)
         {
             if (ItemAdded != null)
-                ItemAdded(this, new ObjectEventArgs<TObject, int>(obj, index));
+                ItemAdded(this, new ObjectEventArgs<TItem, int>(obj, index));
         }
 
-        protected void OnItemRemoved(TObject obj, int index)
+        protected void OnItemRemoved(TItem obj, int index)
         {
             if (ItemRemoved != null)
-                ItemRemoved(this, new ObjectEventArgs<TObject, int>(obj, index));
+                ItemRemoved(this, new ObjectEventArgs<TItem, int>(obj, index));
         }
 
-        virtual public void Add(TObject item)
+        virtual public void Add(TItem item)
         {
             if (item != null)
             {
-                // Get the "real" key for this item
-                TKey key = KeyModifier(item.Key);
+                // Get the "real" group for this item
+                TGroup group = KeyModifier(item.Group);
 
                 // Add a new list if necessary
-                var list = EnsureList(key, true);
+                var list = EnsureList(group, true);
                 int index = list.Count;
                 list.Add(SubscribeToKeyChanges(item));
                 OnItemAdded(item, list.StartIndex + index);
             }
         }
 
-        virtual public int IndexOf(TObject item)
+        virtual public int IndexOf(TItem item)
         {
-            // Get the "real" key
-            TKey key = KeyModifier(item.Key);
-            if (_Dictionary.ContainsKey(key))
+            // Get the "real" group
+            TGroup group = KeyModifier(item.Group);
+            if (_Dictionary.ContainsKey(group))
             {
-                // Get the list associated with this object's key
-                var list = _Dictionary[key];
+                // Get the list associated with this object's group
+                var list = _Dictionary[group];
 
                 // Find the object within the list.
                 int index = list.IndexOf(item);
@@ -184,24 +184,24 @@ namespace DDay.Collections
             return -1;
         }
 
-        virtual public void Clear(TKey key)
+        virtual public void Clear(TGroup group)
         {
-            key = KeyModifier(key);
+            group = KeyModifier(group);
 
-            if (_Dictionary.ContainsKey(key))
+            if (_Dictionary.ContainsKey(group))
             {
-                // Get the list associated with the key
-                var list = _Dictionary[key].ToArray();
+                // Get the list associated with the group
+                var list = _Dictionary[group].ToArray();
                 
                 // Save the number of items in the list
                 int count = list.Length;
 
                 // Save the starting index of the list
-                int startIndex = _Dictionary[key].StartIndex;
+                int startIndex = _Dictionary[group].StartIndex;
 
                 // Clear the list (note that this also clears the list
                 // in the _Lists object).
-                _Dictionary[key].Clear();
+                _Dictionary[group].Clear();
 
                 // Notify that each of these items were removed
                 for (int i = list.Length - 1; i >= 0; i--)
@@ -223,10 +223,10 @@ namespace DDay.Collections
                 OnItemRemoved(UnsubscribeFromKeyChanges(items[i]), i);
         }
 
-        virtual public bool ContainsKey(TKey key)
+        virtual public bool ContainsKey(TGroup group)
         {
-            key = KeyModifier(key);
-            return _Dictionary.ContainsKey(key);
+            group = KeyModifier(group);
+            return _Dictionary.ContainsKey(group);
         }
 
         virtual public int Count
@@ -240,28 +240,28 @@ namespace DDay.Collections
             }
         }
 
-        virtual public int CountOf(TKey key)
+        virtual public int CountOf(TGroup group)
         {
-            key = KeyModifier(key);
-            if (_Dictionary.ContainsKey(key))
-                return _Dictionary[key].Count;
+            group = KeyModifier(group);
+            if (_Dictionary.ContainsKey(group))
+                return _Dictionary[group].Count;
             return 0;
         }
 
-        virtual public IEnumerable<TObject> Values()
+        virtual public IEnumerable<TItem> Values()
         {
             return _Dictionary.Values.SelectMany(i => i);
         }
 
-        virtual public IEnumerable<TObject> AllOf(TKey key)
+        virtual public IEnumerable<TItem> AllOf(TGroup group)
         {
-            key = KeyModifier(key);
-            if (_Dictionary.ContainsKey(key))
-                return _Dictionary[key];
-            return new TObject[0];
+            group = KeyModifier(group);
+            if (_Dictionary.ContainsKey(group))
+                return _Dictionary[group];
+            return new TItem[0];
         }
 
-        virtual public TObject this[int index]
+        virtual public TItem this[int index]
         {
             get
             {
@@ -274,21 +274,21 @@ namespace DDay.Collections
                         return list[index - list.StartIndex];
                     }
                 }
-                return default(TObject);
+                return default(TItem);
             }
         }
         
-        virtual public bool Remove(TObject obj)
+        virtual public bool Remove(TItem obj)
         {
-            TKey key = KeyModifier(obj.Key);
-            if (_Dictionary.ContainsKey(key))
+            TGroup group = KeyModifier(obj.Group);
+            if (_Dictionary.ContainsKey(group))
             {
-                var items = _Dictionary[key];
+                var items = _Dictionary[group];
                 int index = items.IndexOf(obj);
 
                 if (index >= 0)
                 {
-                    TObject item = items[index];
+                    TItem item = items[index];
                     items.RemoveAt(index);
                     OnItemRemoved(UnsubscribeFromKeyChanges(obj), index);
                     return true;
@@ -297,12 +297,12 @@ namespace DDay.Collections
             return false;
         }
 
-        virtual public bool Remove(TKey key)
+        virtual public bool Remove(TGroup group)
         {
-            key = KeyModifier(key);
-            if (_Dictionary.ContainsKey(key))
+            group = KeyModifier(group);
+            if (_Dictionary.ContainsKey(group))
             {
-                var list = _Dictionary[key];
+                var list = _Dictionary[group];
 
                 for (int i = list.Count - 1; i >= 0; i--)
                 {
@@ -315,16 +315,16 @@ namespace DDay.Collections
             return false;
         }
 
-        virtual public void SortKeys(IComparer<TKey> comparer = null)
+        virtual public void SortKeys(IComparer<TGroup> comparer = null)
         {
-            TKey[] keys = _Dictionary.Keys.ToArray();
+            TGroup[] keys = _Dictionary.Keys.ToArray();
 
             _Lists.Clear();
 
-            IMultiLinkedList<TObject> previous = null;
-            foreach (TKey key in _Dictionary.Keys.OrderBy(k => k, comparer))
+            IMultiLinkedList<TItem> previous = null;
+            foreach (TGroup group in _Dictionary.Keys.OrderBy(k => k, comparer))
             {
-                var list = _Dictionary[key];
+                var list = _Dictionary[group];
                 if (previous == null)
                 {
                     previous = list;
@@ -345,15 +345,15 @@ namespace DDay.Collections
 
         #region ICollection<TObject> Members
 
-        virtual public bool Contains(TObject item)
+        virtual public bool Contains(TItem item)
         {
-            var key = KeyModifier(item.Key);
-            if (_Dictionary.ContainsKey(key))
-                return _Dictionary[key].Contains(item);
+            var group = KeyModifier(item.Group);
+            if (_Dictionary.ContainsKey(group))
+                return _Dictionary[group].Contains(item);
             return false;
         }
 
-        virtual public void CopyTo(TObject[] array, int arrayIndex)
+        virtual public void CopyTo(TItem[] array, int arrayIndex)
         {
             _Dictionary.SelectMany(kvp => kvp.Value).ToArray().CopyTo(array, arrayIndex);
         }
@@ -367,9 +367,9 @@ namespace DDay.Collections
         
         #region IEnumerable<U> Members
 
-        public IEnumerator<TObject> GetEnumerator()
+        public IEnumerator<TItem> GetEnumerator()
         {
-            return new KeyedListEnumerator<TObject>(_Lists);
+            return new GroupedCollectionEnumerator<TItem>(_Lists);
         }
 
         #endregion
@@ -378,7 +378,7 @@ namespace DDay.Collections
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return new KeyedListEnumerator<TObject>(_Lists);
+            return new GroupedCollectionEnumerator<TItem>(_Lists);
         }
 
         #endregion

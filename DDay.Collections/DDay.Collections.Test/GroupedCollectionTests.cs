@@ -6,10 +6,10 @@ using NUnit.Framework;
 namespace DDay.Collections.Test
 {
     [TestFixture]
-    public class KeyedListTests
+    public class GroupedCollectionTests
     {
-        IKeyedList<long, Person> _People;
-        IKeyedList<long, Doctor> _Doctors;
+        IGroupedCollection<long, Person> _People;
+        IGroupedCollection<long, Doctor> _Doctors;
         Person _JonSchmidt;
         Person _BobRoss;
         Person _ForrestGump;
@@ -19,13 +19,13 @@ namespace DDay.Collections.Test
         [SetUp]
         public void Setup()
         {
-            _JonSchmidt = new Person() { Key = 1, Name = "Jon Schmidt" };
-            _BobRoss = new Person() { Key = 2, Name = "Bob Ross" };
-            _ForrestGump = new Doctor() { Key = 3, Name = "Forrest Gump", ProviderNumber = "123456" };
-            _MichaelJackson = new Person() { Key = 4, Name = "Michael Jackson" };
-            _DoogieHowser = new Doctor() { Key = 5, Name = "Doogie Howser", ProviderNumber = "234567" };
+            _JonSchmidt = new Person() { Group = 1, Name = "Jon Schmidt" };
+            _BobRoss = new Person() { Group = 2, Name = "Bob Ross" };
+            _ForrestGump = new Doctor() { Group = 3, Name = "Forrest Gump", ProviderNumber = "123456" };
+            _MichaelJackson = new Person() { Group = 4, Name = "Michael Jackson" };
+            _DoogieHowser = new Doctor() { Group = 5, Name = "Doogie Howser", ProviderNumber = "234567" };
 
-            _People = new KeyedList<long, Person>();
+            _People = new GroupedCollection<long, Person>();
 
             _People.Add(_ForrestGump);
             _People.Add(_JonSchmidt);
@@ -33,7 +33,7 @@ namespace DDay.Collections.Test
             _People.Add(_DoogieHowser);
             _People.Add(_MichaelJackson);
 
-            _Doctors = new KeyedListProxy<long, Person, Doctor>(_People);
+            _Doctors = new GroupedCollectionProxy<long, Person, Doctor>(_People);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace DDay.Collections.Test
         [Test]
         public void Add1()
         {
-            var newDoctor = new Doctor() { Key = 5, Name = "New Doctor", ProviderNumber = "23456" };
+            var newDoctor = new Doctor() { Group = 5, Name = "New Doctor", ProviderNumber = "23456" };
             Assert.AreEqual(5, _People.Count);
             Assert.AreEqual(2, _Doctors.Count);
             _People.Add(newDoctor);
@@ -73,7 +73,7 @@ namespace DDay.Collections.Test
         {
             Assert.AreEqual(1, _People.AllOf(4).Count());
             Assert.AreEqual(1, _People.AllOf(5).Count());
-            _MichaelJackson.Key = 5;
+            _MichaelJackson.Group = 5;
             Assert.AreEqual(2, _People.AllOf(5).Count());
             Assert.AreEqual(0, _People.AllOf(4).Count());
         }
@@ -185,18 +185,18 @@ namespace DDay.Collections.Test
         }
 
         /// <summary>
-        /// Ensure items are presented in ascending order (by key)
+        /// Ensure items are presented in ascending order (by group)
         /// </summary>
         [Test]
         public void SortKeys1()
         {
             _People.SortKeys();
             
-            long key = -1;
+            long group = -1;
             foreach (var person in _People)
             {
-                Assert.LessOrEqual(key, person.Key);
-                key = person.Key;
+                Assert.LessOrEqual(group, person.Group);
+                group = person.Group;
             }
         }
     }
