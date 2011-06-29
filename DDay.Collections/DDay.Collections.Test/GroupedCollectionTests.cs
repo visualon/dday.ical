@@ -124,13 +124,52 @@ namespace DDay.Collections.Test
         }
 
         /// <summary>
-        /// Ensures that the indexer works properly with proxies.
+        /// Ensures that proxies properly order their items.
         /// </summary>
         [Test]
-        public void IndexerProxy1()
+        public void ProxyOrder1()
         {
             Assert.AreSame(_ForrestGump, _Doctors.First());
             Assert.AreSame(_DoogieHowser, _Doctors.Skip(1).First());
+        }
+
+        /// <summary>
+        /// Ensures that proxies properly order their items.
+        /// </summary>
+        [Test]
+        public void ProxyOrder2()
+        {
+            var newDoctor = new Doctor() { Group = 5, Name = "New Doctor", ProviderNumber = "23456" };
+            _Doctors.Add(newDoctor);
+            Person[] list = { _ForrestGump, _DoogieHowser, newDoctor };
+
+            Assert.IsTrue(_Doctors.SequenceEqual(list.OfType<Doctor>()));
+        }
+
+        /// <summary>
+        /// Ensures that proxies properly order their items.
+        /// </summary>
+        [Test]
+        public void ProxyOrder3()
+        {
+            var newDoctor = new Doctor() { Group = 5, Name = "New Doctor", ProviderNumber = "23456" };
+            _People.Insert(0, newDoctor);
+            Person[] list = { newDoctor, _ForrestGump, _DoogieHowser };
+
+            Assert.IsTrue(_Doctors.SequenceEqual(list.OfType<Doctor>()));
+        }
+
+        /// <summary>
+        /// Ensures that proxies properly order their items.
+        /// </summary>
+        [Test]
+        public void ProxyOrder4()
+        {
+            var newDoctor = new Doctor() { Group = 5, Name = "New Doctor", ProviderNumber = "23456" };
+            _People.Insert(3, newDoctor);
+            Person[] list = { _ForrestGump, newDoctor, _DoogieHowser };
+
+            Assert.IsTrue(_Doctors.SequenceEqual(list.OfType<Doctor>()));
         }
 
         /// <summary>
@@ -155,10 +194,6 @@ namespace DDay.Collections.Test
             var newDoctor = new Doctor() { Group = 5, Name = "New Doctor", ProviderNumber = "23456" };
             _People.Insert(0, newDoctor);
 
-            // FIXME: there's no way for the Doctor list to be able to insert the object
-            // at the correct location within the proxied list, unless we maintain the original
-            // index of each item and maintain that within the proxy.  This could be an expensive
-            // operation, however.
             Assert.AreEqual(6, _People.Count);
             Assert.AreEqual(3, _Doctors.Count);
             Assert.AreEqual(newDoctor, _Doctors.First());
