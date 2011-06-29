@@ -9,8 +9,8 @@ namespace DDay.Collections.Test
     [TestFixture]
     public class GroupedValueListTests
     {
-        IGroupedValueList<string, Property, string> _Properties;
-        
+        GroupedValueList<string, Property, string> _Properties;
+
         [SetUp]
         public void Setup()
         {
@@ -73,6 +73,58 @@ namespace DDay.Collections.Test
             // Ensure the "Work" and "Personal" categories are accounted for
             Assert.AreEqual(2, categories.Count);
             Assert.AreEqual(2, _Properties.AllOf("CATEGORIES").Sum(o => o.ValueCount));
+        }
+
+        /// <summary>
+        /// Ensures the Add() method works properly with GroupedValueListProxy.
+        /// </summary>
+        [Test]
+        public void AddProxy1()
+        {
+            var proxy = _Properties.GetMany<string>("CATEGORIES");
+            Assert.AreEqual(0, proxy.Count);
+            proxy.Add("Work");
+            Assert.AreEqual(1, proxy.Count);
+            proxy.Add("Personal");
+            Assert.AreEqual(2, proxy.Count);
+            Assert.IsTrue(new string[] { "Work", "Personal" }.SequenceEqual(_Properties.AllOf("CATEGORIES").SelectMany(p => p.Values)));
+        }
+
+        [Test]
+        public void ClearProxy1()
+        {
+            _Properties.Set("Test", "Test");
+
+            // Set another property to ensure it isn't cleared when the categories are cleared
+            Assert.AreEqual(1, _Properties.AllOf("Test").Count());
+            Assert.AreEqual(1, _Properties.GetMany<string>("Test").Count);
+
+            // Get a proxy for categories, and add items to it, ensuring
+            // the items are added propertly afterward.
+            var items = new string[] { "Work", "Personal" };
+            var proxy = _Properties.GetMany<string>("CATEGORIES");
+
+            foreach (var item in items)
+                proxy.Add(item);
+            Assert.IsTrue(items.SequenceEqual(proxy.ToArray()));
+
+            proxy.Clear();
+            Assert.AreEqual(0, proxy.Count);
+
+            Assert.AreEqual(1, _Properties.AllOf("Test").Count());
+            Assert.AreEqual(1, _Properties.GetMany<string>("Test").Count);
+        }
+
+        /// <summary>
+        /// Ensures the Contains() method works properly with GroupedValueListProxy.
+        /// </summary>
+        [Test]
+        public void ContainsProxy1()
+        {
+            var proxy = _Properties.GetMany<string>("CATEGORIES");
+            Assert.IsFalse(proxy.Contains("Work"));
+            proxy.Add("Work");
+            Assert.IsTrue(proxy.Contains("Work"));
         }
     }
 }
