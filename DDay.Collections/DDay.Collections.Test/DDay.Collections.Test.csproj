@@ -107,7 +107,7 @@
     <Compile Include="GroupedValueListTests.cs" />
     <Compile Include="Doctor.cs" />
     <Compile Include="Person.cs" />
-    <Compile Include="GroupedListTests.cs" />
+    <Compile Include="GroupedCollectionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Property.cs" />
     <Compile Include="Startup.cs" />

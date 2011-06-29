@@ -249,10 +249,7 @@ namespace DDay.Collections
         {
             get
             {
-                int count = 0;
-                foreach (var list in _Lists)
-                    count += list.Count;
-                return count;
+                return _Lists.Sum(list => list.Count);
             }
         }
 
