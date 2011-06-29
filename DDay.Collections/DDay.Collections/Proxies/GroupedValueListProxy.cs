@@ -14,7 +14,7 @@ namespace DDay.Collections
     [Serializable]
 #endif
     public class GroupedValueListProxy<TGroup, TOriginal, TOriginalValue, TNewValue> :
-        ICollection<TNewValue>
+        IList<TNewValue>
         where TOriginal : class, IGroupedObject<TGroup>, IValueObject<TOriginalValue>, new()
         where TNewValue : TOriginalValue
     {
@@ -66,40 +66,33 @@ namespace DDay.Collections
 
         virtual public void Clear()
         {
-            foreach (TOriginal original in _RealObject.AllOf(_Key))
+            var items = _RealObject
+                .AllOf(_Key)
+                .Where(o => o.Values != null);
+
+            foreach (TOriginal original in items)
             {
-                if (original.Values != null)
-                {
-                    // Clear all values from each matching object
-                    original.SetValue(default(TOriginalValue));
-                }
+                // Clear all values from each matching object
+                original.SetValue(default(TOriginalValue));
             }
         }
 
         virtual public bool Contains(TNewValue item)
         {
-            foreach (TOriginal original in _RealObject.AllOf(_Key))
-            {
-                if (original.ContainsValue(item))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return _RealObject
+                .AllOf(_Key)
+                .Where(o => o.ContainsValue(item))
+                .Any();
         }
 
         virtual public void CopyTo(TNewValue[] array, int arrayIndex)
         {
-            int index = arrayIndex;
-            foreach (TOriginal original in _RealObject.AllOf(_Key))
-            {
-                if (original.Values != null)
-                {
-                    var valueArray = original.Values.ToArray();
-                    valueArray.CopyTo(array, arrayIndex + index);
-                    index += valueArray.Length;
-                }
-            }
+            _RealObject
+                .AllOf(_Key)
+                .Where(o => o.Values != null)
+                .SelectMany(o => o.Values)
+                .ToArray()
+                .CopyTo(array, arrayIndex);            
         }
         
         virtual public int Count
@@ -119,13 +112,15 @@ namespace DDay.Collections
 
         virtual public bool Remove(TNewValue item)
         {
-            foreach (TOriginal original in _RealObject.AllOf(_Key))
+            var container = _RealObject
+                .AllOf(_Key)
+                .Where(o => o.ContainsValue(item))
+                .FirstOrDefault();
+
+            if (container != null)
             {
-                if (original.ContainsValue(item))
-                {
-                    original.RemoveValue(item);
-                    return true;
-                }
+                container.RemoveValue(item);
+                return true;
             }
             return false;
         }
@@ -138,6 +133,33 @@ namespace DDay.Collections
         IEnumerator IEnumerable.GetEnumerator()
         {
             return new GroupedValueListEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
+        }
+
+        virtual public int IndexOf(TNewValue item)
+        {
+            throw new NotImplementedException();
+        }
+
+        virtual public void Insert(int index, TNewValue item)
+        {
+            throw new NotImplementedException();
+        }
+
+        virtual public void RemoveAt(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        virtual public TNewValue this[int index]
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
