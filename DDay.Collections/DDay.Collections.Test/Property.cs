@@ -65,7 +65,10 @@ namespace DDay.Collections.Test
         {
             var removedValues = Values;
             _InternalValues.Clear();
-            _InternalValues.Add(value);
+            if (value != null)
+            {
+                _InternalValues.Add(value);
+            }
             OnValueChanged(removedValues, _InternalValues);
         }
 
