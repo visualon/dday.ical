@@ -6,10 +6,10 @@ using NUnit.Framework;
 namespace DDay.Collections.Test
 {
     [TestFixture]
-    public class GroupedListTests
+    public class GroupedCollectionTests
     {
         IGroupedList<long, Person> _People;
-        IGroupedList<long, Doctor> _Doctors;
+        IGroupedCollection<long, Doctor> _Doctors;
         Person _JonSchmidt;
         Person _BobRoss;
         Person _ForrestGump;
@@ -33,7 +33,7 @@ namespace DDay.Collections.Test
             _People.Add(_DoogieHowser);
             _People.Add(_MichaelJackson);
 
-            _Doctors = new GroupedListProxy<long, Person, Doctor>(_People);
+            _Doctors = new GroupedCollectionProxy<long, Person, Doctor>(_People);
         }
 
         /// <summary>
@@ -129,8 +129,8 @@ namespace DDay.Collections.Test
         [Test]
         public void IndexerProxy1()
         {
-            Assert.AreSame(_ForrestGump, _Doctors[0]);
-            Assert.AreSame(_DoogieHowser, _Doctors[1]);
+            Assert.AreSame(_ForrestGump, _Doctors.First());
+            Assert.AreSame(_DoogieHowser, _Doctors.Skip(1).First());
         }
 
         /// <summary>
@@ -145,24 +145,14 @@ namespace DDay.Collections.Test
             Assert.AreEqual(3, _People.IndexOf(_DoogieHowser));
             Assert.AreEqual(4, _People.IndexOf(_MichaelJackson));
         }
-
-        /// <summary>
-        /// Ensures the IndexOf() method works as expected when using proxied lists.
-        /// </summary>
-        [Test]
-        public void IndexOfProxy1()
-        {
-            Assert.AreEqual(0, _Doctors.IndexOf((Doctor)_ForrestGump));
-            Assert.AreEqual(1, _Doctors.IndexOf((Doctor)_DoogieHowser));
-        }
-
+        
         [Test]
         public void Insert1()
-        {
-            var newDoctor = new Doctor() { Group = 5, Name = "New Doctor", ProviderNumber = "23456" };
-            var middleDoctor = new Doctor() { Group = 5, Name = "Middle Doctor", ProviderNumber = "23456" };
+        {   
             Assert.AreEqual(5, _People.Count);
             Assert.AreEqual(2, _Doctors.Count);
+
+            var newDoctor = new Doctor() { Group = 5, Name = "New Doctor", ProviderNumber = "23456" };
             _People.Insert(0, newDoctor);
 
             // FIXME: there's no way for the Doctor list to be able to insert the object
@@ -171,11 +161,14 @@ namespace DDay.Collections.Test
             // operation, however.
             Assert.AreEqual(6, _People.Count);
             Assert.AreEqual(3, _Doctors.Count);
-            Assert.AreEqual(newDoctor, _Doctors[0]);
+            Assert.AreEqual(newDoctor, _Doctors.First());
+
+            var middleDoctor = new Doctor() { Group = 5, Name = "Middle Doctor", ProviderNumber = "23456" };
             _People.Insert(2, middleDoctor);
+
             Assert.AreEqual(7, _People.Count);
             Assert.AreEqual(4, _Doctors.Count);
-            Assert.AreEqual(middleDoctor, _Doctors[2]);            
+            Assert.AreEqual(middleDoctor, _Doctors.Skip(2).First());            
         }
 
         /// <summary>

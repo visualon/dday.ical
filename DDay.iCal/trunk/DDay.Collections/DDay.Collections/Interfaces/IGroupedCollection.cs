@@ -4,8 +4,8 @@ using System.Text;
 
 namespace DDay.Collections
 {
-    public interface IGroupedList<TGroup, TItem> :
-        IList<TItem>
+    public interface IGroupedCollection<TGroup, TItem> :
+        ICollection<TItem>
         where TItem : class, IGroupedObject<TGroup>
     {
         /// <summary>
@@ -46,18 +46,6 @@ namespace DDay.Collections
         /// match the specified group.
         /// </summary>
         IEnumerable<TItem> AllOf(TGroup group);
-
-        /// <summary>
-        /// Returns the index of the given item
-        /// within the list, or -1 if the item
-        /// is not found in the list.
-        /// </summary>
-        int IndexOf(TItem obj);
-
-        /// <summary>
-        /// Gets the object at the specified index.
-        /// </summary>
-        TItem this[int index] { get; }
 
         /// <summary>
         /// Sort the keys of the list.
