@@ -17,6 +17,14 @@ namespace DDay.Collections.Test
             _Properties = new GroupedValueList<string, Property, string>();
         }
 
+        private IList<string> AddCategories()
+        {
+            var categories = _Properties.GetMany<string>("CATEGORIES");
+            categories.Add("Work");
+            categories.Add("Personal");
+            return categories;
+        }
+
         [Test]
         public void ItemAdded1()
         {
@@ -125,6 +133,42 @@ namespace DDay.Collections.Test
             Assert.IsFalse(proxy.Contains("Work"));
             proxy.Add("Work");
             Assert.IsTrue(proxy.Contains("Work"));
+        }
+
+        [Test]
+        public void CopyToProxy1()
+        {
+            var categories = AddCategories();
+
+            string[] values = new string[2];
+            categories.CopyTo(values, 0);
+            Assert.IsTrue(categories.ToArray().SequenceEqual(values));
+        }
+
+        [Test]
+        public void CountProxy1()
+        {
+            var categories = AddCategories();
+            Assert.AreEqual(2, categories.Count);
+        }
+
+        [Test]
+        public void RemoveProxy1()
+        {
+            var categories = AddCategories();
+            Assert.AreEqual(2, categories.Count);
+
+            categories.Remove("Work");
+            Assert.AreEqual(1, categories.Count);
+
+            categories.Remove("Bla");
+            Assert.AreEqual(1, categories.Count);
+
+            categories.Remove(null);
+            Assert.AreEqual(1, categories.Count);
+
+            categories.Remove("Personal");
+            Assert.AreEqual(0, categories.Count);
         }
     }
 }

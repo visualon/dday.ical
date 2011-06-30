@@ -92,7 +92,7 @@ namespace DDay.Collections
                 .Where(o => o.Values != null)
                 .SelectMany(o => o.Values)
                 .ToArray()
-                .CopyTo(array, arrayIndex);            
+                .CopyTo(array, arrayIndex);
         }
         
         virtual public int Count
