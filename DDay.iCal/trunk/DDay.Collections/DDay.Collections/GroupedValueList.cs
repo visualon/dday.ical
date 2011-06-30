@@ -57,7 +57,7 @@ namespace DDay.Collections
             return default(TType);
         }
 
-        virtual public ICollection<TType> GetMany<TType>(TGroup group) where TType : TValueType
+        virtual public IList<TType> GetMany<TType>(TGroup group) where TType : TValueType
         {
             return new GroupedValueListProxy<TGroup, TObject, TValueType, TType>(this, group);
         }

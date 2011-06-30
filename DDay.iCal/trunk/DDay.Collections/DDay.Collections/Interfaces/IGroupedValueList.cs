@@ -12,6 +12,6 @@ namespace DDay.Collections
         void Set(TGroup group, TValueType value);
         void Set(TGroup group, IEnumerable<TValueType> values);
         TType Get<TType>(TGroup group) where TType : TValueType;
-        ICollection<TType> GetMany<TType>(TGroup group) where TType : TValueType;
+        IList<TType> GetMany<TType>(TGroup group) where TType : TValueType;
     }
 }
