@@ -79,7 +79,6 @@
     <Compile Include="Constants.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Enumerators\GroupedValueListEnumerator.cs" />
     <Compile Include="Interfaces\IGroupedCollection.cs" />
     <Compile Include="Proxies\GroupedCollectionProxy.cs" />
     <Compile Include="Interfaces\IGroupedList.cs" />
