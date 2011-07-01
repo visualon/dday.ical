@@ -10,9 +10,9 @@ namespace DDay.iCal
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class CalendarPropertyCollection :
-        GroupedValueCollection<string, ICalendarProperty, object>,
-        ICalendarPropertyCollection
+    public class CalendarPropertyList :
+        GroupedValueList<string, ICalendarProperty, object>,
+        ICalendarPropertyList
     {
         #region Private Fields
 
@@ -23,11 +23,11 @@ namespace DDay.iCal
 
         #region Constructors
 
-        public CalendarPropertyCollection()
+        public CalendarPropertyList()
         {
         }
 
-        public CalendarPropertyCollection(ICalendarObject parent, bool caseInsensitive)
+        public CalendarPropertyList(ICalendarObject parent, bool caseInsensitive)
         {
             m_Parent = parent;
             m_CaseInsensitive = caseInsensitive;

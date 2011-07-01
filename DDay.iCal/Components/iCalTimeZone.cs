@@ -133,7 +133,7 @@ namespace DDay.iCal
         #region Private Fields
 
         TimeZoneEvaluator m_Evaluator;
-        ICalendarObjectCollection<ITimeZoneInfo> m_TimeZoneInfos;
+        ICalendarObjectList<ITimeZoneInfo> m_TimeZoneInfos;
 
         #endregion
 
@@ -214,7 +214,7 @@ namespace DDay.iCal
             set { Url = value; }
         }
 
-        virtual public ICalendarObjectCollection<ITimeZoneInfo> TimeZoneInfos
+        virtual public ICalendarObjectList<ITimeZoneInfo> TimeZoneInfos
         {
             get { return m_TimeZoneInfos; }
             set { m_TimeZoneInfos = value; }
