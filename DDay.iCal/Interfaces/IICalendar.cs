@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DDay.Collections;
 
 namespace DDay.iCal
 {
@@ -58,32 +59,32 @@ namespace DDay.iCal
         /// <summary>
         /// Gets a list of unique components contained in the calendar.
         /// </summary>
-        IKeyedList<string, IUniqueComponent> UniqueComponents { get; }
+        IGroupedCollection<string, IUniqueComponent> UniqueComponents { get; }
 
         /// <summary>
         /// Gets a list of Events contained in the calendar.
         /// </summary>
-        IKeyedList<string, IEvent> Events { get; }
+        IGroupedCollection<string, IEvent> Events { get; }
 
         /// <summary>
         /// Gets a list of Free/Busy components contained in the calendar.
         /// </summary>
-        IKeyedList<string, IFreeBusy> FreeBusy { get; }
+        IGroupedCollection<string, IFreeBusy> FreeBusy { get; }
 
         /// <summary>
         /// Gets a list of Journal entries contained in the calendar.
         /// </summary>
-        IKeyedList<string, IJournal> Journals { get; }
+        IGroupedCollection<string, IJournal> Journals { get; }
 
         /// <summary>
         /// Gets a list of time zones contained in the calendar.
         /// </summary>
-        IKeyedList<string, ITimeZone> TimeZones { get; }
+        IGroupedCollection<string, ITimeZone> TimeZones { get; }
 
         /// <summary>
         /// Gets a list of To-do items contained in the calendar.
         /// </summary>
-        IKeyedList<string, ITodo> Todos { get; }        
+        IGroupedCollection<string, ITodo> Todos { get; }        
 
 #if !SILVERLIGHT
         /// <summary>

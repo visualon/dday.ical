@@ -11,8 +11,8 @@ namespace DDay.iCal
     [Serializable]
 #endif
     public class CalendarParameterList :
-        GroupedValueList<string, ICalendarParameter, string>,
-        ICalendarParameterList
+        GroupedValueList<string, ICalendarParameter, CalendarParameter, string>,
+        ICalendarParameterCollection
     {
         #region Private Fields
 
@@ -32,33 +32,33 @@ namespace DDay.iCal
             m_Parent = parent;
             m_CaseInsensitive = caseInsensitive;
 
-            ItemAdded += new EventHandler<ObjectEventArgs<ICalendarParameter>>(OnParameterAdded);
-            ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarParameter>>(OnParameterRemoved);
+            ItemAdded += new EventHandler<ObjectEventArgs<ICalendarParameter,int>>(OnParameterAdded);
+            ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarParameter,int>>(OnParameterRemoved);
         }
 
         #endregion
 
         #region Protected Methods
 
-        protected void OnParameterRemoved(object sender, ObjectEventArgs<ICalendarParameter> e)
+        protected void OnParameterRemoved(object sender, ObjectEventArgs<ICalendarParameter, int> e)
         {
-            e.Object.Parent = null;
+            e.First.Parent = null;
         }
 
-        protected void OnParameterAdded(object sender, ObjectEventArgs<ICalendarParameter> e)
+        protected void OnParameterAdded(object sender, ObjectEventArgs<ICalendarParameter, int> e)
         {
-            e.Object.Parent = m_Parent;
+            e.First.Parent = m_Parent;
         }
 
         #endregion
 
         #region Overrides
-
-        protected override string KeyModifier(string key)
+        
+        protected override string GroupModifier(string group)
         {
             if (m_CaseInsensitive)
-                return key.ToUpper();
-            return key;
+                return group.ToUpper();
+            return group;
         }
 
         #endregion

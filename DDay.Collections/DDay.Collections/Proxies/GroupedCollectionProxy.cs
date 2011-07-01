@@ -14,7 +14,7 @@ namespace DDay.Collections
     [Serializable]
 #endif
     public class GroupedCollectionProxy<TGroup, TOriginal, TNew> :
-        IGroupedCollection<TGroup, TNew>
+        IGroupedCollectionProxy<TGroup, TOriginal, TNew>
         where TOriginal : class, IGroupedObject<TGroup>
         where TNew : class, TOriginal
     {
@@ -54,16 +54,7 @@ namespace DDay.Collections
 
         #endregion
 
-        #region Public Methods
-
-        virtual public void SetProxiedObject(IGroupedList<TGroup, TOriginal> realObject)
-        {
-            _RealObject = realObject;            
-        }
-
-        #endregion
-
-        #region IGroupedCollection Methods
+        #region IGroupedCollection Members
 
         virtual public event EventHandler<ObjectEventArgs<TNew, int>> ItemAdded;
         virtual public event EventHandler<ObjectEventArgs<TNew, int>> ItemRemoved;
@@ -187,6 +178,20 @@ namespace DDay.Collections
                 .OfType<TNew>()
                 .Where(_Predicate)
                 .GetEnumerator();
+        }
+
+        #endregion
+
+        #region IGroupedCollectionProxy Members
+
+        public IGroupedList<TGroup, TOriginal> RealObject
+        {
+            get { return _RealObject; }
+        }
+
+        virtual public void SetProxiedObject(IGroupedList<TGroup, TOriginal> realObject)
+        {
+            _RealObject = realObject;
         }
 
         #endregion

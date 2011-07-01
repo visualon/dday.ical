@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DDay.Collections;
 
 namespace DDay.iCal
 {
     public interface ICalendarObject :
-        IKeyedObject<string>,
+        IGroupedObject<string>,
         ILoadable,
         ICopyable,
         IServiceProvider

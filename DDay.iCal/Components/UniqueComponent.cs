@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using DDay.Collections;
 
 namespace DDay.iCal
 {
@@ -60,8 +61,8 @@ namespace DDay.iCal
 
         private void Initialize()
         {
-            Properties.ItemAdded += new EventHandler<ObjectEventArgs<ICalendarProperty>>(Properties_ItemAdded);
-            Properties.ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarProperty>>(Properties_ItemRemoved);
+            Properties.ItemAdded += new EventHandler<ObjectEventArgs<ICalendarProperty, int>>(Properties_ItemAdded);
+            Properties.ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarProperty, int>>(Properties_ItemRemoved);
         }
 
         #endregion
@@ -108,25 +109,25 @@ namespace DDay.iCal
 
         #region Event Handlers
 
-        void Properties_ItemRemoved(object sender, ObjectEventArgs<ICalendarProperty> e)
+        void Properties_ItemRemoved(object sender, ObjectEventArgs<ICalendarProperty, int> e)
         {
-            if (e.Object != null &&
-                e.Object.Name != null &&
-                string.Equals(e.Object.Name.ToUpper(), "UID"))
+            if (e.First != null &&
+                e.First.Name != null &&
+                string.Equals(e.First.Name.ToUpper(), "UID"))
             {
-                OnKeyChanged(e.Object.Values.Cast<string>().FirstOrDefault(), null);
-                e.Object.ValueChanged -= Object_ValueChanged;
+                OnGroupChanged(e.First.Values.Cast<string>().FirstOrDefault(), null);
+                e.First.ValueChanged -= Object_ValueChanged;
             }
         }
 
-        void Properties_ItemAdded(object sender, ObjectEventArgs<ICalendarProperty> e)
+        void Properties_ItemAdded(object sender, ObjectEventArgs<ICalendarProperty, int> e)
         {
-            if (e.Object != null &&
-                e.Object.Name != null &&
-                string.Equals(e.Object.Name.ToUpper(), "UID"))
+            if (e.First != null &&
+                e.First.Name != null &&
+                string.Equals(e.First.Name.ToUpper(), "UID"))
             {
-                OnKeyChanged(null, e.Object.Values.Cast<string>().FirstOrDefault());
-                e.Object.ValueChanged += Object_ValueChanged;
+                OnGroupChanged(null, e.First.Values.Cast<string>().FirstOrDefault());
+                e.First.ValueChanged += Object_ValueChanged;
             }
         }
 
@@ -134,14 +135,14 @@ namespace DDay.iCal
         {
             string oldValue = e.RemovedValues.Cast<string>().FirstOrDefault();
             string newValue = e.AddedValues.Cast<string>().FirstOrDefault();
-            OnKeyChanged(oldValue, newValue);
+            OnGroupChanged(oldValue, newValue);
         }
 
         #endregion
 
         #region Overrides
 
-        public override string Key
+        public override string Group
         {
             get
             {

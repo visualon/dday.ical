@@ -5,6 +5,7 @@ using System.Text;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using DDay.Collections;
 
 namespace DDay.iCal
 {
@@ -38,7 +39,7 @@ namespace DDay.iCal
         #region Private Fields
 
         private IList<object> _Values;        
-        private ICalendarParameterList _Parameters;
+        private ICalendarParameterCollection _Parameters;
 
         #endregion
 
@@ -47,7 +48,7 @@ namespace DDay.iCal
         /// <summary>
         /// Returns a list of parameters that are associated with the iCalendar object.
         /// </summary>
-        virtual public ICalendarParameterList Parameters
+        virtual public ICalendarParameterCollection Parameters
         {
             get { return _Parameters; }
             protected set
@@ -110,7 +111,7 @@ namespace DDay.iCal
         /// Adds a parameter to the iCalendar object.
         /// </summary>
         virtual public void AddParameter(ICalendarParameter p)
-        {            
+        {
             Parameters.Add(p);
         }
 
@@ -190,6 +191,14 @@ namespace DDay.iCal
         virtual public bool ContainsValue(object value)
         {
             return _Values.Contains(value);
+        }
+
+        virtual public int ValueCount
+        {
+            get
+            {
+                return _Values != null ? _Values.Count : 0;
+            }
         }
 
         virtual public void SetValue(object value)

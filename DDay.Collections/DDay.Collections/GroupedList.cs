@@ -43,7 +43,7 @@ namespace DDay.Collections
 
         #region Protected Methods
 
-        virtual protected TGroup KeyModifier(TGroup group)
+        virtual protected TGroup GroupModifier(TGroup group)
         {
             if (group == null)
                 throw new ArgumentNullException("The item's group cannot be null.");
@@ -116,7 +116,7 @@ namespace DDay.Collections
                 if (!object.Equals(oldValue, default(TGroup)))
                 {
                     // Find the specific item and remove it
-                    TGroup group = KeyModifier(oldValue);
+                    TGroup group = GroupModifier(oldValue);
                     if (_Dictionary.ContainsKey(group))
                     {
                         IMultiLinkedList<TItem> items = _Dictionary[group];
@@ -146,7 +146,7 @@ namespace DDay.Collections
 
         #endregion
 
-        #region IKeyedList<TGroup, TObject> Members
+        #region IGroupedList<TGroup, TObject> Members
 
         [field: NonSerialized]
         public event EventHandler<ObjectEventArgs<TItem, int>> ItemAdded;
@@ -171,7 +171,7 @@ namespace DDay.Collections
             if (item != null)
             {
                 // Get the "real" group for this item
-                TGroup group = KeyModifier(item.Group);
+                TGroup group = GroupModifier(item.Group);
 
                 // Add a new list if necessary
                 var list = EnsureList(group, true);
@@ -184,7 +184,7 @@ namespace DDay.Collections
         virtual public int IndexOf(TItem item)
         {
             // Get the "real" group
-            TGroup group = KeyModifier(item.Group);
+            TGroup group = GroupModifier(item.Group);
             if (_Dictionary.ContainsKey(group))
             {
                 // Get the list associated with this object's group
@@ -202,7 +202,7 @@ namespace DDay.Collections
 
         virtual public void Clear(TGroup group)
         {
-            group = KeyModifier(group);
+            group = GroupModifier(group);
 
             if (_Dictionary.ContainsKey(group))
             {
@@ -241,7 +241,7 @@ namespace DDay.Collections
 
         virtual public bool ContainsKey(TGroup group)
         {
-            group = KeyModifier(group);
+            group = GroupModifier(group);
             return _Dictionary.ContainsKey(group);
         }
 
@@ -255,7 +255,7 @@ namespace DDay.Collections
 
         virtual public int CountOf(TGroup group)
         {
-            group = KeyModifier(group);
+            group = GroupModifier(group);
             if (_Dictionary.ContainsKey(group))
                 return _Dictionary[group].Count;
             return 0;
@@ -268,7 +268,7 @@ namespace DDay.Collections
 
         virtual public IEnumerable<TItem> AllOf(TGroup group)
         {
-            group = KeyModifier(group);
+            group = GroupModifier(group);
             if (_Dictionary.ContainsKey(group))
                 return _Dictionary[group];
             return new TItem[0];
@@ -276,7 +276,7 @@ namespace DDay.Collections
         
         virtual public bool Remove(TItem obj)
         {
-            TGroup group = KeyModifier(obj.Group);
+            TGroup group = GroupModifier(obj.Group);
             if (_Dictionary.ContainsKey(group))
             {
                 var items = _Dictionary[group];
@@ -295,7 +295,7 @@ namespace DDay.Collections
 
         virtual public bool Remove(TGroup group)
         {
-            group = KeyModifier(group);
+            group = GroupModifier(group);
             if (_Dictionary.ContainsKey(group))
             {
                 var list = _Dictionary[group];
@@ -343,7 +343,7 @@ namespace DDay.Collections
 
         virtual public bool Contains(TItem item)
         {
-            var group = KeyModifier(item.Group);
+            var group = GroupModifier(item.Group);
             if (_Dictionary.ContainsKey(group))
                 return _Dictionary[group].Contains(item);
             return false;

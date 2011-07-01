@@ -68,7 +68,7 @@ namespace DDay.iCal
         /// <example>Conference room #2</example>
         /// <example>Projector</example>
         /// </summary>
-        ICollection<string> Resources { get; set; }
+        IList<string> Resources { get; set; }
 
         /// <summary>
         /// The status of the event.
