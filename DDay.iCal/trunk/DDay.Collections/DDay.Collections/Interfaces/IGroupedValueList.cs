@@ -9,7 +9,7 @@ namespace DDay.Collections
         IGroupedValueCollection<TGroup, TInterface, TItem, TValueType>,
         IGroupedList<TGroup, TInterface>
         where TInterface : class, IGroupedObject<TGroup>, IValueObject<TValueType>
-        where TItem : TInterface, new()
+        where TItem : new()
     {        
     }
 }

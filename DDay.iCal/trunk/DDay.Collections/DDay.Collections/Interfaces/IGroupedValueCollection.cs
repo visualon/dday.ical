@@ -8,7 +8,7 @@ namespace DDay.Collections
     public interface IGroupedValueCollection<TGroup, TInterface, TItem, TValueType> :
         IGroupedCollection<TGroup, TInterface>
         where TInterface : class, IGroupedObject<TGroup>, IValueObject<TValueType>
-        where TItem : TInterface, new()
+        where TItem : new()
     {
         void Set(TGroup group, TValueType value);
         void Set(TGroup group, IEnumerable<TValueType> values);

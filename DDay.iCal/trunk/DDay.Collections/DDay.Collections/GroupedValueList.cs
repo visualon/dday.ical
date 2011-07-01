@@ -9,7 +9,7 @@ namespace DDay.Collections
         GroupedList<TGroup, TInterface>,
         IGroupedValueList<TGroup, TInterface, TItem, TValueType>
         where TInterface : class, IGroupedObject<TGroup>, IValueObject<TValueType>
-        where TItem : TInterface, new()
+        where TItem : new()        
     {
         #region IKeyedValueList<TGroup, TObject, TValueType> Members
 

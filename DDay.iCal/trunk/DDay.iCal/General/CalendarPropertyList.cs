@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Collections;
 using System.Runtime.Serialization;
@@ -30,25 +31,13 @@ namespace DDay.iCal
         public CalendarPropertyList(ICalendarObject parent, bool caseInsensitive)
         {
             m_Parent = parent;
-            m_CaseInsensitive = caseInsensitive;
 
             ItemAdded += new EventHandler<ObjectEventArgs<ICalendarProperty, int>>(CalendarPropertyList_ItemAdded);
             ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarProperty, int>>(CalendarPropertyList_ItemRemoved);
         }
 
         #endregion
-
-        #region Overrides
-
-        protected override string GroupModifier(string group)
-        {
-            if (m_CaseInsensitive)
-                return group.ToUpper();
-            return group;
-        }
-
-        #endregion
-
+        
         #region Event Handlers
 
         void CalendarPropertyList_ItemRemoved(object sender, ObjectEventArgs<ICalendarProperty, int> e)
@@ -62,5 +51,25 @@ namespace DDay.iCal
         }
 
         #endregion
+
+        protected override string GroupModifier(string group)
+        {
+            if (m_CaseInsensitive && group != null)
+                return group.ToUpper();
+            return group;
+        }
+
+        public ICalendarProperty this[string name]
+        {
+            get
+            {
+                if (ContainsKey(name))
+                {
+                    return AllOf(name)
+                        .FirstOrDefault();
+                }
+                return null;
+            }            
+        }
     }
 }

@@ -9,12 +9,12 @@ namespace DDay.Collections.Test
     [TestFixture]
     public class GroupedValueListTests
     {
-        GroupedValueList<string, Property, string> _Properties;
+        GroupedValueList<string, Property, Property, string> _Properties;
 
         [SetUp]
         public void Setup()
         {
-            _Properties = new GroupedValueList<string, Property, string>();
+            _Properties = new GroupedValueList<string, Property, Property, string>();
         }
 
         private IList<string> AddCategories()
@@ -235,7 +235,6 @@ namespace DDay.Collections.Test
             categories[1] = "Blah!";
             Assert.AreEqual("Blah!", categories[1]);
             Assert.AreEqual(2, categories.Count);
-
         }
     }
 }

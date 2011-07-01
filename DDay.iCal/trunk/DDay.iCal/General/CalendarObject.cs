@@ -38,7 +38,8 @@ namespace DDay.iCal
             Initialize();
         }
 
-        public CalendarObject(string name) : this()
+        public CalendarObject(string name)
+            : this()
         {
             Name = name;
         }
@@ -275,7 +276,7 @@ namespace DDay.iCal
 
         #endregion
 
-        #region IGroupedObject<string> Members
+        #region IGroupedObject Members
 
         [field: NonSerialized]
         public event EventHandler<ObjectEventArgs<string, string>> GroupChanged;

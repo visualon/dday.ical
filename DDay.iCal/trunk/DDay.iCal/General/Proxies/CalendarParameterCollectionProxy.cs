@@ -7,112 +7,108 @@ using DDay.Collections;
 namespace DDay.iCal
 {
     public class CalendarParameterCollectionProxy :
-        GroupedValueList<string, ICalendarParameter, CalendarParameter, string>
+        GroupedCollectionProxy<string, ICalendarParameter, ICalendarParameter>,
         ICalendarParameterCollectionProxy
     {
-        //public CalendarParameterCollectionProxy(IGroupedList<string, ICalendarParameter> realObject) :
-        //    base(realObject)
-        //{
-        //}
+        public CalendarParameterCollectionProxy(IGroupedList<string, ICalendarParameter> realObject) :
+            base(realObject)
+        {
+        }
 
-        //virtual public void SetParent(ICalendarObject parent)
-        //{
-        //    foreach (ICalendarParameter parameter in this)
-        //    {
-        //        parameter.Parent = parent;
-        //    }
-        //}
+        virtual public void SetParent(ICalendarObject parent)
+        {
+            foreach (ICalendarParameter parameter in this)
+            {
+                parameter.Parent = parent;
+            }
+        }
 
-        //virtual public string Get(string name)
-        //{
-        //    var parameter = RealObject
-        //        .AllOf(name)
-        //        .FirstOrDefault();
+        virtual public string Get(string name)
+        {
+            var parameter = RealObject
+                .AllOf(name)
+                .FirstOrDefault();
 
-        //    if (parameter != null)
-        //        return parameter.Value;
-        //    return null;
-        //}
+            if (parameter != null)
+                return parameter.Value;
+            return default(string);
+        }
 
-        //virtual public void Set(string name, string value)
-        //{
-        //    var parameter = RealObject
-        //        .AllOf(name)
-        //        .FirstOrDefault();
+        virtual public void Set(string name, string value)
+        {
+            var parameter = RealObject
+                .AllOf(name)
+                .FirstOrDefault();
 
-        //    if (parameter == null)
-        //    {
-        //        RealObject.Add(new CalendarParameter(name, value));
-        //    }
-        //    else
-        //    {
-        //        parameter.SetValue(value);
-        //    }
-        //}
-        
-        //virtual public void Set(string name, IEnumerable<string> values)
-        //{
-        //    var parameter = RealObject
-        //        .AllOf(name)
-        //        .FirstOrDefault();
+            if (parameter == null)
+            {
+                RealObject.Add(new CalendarParameter(name, value));
+            }
+            else
+            {
+                parameter.SetValue(value);
+            }
+        }
 
-        //    if (parameter == null)
-        //    {
-        //        RealObject.Add(new CalendarParameter(name, values));
-        //    }
-        //    else
-        //    {
-        //        parameter.SetValue(values);
-        //    }
-        //}
+        virtual public void Set(string name, IEnumerable<string> values)
+        {
+            var parameter = RealObject
+                .AllOf(name)
+                .FirstOrDefault();
 
-        //virtual public TType Get<TType>(string group)
-        //{
-        //    return Get(group) as TType;
-        //}
+            if (parameter == null)
+            {
+                RealObject.Add(new CalendarParameter(name, values));
+            }
+            else
+            {
+                parameter.SetValue(values);
+            }
+        }
 
-        //virtual public IList<TType> GetMany<TType>(string group)
-        //{
-        //    return new GroupedValueListProxy<string, ICalendarParameter, CalendarParameter, string, TType>(RealObject, group);
-        //}
+        virtual public TType Get<TType>(string group)
+        {
+            var value = Get(group);
+            if (value is TType)
+                return (TType)(object)Get(group);
+            return default(TType);
+        }
 
-        //virtual public new System.Collections.IEnumerator GetEnumerator()
-        //{
-        //    return RealObject.GetEnumerator();
-        //}
-        
-        //virtual public int IndexOf(ICalendarParameter obj)
-        //{
-        //    return 
-        //    throw new NotImplementedException();
-        //}
+        virtual public IList<TType> GetMany<TType>(string group)
+        {
+            throw new NotSupportedException();
+        }
 
-        //public ICalendarParameter this[int index]
-        //{
-        //    get { throw new NotImplementedException(); }
-        //}
+        virtual public new System.Collections.IEnumerator GetEnumerator()
+        {
+            return RealObject.GetEnumerator();
+        }
 
+        virtual public int IndexOf(ICalendarParameter obj)
+        {
+            throw new NotImplementedException();
+        }
 
-        //public void Insert(int index, ICalendarParameter item)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        virtual public void Insert(int index, ICalendarParameter item)
+        {
+            throw new NotImplementedException();
+        }
 
-        //public void RemoveAt(int index)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        virtual public void RemoveAt(int index)
+        {
+            throw new NotImplementedException();
+        }
 
-        //public ICalendarParameter this[int index]
-        //{
-        //    get
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //    set
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //}
+        virtual public ICalendarParameter this[int index]
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }
