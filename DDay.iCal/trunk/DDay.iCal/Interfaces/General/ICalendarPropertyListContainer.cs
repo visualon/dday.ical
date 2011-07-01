@@ -4,9 +4,9 @@ using System.Text;
 
 namespace DDay.iCal
 {
-    public interface ICalendarPropertyCollectionContainer :
+    public interface ICalendarPropertyListContainer :
         ICalendarObject
     {
-        ICalendarPropertyCollection Properties { get; }
+        ICalendarPropertyList Properties { get; }
     }
 }

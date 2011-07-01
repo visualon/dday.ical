@@ -11,8 +11,8 @@ namespace DDay.iCal
         {
             List<Type> types = new List<Type>();
 
-            types.Add(typeof(CalendarPropertyCollection));
-            types.Add(typeof(CalendarParameterCollection));
+            types.Add(typeof(CalendarPropertyList));
+            types.Add(typeof(CalendarParameterList));
 
             return types;
         }

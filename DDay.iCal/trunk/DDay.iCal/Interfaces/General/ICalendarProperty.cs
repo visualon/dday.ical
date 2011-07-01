@@ -5,7 +5,7 @@ using System.Text;
 namespace DDay.iCal
 {
     public interface ICalendarProperty :        
-        ICalendarParameterCollectionContainer,
+        ICalendarParameterListContainer,
         ICalendarObject,
         IValueObject<object>
     {        
