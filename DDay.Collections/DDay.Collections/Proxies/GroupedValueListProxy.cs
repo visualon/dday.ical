@@ -13,43 +13,44 @@ namespace DDay.Collections
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class GroupedValueListProxy<TGroup, TOriginal, TOriginalValue, TNewValue> :
-        IList<TNewValue>
-        where TOriginal : class, IGroupedObject<TGroup>, IValueObject<TOriginalValue>, new()
+    public class GroupedValueListProxy<TGroup, TInterface, TItem, TOriginalValue, TNewValue> :
+        IGroupedValueListProxy<TInterface, TNewValue>
+        where TInterface : class, IGroupedObject<TGroup>, IValueObject<TOriginalValue>
+        where TItem : TInterface, new()
         where TNewValue : TOriginalValue
     {
         #region Private Fields
 
-        GroupedValueList<TGroup, TOriginal, TOriginalValue> _RealObject;
-        TGroup _Key;
-        TOriginal _Container;
+        IGroupedValueList<TGroup, TInterface, TItem, TOriginalValue> _RealObject;
+        TGroup _Group;
+        TInterface _Container;
 
         #endregion
 
         #region Constructors
 
-        public GroupedValueListProxy(GroupedValueList<TGroup, TOriginal, TOriginalValue> realObject, TGroup group)
+        public GroupedValueListProxy(IGroupedValueList<TGroup, TInterface, TItem, TOriginalValue> realObject, TGroup group)
         {
             _RealObject = realObject;
-            _Key = group;
+            _Group = group;
         }
 
         #endregion
 
         #region Private Methods
 
-        TOriginal EnsureContainer()
+        TInterface EnsureContainer()
         {
             if (_Container == null)
             {
                 // Find an item that matches our group
-                _Container = _RealObject.AllOf(_Key).FirstOrDefault();
+                _Container = Items.FirstOrDefault();
 
                 // If no item is found, create a new object and add it to the list
-                if (_Container == default(TOriginal))
+                if (object.Equals(_Container, default(TInterface)))
                 {
-                    _Container = new TOriginal();
-                    _Container.Group = _Key;
+                    _Container = new TItem();
+                    _Container.Group = _Group;
                     _RealObject.Add(_Container);
                 }
             }
@@ -95,8 +96,7 @@ namespace DDay.Collections
 
         IEnumerator<TNewValue> GetEnumeratorInternal()
         {
-            return _RealObject
-                .AllOf(_Key)
+            return Items
                 .Where(o => o.ValueCount > 0)
                 .SelectMany(o => o.Values)
                 .OfType<TNewValue>()
@@ -110,16 +110,17 @@ namespace DDay.Collections
         virtual public void Add(TNewValue item)
         {
             // Add the value to the object
-            EnsureContainer().AddValue(item);
+            if (item is TOriginalValue)
+            {
+                EnsureContainer().AddValue((TOriginalValue)item);
+            }
         }
 
         virtual public void Clear()
         {
-            var items = _RealObject
-                .AllOf(_Key)
-                .Where(o => o.Values != null);
+            var items = Items.Where(o => o.Values != null);
 
-            foreach (TOriginal original in items)
+            foreach (TInterface original in items)
             {
                 // Clear all values from each matching object
                 original.SetValue(default(TOriginalValue));
@@ -128,16 +129,14 @@ namespace DDay.Collections
 
         virtual public bool Contains(TNewValue item)
         {
-            return _RealObject
-                .AllOf(_Key)
+            return Items
                 .Where(o => o.ContainsValue(item))
                 .Any();
         }
 
         virtual public void CopyTo(TNewValue[] array, int arrayIndex)
         {
-            _RealObject
-                .AllOf(_Key)
+            Items                
                 .Where(o => o.Values != null)
                 .SelectMany(o => o.Values)
                 .ToArray()
@@ -148,9 +147,7 @@ namespace DDay.Collections
         {
             get
             {
-                return _RealObject
-                    .AllOf(_Key)
-                    .Sum(o => o.ValueCount);
+                return Items.Sum(o => o.ValueCount);
             }
         }
 
@@ -161,8 +158,7 @@ namespace DDay.Collections
 
         virtual public bool Remove(TNewValue item)
         {
-            var container = _RealObject
-                .AllOf(_Key)
+            var container = Items                
                 .Where(o => o.ContainsValue(item))
                 .FirstOrDefault();
 
@@ -267,5 +263,20 @@ namespace DDay.Collections
         }
 
         #endregion
+
+        #region IGroupedValueListProxy Members
+
+        virtual public IEnumerable<TInterface> Items
+        {
+            get
+            {
+                if (_Group != null)
+                    return _RealObject.AllOf(_Group);
+                else
+                    return _RealObject;
+            }
+        }
+
+        #endregion 
     }
 }

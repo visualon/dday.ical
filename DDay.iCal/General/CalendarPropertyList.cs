@@ -11,7 +11,7 @@ namespace DDay.iCal
     [Serializable]
 #endif
     public class CalendarPropertyList :
-        GroupedValueList<string, ICalendarProperty, object>,
+        GroupedValueList<string, ICalendarProperty, CalendarProperty, object>,
         ICalendarPropertyList
     {
         #region Private Fields
@@ -32,33 +32,33 @@ namespace DDay.iCal
             m_Parent = parent;
             m_CaseInsensitive = caseInsensitive;
 
-            ItemAdded += new EventHandler<ObjectEventArgs<ICalendarProperty>>(CalendarPropertyList_ItemAdded);
-            ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarProperty>>(CalendarPropertyList_ItemRemoved);
+            ItemAdded += new EventHandler<ObjectEventArgs<ICalendarProperty, int>>(CalendarPropertyList_ItemAdded);
+            ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarProperty, int>>(CalendarPropertyList_ItemRemoved);
         }
 
         #endregion
 
         #region Overrides
 
-        protected override string KeyModifier(string key)
+        protected override string GroupModifier(string group)
         {
             if (m_CaseInsensitive)
-                return key.ToUpper();
-            return key;
+                return group.ToUpper();
+            return group;
         }
 
         #endregion
 
         #region Event Handlers
 
-        void CalendarPropertyList_ItemRemoved(object sender, ObjectEventArgs<ICalendarProperty> e)
+        void CalendarPropertyList_ItemRemoved(object sender, ObjectEventArgs<ICalendarProperty, int> e)
         {
-            e.Object.Parent = null;
+            e.First.Parent = null;
         }
 
-        void CalendarPropertyList_ItemAdded(object sender, ObjectEventArgs<ICalendarProperty> e)
+        void CalendarPropertyList_ItemAdded(object sender, ObjectEventArgs<ICalendarProperty, int> e)
         {
-            e.Object.Parent = m_Parent;
+            e.First.Parent = m_Parent;
         }
 
         #endregion

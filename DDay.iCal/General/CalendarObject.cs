@@ -5,6 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using DDay.Collections;
 
 namespace DDay.iCal
 {
@@ -53,8 +54,8 @@ namespace DDay.iCal
             _Children = new CalendarObjectList(this);
             _ServiceProvider = new ServiceProvider();
 
-            _Children.ItemAdded += new EventHandler<ObjectEventArgs<ICalendarObject>>(_Children_ItemAdded);
-            _Children.ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarObject>>(_Children_ItemRemoved);
+            _Children.ItemAdded += new EventHandler<ObjectEventArgs<ICalendarObject, int>>(_Children_ItemAdded);
+            _Children.ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarObject, int>>(_Children_ItemRemoved);
         }        
 
         #endregion
@@ -90,14 +91,14 @@ namespace DDay.iCal
 
         #region Event Handlers
 
-        void _Children_ItemRemoved(object sender, ObjectEventArgs<ICalendarObject> e)
+        void _Children_ItemRemoved(object sender, ObjectEventArgs<ICalendarObject, int> e)
         {
-            e.Object.Parent = null;
+            e.First.Parent = null;
         }
 
-        void _Children_ItemAdded(object sender, ObjectEventArgs<ICalendarObject> e)
+        void _Children_ItemAdded(object sender, ObjectEventArgs<ICalendarObject, int> e)
         {
-            e.Object.Parent = this;
+            e.First.Parent = this;
         }
 
         #endregion
@@ -183,7 +184,7 @@ namespace DDay.iCal
                 {
                     string old = _Name;
                     _Name = value;
-                    OnKeyChanged(old, _Name);
+                    OnGroupChanged(old, _Name);
                 }
             }
         }
@@ -274,20 +275,21 @@ namespace DDay.iCal
 
         #endregion
 
-        #region IKeyedObject<string> Members
+        #region IGroupedObject<string> Members
 
         [field: NonSerialized]
-        public event EventHandler<ObjectEventArgs<string, string>> KeyChanged;
+        public event EventHandler<ObjectEventArgs<string, string>> GroupChanged;
 
-        protected void OnKeyChanged(string @old, string @new)
+        protected void OnGroupChanged(string @old, string @new)
         {
-            if (KeyChanged != null)
-                KeyChanged(this, new ObjectEventArgs<string, string>(@old, @new));
+            if (GroupChanged != null)
+                GroupChanged(this, new ObjectEventArgs<string, string>(@old, @new));
         }
 
-        virtual public string Key
+        virtual public string Group
         {
             get { return Name; }
+            set { Name = value; }
         }
 
         #endregion

@@ -5,10 +5,11 @@ using System.Text;
 
 namespace DDay.Collections
 {
-    public class GroupedValueList<TGroup, TObject, TValueType> :
-        GroupedList<TGroup, TObject>,
-        IGroupedValueList<TGroup, TObject, TValueType>
-        where TObject : class, IGroupedObject<TGroup>, IValueObject<TValueType>, new()
+    public class GroupedValueList<TGroup, TInterface, TItem, TValueType> :
+        GroupedList<TGroup, TInterface>,
+        IGroupedValueList<TGroup, TInterface, TItem, TValueType>
+        where TInterface : class, IGroupedObject<TGroup>, IValueObject<TValueType>
+        where TItem : TInterface, new()
     {
         #region IKeyedValueList<TGroup, TObject, TValueType> Members
 
@@ -21,7 +22,7 @@ namespace DDay.Collections
         {
             if (ContainsKey(group))
             {
-                IEnumerable<TObject> items = AllOf(group);
+                IEnumerable<TInterface> items = AllOf(group);
                 if (items != null)
                 {
                     // Add a value to the first matching item in the list
@@ -31,7 +32,7 @@ namespace DDay.Collections
             }
 
             // No matching item was found, add a new item to the list
-            TObject obj = Activator.CreateInstance(typeof(TObject)) as TObject;
+            TInterface obj = Activator.CreateInstance(typeof(TInterface)) as TInterface;
 
             // Set the group for the object
             obj.Group = group;
@@ -43,7 +44,7 @@ namespace DDay.Collections
             obj.SetValue(values);
         }
 
-        virtual public TType Get<TType>(TGroup group) where TType : TValueType
+        virtual public TType Get<TType>(TGroup group)
         {
             var firstItem = AllOf(group).FirstOrDefault();
             if (firstItem != null &&
@@ -57,9 +58,9 @@ namespace DDay.Collections
             return default(TType);
         }
 
-        virtual public IList<TType> GetMany<TType>(TGroup group) where TType : TValueType
+        virtual public IList<TType> GetMany<TType>(TGroup group)
         {
-            return new GroupedValueListProxy<TGroup, TObject, TValueType, TType>(this, group);
+            return new GroupedValueListProxy<TGroup, TInterface, TItem, TValueType, TType>(this, group);
         }
 
         #endregion

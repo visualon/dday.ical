@@ -491,7 +491,7 @@ _loop20_breakloop:			;
 	public ICalendarParameter  parameter(
 		
 	ISerializationContext ctx,
-	ICalendarParameterListContainer container
+	ICalendarParameterCollectionContainer container
 
 	) //throws RecognitionException, TokenStreamException
 {

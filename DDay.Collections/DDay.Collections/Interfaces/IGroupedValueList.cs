@@ -5,13 +5,11 @@ using System.Text;
 
 namespace DDay.Collections
 {
-    public interface IGroupedValueList<TGroup, TItem, TValueType> :
-        IGroupedList<TGroup, TItem>
-        where TItem : class, IGroupedObject<TGroup>, IValueObject<TValueType>        
+    public interface IGroupedValueList<TGroup, TInterface, TItem, TValueType> :
+        IGroupedValueCollection<TGroup, TInterface, TItem, TValueType>,
+        IGroupedList<TGroup, TInterface>
+        where TInterface : class, IGroupedObject<TGroup>, IValueObject<TValueType>
+        where TItem : TInterface, new()
     {        
-        void Set(TGroup group, TValueType value);
-        void Set(TGroup group, IEnumerable<TValueType> values);
-        TType Get<TType>(TGroup group) where TType : TValueType;
-        IList<TType> GetMany<TType>(TGroup group) where TType : TValueType;
     }
 }
