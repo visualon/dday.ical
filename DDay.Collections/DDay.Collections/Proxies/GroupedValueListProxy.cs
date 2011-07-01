@@ -56,7 +56,56 @@ namespace DDay.Collections
             return _Container;
         }
 
+        void IterateValues(Func<IValueObject<TOriginalValue>, int, int, bool> action)
+        {
+            int i = 0;
+            foreach (var obj in _RealObject)
+            {
+                // Get the number of items of the target value i this object
+                var count = obj.Values != null ? obj.Values.OfType<TNewValue>().Count() : 0;
+
+                // Perform some action on this item
+                if (!action(obj, i, count))
+                    return;
+
+                i += count;
+            }
+        }
+
+        IValueObject<TOriginalValue> ObjectForIndex(int index, ref int relativeIndex)
+        {
+            IValueObject<TOriginalValue> obj = null;
+            int retVal = -1;
+
+            IterateValues((o, i, count) =>
+                {
+                    // Determine if this index is found within this object
+                    if (index >= i && index < count)
+                    {
+                        retVal = index - i;
+                        obj = o;
+                        return false;
+                    }
+                    return true;
+                });
+
+            relativeIndex = retVal;
+            return obj;            
+        }
+
+        IEnumerator<TNewValue> GetEnumeratorInternal()
+        {
+            return _RealObject
+                .AllOf(_Key)
+                .Where(o => o.ValueCount > 0)
+                .SelectMany(o => o.Values)
+                .OfType<TNewValue>()
+                .GetEnumerator();
+        }
+
         #endregion
+
+        #region IList<TNewValue> Members
 
         virtual public void Add(TNewValue item)
         {
@@ -127,39 +176,96 @@ namespace DDay.Collections
 
         virtual public IEnumerator<TNewValue> GetEnumerator()
         {
-            return new GroupedValueListEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
+            return GetEnumeratorInternal();        
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new GroupedValueListEnumerator<TGroup, TOriginal, TOriginalValue, TNewValue>(_RealObject, _Key);
+            return GetEnumeratorInternal();
         }
 
         virtual public int IndexOf(TNewValue item)
         {
-            throw new NotImplementedException();
+            int index = -1;
+
+            IterateValues((o, i, count) =>
+                {
+                    if (o.Values != null && o.Values.Contains(item))
+                    {
+                        var list = o.Values.ToList();
+                        index = i + list.IndexOf(item);
+                        return false;
+                    }
+                    return true;
+                });
+
+            return index;
         }
 
         virtual public void Insert(int index, TNewValue item)
         {
-            throw new NotImplementedException();
+            IterateValues((o, i, count) =>
+                {
+                    // Determine if this index is found within this object
+                    if (index >= i && index < count)
+                    {
+                        // Convert the items to a list
+                        var items = o.Values.ToList();
+                        // Insert the item at the relative index within the list
+                        items.Insert(index - i, item);
+                        // Set the new list
+                        o.SetValue(items);
+                        return false;
+                    }
+                    return true;
+                });
         }
 
         virtual public void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            IterateValues((o, i, count) =>
+            {
+                // Determine if this index is found within this object
+                if (index >= i && index < count)
+                {
+                    // Convert the items to a list
+                    var items = o.Values.ToList();
+                    // Remove the item at the relative index within the list
+                    items.RemoveAt(index - i);
+                    // Set the new list
+                    o.SetValue(items);
+                    return false;
+                }
+                return true;
+            });
         }
 
         virtual public TNewValue this[int index]
         {
             get
             {
-                throw new NotImplementedException();
+                if (index >= 0 && index < Count)
+                {
+                    return this
+                        .Skip(index)
+                        .FirstOrDefault();
+                }
+                return default(TNewValue);
             }
             set
             {
-                throw new NotImplementedException();
+                if (index >= 0 && index < Count)
+                {   
+                    if (!object.Equals(value, default(TNewValue)))
+                    {
+                        Insert(index, value);
+                        index++;
+                    }
+                    RemoveAt(index);
+                }
             }
         }
+
+        #endregion
     }
 }

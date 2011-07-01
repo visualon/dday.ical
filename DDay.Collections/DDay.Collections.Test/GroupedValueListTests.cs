@@ -170,5 +170,72 @@ namespace DDay.Collections.Test
             categories.Remove("Personal");
             Assert.AreEqual(0, categories.Count);
         }
+
+        [Test]
+        public void IndexOfProxy1()
+        {
+            var categories = AddCategories();
+            Assert.AreEqual(0, categories.IndexOf("Work"));
+            Assert.AreEqual(1, categories.IndexOf("Personal"));
+        }
+
+        [Test]
+        public void InsertProxy1()
+        {
+            var categories = AddCategories();
+
+            Assert.AreEqual(2, categories.Count);
+            Assert.AreEqual("Work", categories.First());
+            categories.Insert(0, "Test");
+            Assert.AreEqual(3, categories.Count);
+            Assert.AreEqual("Test", categories.First());
+
+            categories.Insert(2, "Bla!");
+            Assert.AreEqual(4, categories.Count);
+            Assert.AreEqual("Bla!", categories.Skip(2).First());
+        }
+
+        [Test]
+        public void RemoveAtProxy1()
+        {
+            var categories = AddCategories();
+
+            Assert.AreEqual(2, categories.Count);
+            categories.RemoveAt(0);
+            Assert.AreEqual(1, categories.Count);
+            categories.RemoveAt(0);
+            Assert.AreEqual(0, categories.Count);
+        }
+
+        [Test]
+        public void RemoveAtProxy2()
+        {
+            var categories = AddCategories();
+
+            Assert.AreEqual(2, categories.Count);
+            categories.RemoveAt(1);
+            Assert.AreEqual(1, categories.Count);
+            categories.RemoveAt(0);
+            Assert.AreEqual(0, categories.Count);
+        }
+
+        [Test]
+        public void IndexerProxy1()
+        {
+            var categories = AddCategories();
+
+            Assert.AreEqual("Work", categories[0]);
+            Assert.AreEqual(2, categories.Count);
+            
+            categories[0] = "Test";
+            Assert.AreEqual("Test", categories[0]);
+            Assert.AreEqual(2, categories.Count);
+
+            Assert.AreEqual("Personal", categories[1]);
+            categories[1] = "Blah!";
+            Assert.AreEqual("Blah!", categories[1]);
+            Assert.AreEqual(2, categories.Count);
+
+        }
     }
 }
