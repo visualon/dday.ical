@@ -29,18 +29,21 @@ namespace DDay.iCal
             Initialize();
         }
 
-        public CalendarParameter(string name) : base(name)
+        public CalendarParameter(string name)
+            : base(name)
         {
             Initialize();
         }
 
-        public CalendarParameter(string name, string value) : base(name)
+        public CalendarParameter(string name, string value)
+            : base(name)
         {
             Initialize();
             AddValue(value);
         }
 
-        public CalendarParameter(string name, IEnumerable<string> values) : base(name)
+        public CalendarParameter(string name, IEnumerable<string> values)
+            : base(name)
         {
             Initialize();
             foreach (string v in values)
@@ -76,7 +79,7 @@ namespace DDay.iCal
         }
 
         #endregion
-        
+
         #region IValueObject<string> Members
 
         [field:NonSerialized]
@@ -168,7 +171,7 @@ namespace DDay.iCal
             {
                 if (Values != null)
                     return Values.FirstOrDefault();
-                return null;
+                return default(string);
             }
             set
             {

@@ -16,8 +16,7 @@ namespace DDay.Collections
     public class GroupedValueListProxy<TGroup, TInterface, TItem, TOriginalValue, TNewValue> :
         IGroupedValueListProxy<TInterface, TNewValue>
         where TInterface : class, IGroupedObject<TGroup>, IValueObject<TOriginalValue>
-        where TItem : TInterface, new()
-        where TNewValue : TOriginalValue
+        where TItem : new()        
     {
         #region Private Fields
 
@@ -49,7 +48,10 @@ namespace DDay.Collections
                 // If no item is found, create a new object and add it to the list
                 if (object.Equals(_Container, default(TInterface)))
                 {
-                    _Container = new TItem();
+                    var container = new TItem();
+                    if (!(container is TInterface))
+                        throw new Exception("Could not create a container for the value - the container is not of type " + typeof(TInterface).GetType().Name);
+                    _Container = (TInterface)(object)container;
                     _Container.Group = _Group;
                     _RealObject.Add(_Container);
                 }
@@ -112,7 +114,8 @@ namespace DDay.Collections
             // Add the value to the object
             if (item is TOriginalValue)
             {
-                EnsureContainer().AddValue((TOriginalValue)item);
+                var value = (TOriginalValue)(object)item;
+                EnsureContainer().AddValue(value);
             }
         }
 
@@ -129,9 +132,13 @@ namespace DDay.Collections
 
         virtual public bool Contains(TNewValue item)
         {
-            return Items
-                .Where(o => o.ContainsValue(item))
-                .Any();
+            if (item is TOriginalValue)
+            {
+                return Items
+                    .Where(o => o.ContainsValue((TOriginalValue)(object)item))
+                    .Any();
+            }
+            return false;
         }
 
         virtual public void CopyTo(TNewValue[] array, int arrayIndex)
@@ -158,14 +165,19 @@ namespace DDay.Collections
 
         virtual public bool Remove(TNewValue item)
         {
-            var container = Items                
-                .Where(o => o.ContainsValue(item))
-                .FirstOrDefault();
-
-            if (container != null)
+            if (item is TOriginalValue)
             {
-                container.RemoveValue(item);
-                return true;
+                var value = (TOriginalValue)(object)item;
+
+                var container = Items
+                    .Where(o => o.ContainsValue(value))
+                    .FirstOrDefault();
+
+                if (container != null)
+                {
+                    container.RemoveValue(value);
+                    return true;
+                }
             }
             return false;
         }
@@ -184,16 +196,20 @@ namespace DDay.Collections
         {
             int index = -1;
 
-            IterateValues((o, i, count) =>
-                {
-                    if (o.Values != null && o.Values.Contains(item))
+            if (item is TOriginalValue)
+            {
+                var value = (TOriginalValue)(object)item;
+                IterateValues((o, i, count) =>
                     {
-                        var list = o.Values.ToList();
-                        index = i + list.IndexOf(item);
-                        return false;
-                    }
-                    return true;
-                });
+                        if (o.Values != null && o.Values.Contains(value))
+                        {
+                            var list = o.Values.ToList();
+                            index = i + list.IndexOf(value);
+                            return false;
+                        }
+                        return true;
+                    });
+            }
 
             return index;
         }
@@ -202,13 +218,15 @@ namespace DDay.Collections
         {
             IterateValues((o, i, count) =>
                 {
+                    var value = (TOriginalValue)(object)item;
+
                     // Determine if this index is found within this object
                     if (index >= i && index < count)
                     {
                         // Convert the items to a list
                         var items = o.Values.ToList();
                         // Insert the item at the relative index within the list
-                        items.Insert(index - i, item);
+                        items.Insert(index - i, value);
                         // Set the new list
                         o.SetValue(items);
                         return false;

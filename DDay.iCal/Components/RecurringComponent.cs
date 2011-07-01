@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization;
+using DDay.Collections;
 
 namespace DDay.iCal
 {
@@ -170,9 +171,9 @@ namespace DDay.iCal
         /// <summary>
         /// A list of <see cref="Alarm"/>s for this recurring component.
         /// </summary>
-        virtual public ICalendarObjectList<IAlarm> Alarms
+        virtual public IGroupedCollection<string, IAlarm> Alarms
         {
-            get { return new FilteredCalendarObjectList<IAlarm>(this); }
+            get { return new GroupedCollectionProxy<string, ICalendarObject, IAlarm>(Children); }
         }
 
         #endregion

@@ -32,7 +32,7 @@ namespace DDay.iCal
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class CalendarProperty : 
+    public class CalendarProperty :
         CalendarObject,
         ICalendarProperty
     {
@@ -71,12 +71,14 @@ namespace DDay.iCal
             CopyFrom(other);
         }
 
-        public CalendarProperty(string name) : base(name)
+        public CalendarProperty(string name)
+            : base(name)
         {
             Initialize();
         }
 
-        public CalendarProperty(string name, object value) : base(name)
+        public CalendarProperty(string name, object value)
+            : base(name)
         {
             Initialize();
             _Values = new List<object>();
@@ -185,6 +187,33 @@ namespace DDay.iCal
             get 
             {
                 return _Values;
+            }
+        }
+
+        public object Value
+        {
+            get
+            {
+                if (_Values != null)
+                    return _Values.FirstOrDefault();
+                return null;
+            }
+            set
+            {
+                if (value != null)
+                {
+                    if (_Values != null && _Values.Count > 0)
+                        _Values[0] = value;
+                    else
+                    {
+                        _Values.Clear();
+                        _Values.Add(value);
+                    }
+                }
+                else
+                {
+                    _Values = null;
+                }
             }
         }
 

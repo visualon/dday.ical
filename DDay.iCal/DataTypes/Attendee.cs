@@ -10,7 +10,7 @@ namespace DDay.iCal
     public class Attendee :
         EncodableDataType,
         IAttendee
-	{
+    {
         #region IAttendee Members
         
         virtual public Uri SentBy
@@ -104,7 +104,7 @@ namespace DDay.iCal
         #endregion        
             
         #region Constructors
-		
+        
         public Attendee()
         {
         }
@@ -120,7 +120,7 @@ namespace DDay.iCal
                 throw new ArgumentException("attendeeUri");
             Value = new Uri(attendeeUri);
         }
-		
+        
         #endregion
 
         #region Overrides
