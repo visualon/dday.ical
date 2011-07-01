@@ -9,6 +9,7 @@ namespace DDay.iCal
         ICalendarParameterCollectionContainer,
         ICalendarObject,
         IValueObject<object>
-    {        
-    }    
+    {
+        object Value { get; set; }
+    }
 }

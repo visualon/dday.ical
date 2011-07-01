@@ -32,8 +32,9 @@ namespace DDay.iCal
             m_Parent = parent;
             m_CaseInsensitive = caseInsensitive;
 
-            ItemAdded += new EventHandler<ObjectEventArgs<ICalendarParameter,int>>(OnParameterAdded);
-            ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarParameter,int>>(OnParameterRemoved);
+
+            ItemAdded += new EventHandler<ObjectEventArgs<ICalendarParameter, int>>(OnParameterAdded);
+            ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarParameter, int>>(OnParameterRemoved);
         }
 
         #endregion
@@ -52,15 +53,11 @@ namespace DDay.iCal
 
         #endregion
 
-        #region Overrides
-        
         protected override string GroupModifier(string group)
         {
-            if (m_CaseInsensitive)
+            if (m_CaseInsensitive && group != null)
                 return group.ToUpper();
             return group;
         }
-
-        #endregion
     }
 }

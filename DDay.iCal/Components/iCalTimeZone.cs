@@ -16,7 +16,7 @@ namespace DDay.iCal
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public partial class iCalTimeZone : 
+    public partial class iCalTimeZone :
         CalendarComponent,
         ITimeZone
     {
