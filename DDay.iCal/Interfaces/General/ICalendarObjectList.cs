@@ -5,8 +5,8 @@ using DDay.Collections;
 
 namespace DDay.iCal
 {
-    public interface ICalendarObjectCollection<TType> : 
-        IGroupedCollection<string, TType>
+    public interface ICalendarObjectList<TType> : 
+        IGroupedList<string, TType>
         where TType : class, ICalendarObject
     {
     }
