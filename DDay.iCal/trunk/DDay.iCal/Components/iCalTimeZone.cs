@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Globalization;
 using System.Diagnostics;
+using DDay.Collections;
 
 namespace DDay.iCal
 {
@@ -133,7 +134,7 @@ namespace DDay.iCal
         #region Private Fields
 
         TimeZoneEvaluator m_Evaluator;
-        ICalendarObjectList<ITimeZoneInfo> m_TimeZoneInfos;
+        IGroupedCollection<string, ITimeZoneInfo> m_TimeZoneInfos;
 
         #endregion
 
@@ -149,9 +150,9 @@ namespace DDay.iCal
             this.Name = Components.TIMEZONE;
 
             m_Evaluator = new TimeZoneEvaluator(this);
-            m_TimeZoneInfos = new FilteredCalendarObjectList<ITimeZoneInfo>(this);
-            Children.ItemAdded += new EventHandler<ObjectEventArgs<ICalendarObject>>(Children_ItemAdded);
-            Children.ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarObject>>(Children_ItemRemoved);
+            m_TimeZoneInfos = new GroupedCollectionProxy<string, ICalendarObject, ITimeZoneInfo>(Children);
+            Children.ItemAdded += new EventHandler<ObjectEventArgs<ICalendarObject, int>>(Children_ItemAdded);
+            Children.ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarObject, int>>(Children_ItemRemoved);
             SetService(m_Evaluator);
         }        
 
@@ -159,12 +160,12 @@ namespace DDay.iCal
 
         #region Event Handlers
 
-        void Children_ItemRemoved(object sender, ObjectEventArgs<ICalendarObject> e)
+        void Children_ItemRemoved(object sender, ObjectEventArgs<ICalendarObject, int> e)
         {
             m_Evaluator.Clear();
         }
 
-        void Children_ItemAdded(object sender, ObjectEventArgs<ICalendarObject> e)
+        void Children_ItemAdded(object sender, ObjectEventArgs<ICalendarObject, int> e)
         {
             m_Evaluator.Clear();
         }
@@ -214,7 +215,7 @@ namespace DDay.iCal
             set { Url = value; }
         }
 
-        virtual public ICalendarObjectList<ITimeZoneInfo> TimeZoneInfos
+        virtual public IGroupedCollection<string, ITimeZoneInfo> TimeZoneInfos
         {
             get { return m_TimeZoneInfos; }
             set { m_TimeZoneInfos = value; }

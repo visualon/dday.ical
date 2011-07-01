@@ -79,7 +79,9 @@
     <Compile Include="Constants.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Interfaces\IGroupedValueCollection.cs" />
     <Compile Include="Interfaces\IGroupedCollection.cs" />
+    <Compile Include="Interfaces\Proxies\IGroupedValueListProxy.cs" />
     <Compile Include="Proxies\GroupedCollectionProxy.cs" />
     <Compile Include="Interfaces\IGroupedList.cs" />
     <Compile Include="Interfaces\IGroupedObject.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="MultiLinkedList.cs" />
     <Compile Include="Enumerators\GroupedListEnumerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Interfaces\Proxies\IGroupedCollectionProxy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -5,8 +5,8 @@ using DDay.Collections;
 
 namespace DDay.iCal
 {
-    public interface ICalendarPropertyList :
-        IGroupedValueList<string, ICalendarProperty, CalendarProperty, object>
+    public interface ICalendarParameterCollection :
+        IGroupedValueList<string, ICalendarParameter, CalendarParameter, string>
     {
     }
 }

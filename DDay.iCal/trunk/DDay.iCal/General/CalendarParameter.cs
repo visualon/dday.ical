@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using DDay.Collections;
 
 namespace DDay.iCal
 {
@@ -39,7 +40,7 @@ namespace DDay.iCal
             AddValue(value);
         }
 
-        public CalendarParameter(string name, string[] values) : base(name)
+        public CalendarParameter(string name, IEnumerable<string> values) : base(name)
         {
             Initialize();
             foreach (string v in values)
@@ -95,6 +96,14 @@ namespace DDay.iCal
         virtual public bool ContainsValue(string value)
         {
             return _Values.Contains(value);
+        }
+
+        virtual public int ValueCount
+        {
+            get
+            {
+                return _Values != null ? _Values.Count : 0;
+            }
         }
 
         virtual public void SetValue(string value)
