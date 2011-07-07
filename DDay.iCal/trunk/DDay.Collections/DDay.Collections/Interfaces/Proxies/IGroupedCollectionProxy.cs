@@ -7,7 +7,7 @@ namespace DDay.Collections
         where TOriginal : class, IGroupedObject<TGroup>
         where TNew : class, TOriginal
     {
-        IGroupedList<TGroup, TOriginal> RealObject { get; }
-        void SetProxiedObject(IGroupedList<TGroup, TOriginal> realObject);        
+        IGroupedCollection<TGroup, TOriginal> RealObject { get; }
+        void SetProxiedObject(IGroupedCollection<TGroup, TOriginal> realObject);        
     }
 }

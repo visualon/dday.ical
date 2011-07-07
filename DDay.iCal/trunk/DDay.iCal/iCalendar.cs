@@ -394,12 +394,12 @@ namespace DDay.iCal
 
         #region Private Fields
 
-        private IGroupedCollection<string, IUniqueComponent> m_UniqueComponents;
-        private IGroupedCollection<string, IEvent> m_Events;
-        private IGroupedCollection<string, ITodo> m_Todos;
-        private IGroupedCollection<string, IJournal> m_Journals;
-        private IGroupedCollection<string, IFreeBusy> m_FreeBusy;
-        private IGroupedCollection<string, ITimeZone> m_TimeZones;
+        private IUniqueComponentList<IUniqueComponent> m_UniqueComponents;
+        private IUniqueComponentList<IEvent> m_Events;
+        private IUniqueComponentList<ITodo> m_Todos;
+        private ICalendarObjectList<IJournal> m_Journals;
+        private IUniqueComponentList<IFreeBusy> m_FreeBusy;
+        private ICalendarObjectList<ITimeZone> m_TimeZones;
 
         #endregion
 
@@ -423,12 +423,12 @@ namespace DDay.iCal
         {
             this.Name = Components.CALENDAR;
 
-            m_UniqueComponents = new GroupedCollectionProxy<string, ICalendarObject, IUniqueComponent>(Children);
-            m_Events = new GroupedCollectionProxy<string, ICalendarObject, IEvent>(Children);
-            m_Todos = new GroupedCollectionProxy<string, ICalendarObject, ITodo>(Children);
-            m_Journals = new GroupedCollectionProxy<string, ICalendarObject, IJournal>(Children);
-            m_FreeBusy = new GroupedCollectionProxy<string, ICalendarObject, IFreeBusy>(Children);
-            m_TimeZones = new GroupedCollectionProxy<string, ICalendarObject, ITimeZone>(Children);
+            m_UniqueComponents = new UniqueComponentListProxy<IUniqueComponent>(Children);
+            m_Events = new UniqueComponentListProxy<IEvent>(Children);
+            m_Todos = new UniqueComponentListProxy<ITodo>(Children);
+            m_Journals = new CalendarObjectListProxy<IJournal>(Children);
+            m_FreeBusy = new UniqueComponentListProxy<IFreeBusy>(Children);
+            m_TimeZones = new CalendarObjectListProxy<ITimeZone>(Children);
         }
 
         #endregion
@@ -482,7 +482,7 @@ namespace DDay.iCal
 
         #region IICalendar Members
 
-        virtual public IGroupedCollection<string, IUniqueComponent> UniqueComponents
+        virtual public IUniqueComponentList<IUniqueComponent> UniqueComponents
         {
             get { return m_UniqueComponents; }
         }
@@ -502,7 +502,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="Event"/> components in the iCalendar.
         /// </summary>
-        virtual public IGroupedCollection<string, IEvent> Events
+        virtual public IUniqueComponentList<IEvent> Events
         {
             get { return m_Events; }
         }
@@ -510,7 +510,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="DDay.iCal.FreeBusy"/> components in the iCalendar.
         /// </summary>
-        virtual public IGroupedCollection<string, IFreeBusy> FreeBusy
+        virtual public IUniqueComponentList<IFreeBusy> FreeBusy
         {
             get { return m_FreeBusy; }
         }
@@ -518,7 +518,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="Journal"/> components in the iCalendar.
         /// </summary>
-        virtual public IGroupedCollection<string, IJournal> Journals
+        virtual public ICalendarObjectList<IJournal> Journals
         {
             get { return m_Journals; }
         }
@@ -526,7 +526,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="DDay.iCal.TimeZone"/> components in the iCalendar.
         /// </summary>
-        virtual public IGroupedCollection<string, ITimeZone> TimeZones
+        virtual public ICalendarObjectList<ITimeZone> TimeZones
         {
             get { return m_TimeZones; }
         }
@@ -534,7 +534,7 @@ namespace DDay.iCal
         /// <summary>
         /// A collection of <see cref="Todo"/> components in the iCalendar.
         /// </summary>
-        virtual public IGroupedCollection<string, ITodo> Todos
+        virtual public IUniqueComponentList<ITodo> Todos
         {
             get { return m_Todos; }
         }

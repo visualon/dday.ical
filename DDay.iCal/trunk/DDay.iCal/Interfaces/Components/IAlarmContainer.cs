@@ -10,7 +10,7 @@ namespace DDay.iCal
         /// <summary>
         /// A list of <see cref="Alarm"/>s for this recurring component.
         /// </summary>
-        IGroupedCollection<string, IAlarm> Alarms { get; }
+        ICalendarObjectList<IAlarm> Alarms { get; }
 
         /// <summary>
         /// Polls <see cref="Alarm"/>s for occurrences within the <see cref="Evaluate"/>d

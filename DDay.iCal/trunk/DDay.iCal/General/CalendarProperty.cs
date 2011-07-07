@@ -81,7 +81,6 @@ namespace DDay.iCal
             : base(name)
         {
             Initialize();
-            _Values = new List<object>();
             _Values.Add(value);
         }
 
@@ -92,6 +91,7 @@ namespace DDay.iCal
 
         private void Initialize()
         {
+            _Values = new List<object>();
             _Parameters = new CalendarParameterList(this, true);
             ValueChanged += new EventHandler<ValueChangedEventArgs<object>>(CalendarProperty_ValueChanged);
         }        
@@ -174,12 +174,7 @@ namespace DDay.iCal
         protected void OnValueChanged(object removedValue, object addedValue)
         {
             if (ValueChanged != null)
-            {
-                ValueChanged(this, new ValueChangedEventArgs<object>(
-                    removedValue != null ? new object[] { removedValue } : null,
-                    addedValue != null ? new object[] { addedValue } : null
-                ));
-            }
+                ValueChanged(this, new ValueChangedEventArgs<object>((IEnumerable<object>)removedValue, (IEnumerable<object>)addedValue));
         }
 
         virtual public IEnumerable<object> Values

@@ -6,16 +6,16 @@ using DDay.Collections;
 
 namespace DDay.iCal
 {
-    public class UniqueComponentCollectionProxy<TComponentType> :
-        GroupedCollectionProxy<string, ICalendarObject, TComponentType>,
-        IUniqueComponentCollection<TComponentType>
+    public class UniqueComponentListProxy<TComponentType> :
+        CalendarObjectListProxy<TComponentType>,
+        IUniqueComponentList<TComponentType>
         where TComponentType : class, IUniqueComponent
     {
         Dictionary<string, TComponentType> _Lookup;
 
         #region Constructors
 
-        public UniqueComponentCollectionProxy(IGroupedList<string, ICalendarObject> children) : base(children)
+        public UniqueComponentListProxy(IGroupedCollection<string, ICalendarObject> children) : base(children)
         {
             _Lookup = new Dictionary<string, TComponentType>();
 
@@ -49,7 +49,7 @@ namespace DDay.iCal
 
         #endregion
 
-        #region UniqueComponentCollectionProxy Members
+        #region UniqueComponentListProxy Members
 
         virtual public TComponentType this[string uid]
         {
@@ -92,8 +92,9 @@ namespace DDay.iCal
         {
             if (e.First is TComponentType)
             {
-                TComponentType component = (TComponentType)e.First;                
-                _Lookup[component.UID] = component;
+                TComponentType component = (TComponentType)e.First;
+                if (!string.IsNullOrEmpty(component.UID))
+                    _Lookup[component.UID] = component;
             }
         }
 
@@ -102,7 +103,8 @@ namespace DDay.iCal
             if (e.First is TComponentType)
             {
                 TComponentType component = (TComponentType)e.First;
-                if (_Lookup.ContainsKey(component.UID))
+                if (!string.IsNullOrEmpty(component.UID) &&
+                    _Lookup.ContainsKey(component.UID))
                 {
                     _Lookup.Remove(component.UID);
                 }
