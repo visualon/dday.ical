@@ -59,32 +59,32 @@ namespace DDay.iCal
         /// <summary>
         /// Gets a list of unique components contained in the calendar.
         /// </summary>
-        IGroupedCollection<string, IUniqueComponent> UniqueComponents { get; }
+        IUniqueComponentList<IUniqueComponent> UniqueComponents { get; }
 
         /// <summary>
         /// Gets a list of Events contained in the calendar.
         /// </summary>
-        IGroupedCollection<string, IEvent> Events { get; }
+        IUniqueComponentList<IEvent> Events { get; }
 
         /// <summary>
         /// Gets a list of Free/Busy components contained in the calendar.
         /// </summary>
-        IGroupedCollection<string, IFreeBusy> FreeBusy { get; }
+        IUniqueComponentList<IFreeBusy> FreeBusy { get; }
 
         /// <summary>
         /// Gets a list of Journal entries contained in the calendar.
         /// </summary>
-        IGroupedCollection<string, IJournal> Journals { get; }
+        ICalendarObjectList<IJournal> Journals { get; }
 
         /// <summary>
         /// Gets a list of time zones contained in the calendar.
         /// </summary>
-        IGroupedCollection<string, ITimeZone> TimeZones { get; }
+        ICalendarObjectList<ITimeZone> TimeZones { get; }
 
         /// <summary>
         /// Gets a list of To-do items contained in the calendar.
         /// </summary>
-        IGroupedCollection<string, ITodo> Todos { get; }        
+        IUniqueComponentList<ITodo> Todos { get; }        
 
 #if !SILVERLIGHT
         /// <summary>

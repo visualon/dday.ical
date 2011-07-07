@@ -20,14 +20,14 @@ namespace DDay.Collections
     {
         #region Private Fields
 
-        IGroupedList<TGroup, TOriginal> _RealObject;
+        IGroupedCollection<TGroup, TOriginal> _RealObject;
         Func<TNew, bool> _Predicate;
 
         #endregion
 
         #region Constructors
 
-        public GroupedCollectionProxy(IGroupedList<TGroup, TOriginal> realObject, Func<TNew, bool> predicate = null)
+        public GroupedCollectionProxy(IGroupedCollection<TGroup, TOriginal> realObject, Func<TNew, bool> predicate = null)
         {
             _Predicate = predicate ?? new Func<TNew, bool>(o => true);
             SetProxiedObject(realObject);
@@ -184,12 +184,12 @@ namespace DDay.Collections
 
         #region IGroupedCollectionProxy Members
 
-        public IGroupedList<TGroup, TOriginal> RealObject
+        public IGroupedCollection<TGroup, TOriginal> RealObject
         {
             get { return _RealObject; }
         }
 
-        virtual public void SetProxiedObject(IGroupedList<TGroup, TOriginal> realObject)
+        virtual public void SetProxiedObject(IGroupedCollection<TGroup, TOriginal> realObject)
         {
             _RealObject = realObject;
         }

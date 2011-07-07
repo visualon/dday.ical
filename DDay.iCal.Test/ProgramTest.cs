@@ -128,7 +128,7 @@ namespace DDay.iCal.Test
             IICalendar iCal2 = iCalendar.LoadFromFile(@"Calendars\Recurrence\MonthlyByDay1.ics")[0];
 
             // Change the UID of the 2nd event to make sure it's different
-            iCal2.Events[iCal1.Events.First().UID].UID = "1234567890";
+            iCal2.Events[iCal1.Events[0].UID].UID = "1234567890";
             iCal1.MergeWith(iCal2);
 
             IEvent evt1 = iCal1.Events.First();

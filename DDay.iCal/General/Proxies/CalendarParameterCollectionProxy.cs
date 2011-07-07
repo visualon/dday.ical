@@ -23,6 +23,11 @@ namespace DDay.iCal
             }
         }
 
+        virtual public void Add(string name, string value)
+        {
+            RealObject.Add(new CalendarParameter(name, value));
+        }
+
         virtual public string Get(string name)
         {
             var parameter = RealObject

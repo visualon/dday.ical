@@ -171,9 +171,9 @@ namespace DDay.iCal
         /// <summary>
         /// A list of <see cref="Alarm"/>s for this recurring component.
         /// </summary>
-        virtual public IGroupedCollection<string, IAlarm> Alarms
+        virtual public ICalendarObjectList<IAlarm> Alarms
         {
-            get { return new GroupedCollectionProxy<string, ICalendarObject, IAlarm>(Children); }
+            get { return new CalendarObjectListProxy<IAlarm>(Children); }
         }
 
         #endregion
