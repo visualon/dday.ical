@@ -134,7 +134,7 @@ namespace DDay.iCal
         #region Private Fields
 
         TimeZoneEvaluator m_Evaluator;
-        IGroupedCollection<string, ITimeZoneInfo> m_TimeZoneInfos;
+        ICalendarObjectList<ITimeZoneInfo> m_TimeZoneInfos;
 
         #endregion
 
@@ -150,7 +150,7 @@ namespace DDay.iCal
             this.Name = Components.TIMEZONE;
 
             m_Evaluator = new TimeZoneEvaluator(this);
-            m_TimeZoneInfos = new GroupedCollectionProxy<string, ICalendarObject, ITimeZoneInfo>(Children);
+            m_TimeZoneInfos = new CalendarObjectListProxy<ITimeZoneInfo>(Children);
             Children.ItemAdded += new EventHandler<ObjectEventArgs<ICalendarObject, int>>(Children_ItemAdded);
             Children.ItemRemoved += new EventHandler<ObjectEventArgs<ICalendarObject, int>>(Children_ItemRemoved);
             SetService(m_Evaluator);
@@ -215,7 +215,7 @@ namespace DDay.iCal
             set { Url = value; }
         }
 
-        virtual public IGroupedCollection<string, ITimeZoneInfo> TimeZoneInfos
+        virtual public ICalendarObjectList<ITimeZoneInfo> TimeZoneInfos
         {
             get { return m_TimeZoneInfos; }
             set { m_TimeZoneInfos = value; }

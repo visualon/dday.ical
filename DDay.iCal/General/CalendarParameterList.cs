@@ -59,5 +59,14 @@ namespace DDay.iCal
                 return group.ToUpper();
             return group;
         }
+
+        #region ICalendarParameterCollection Members
+
+        virtual public void Add(string name, string value)
+        {
+            Add(new CalendarParameter(name, value));
+        }
+
+        #endregion
     }
 }

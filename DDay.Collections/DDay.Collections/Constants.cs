@@ -34,13 +34,13 @@ namespace DDay.Collections
     public class ValueChangedEventArgs<T> :
         EventArgs
     {
-        public IList<T> RemovedValues { get; protected set; }
-        public IList<T> AddedValues { get; protected set; }
+        public IEnumerable<T> RemovedValues { get; protected set; }
+        public IEnumerable<T> AddedValues { get; protected set; }
 
         public ValueChangedEventArgs(IEnumerable<T> removedValues, IEnumerable<T> addedValues)
         {
-            RemovedValues = removedValues.ToList().AsReadOnly();
-            AddedValues = addedValues.ToList().AsReadOnly();
+            RemovedValues = removedValues ?? new T[0];
+            AddedValues = addedValues ?? new T[0];
         }
     }
     

@@ -133,23 +133,15 @@ namespace DDay.iCal
 
         void Object_ValueChanged(object sender, ValueChangedEventArgs<object> e)
         {
-            string oldValue = e.RemovedValues.Cast<string>().FirstOrDefault();
-            string newValue = e.AddedValues.Cast<string>().FirstOrDefault();
+            string oldValue = e.RemovedValues.OfType<string>().FirstOrDefault();
+            string newValue = e.AddedValues.OfType<string>().FirstOrDefault();
             OnGroupChanged(oldValue, newValue);
         }
 
         #endregion
 
         #region Overrides
-
-        public override string Group
-        {
-            get
-            {
-                return UID;
-            }            
-        }
-
+        
         protected override void OnDeserializing(StreamingContext context)
         {
             base.OnDeserializing(context);
