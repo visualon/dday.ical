@@ -48,7 +48,7 @@ namespace DDay.iCal
         }
 
         #endregion
-
+       
         #region UniqueComponentListProxy Members
 
         virtual public TComponentType this[string uid]
@@ -61,26 +61,12 @@ namespace DDay.iCal
             {
                 // Find the item matching the UID
                 var item = Search(uid);
-                
+
                 if (item != null)
-                {
-                    if (_Lookup.ContainsKey(uid))
-                        _Lookup.Remove(uid);
-
-                    // Remove it if found                    
                     Remove(item);
-                }
-                                
+                
                 if (value != null)
-                {
-                    // If we're setting another value, then
-                    // we need to assign the UID to the where
-                    // we just placed this component.
-                    value.UID = uid;
                     Add(value);
-
-                    _Lookup[uid] = value;
-                }
             }
         }
 
@@ -93,6 +79,8 @@ namespace DDay.iCal
             if (e.First is TComponentType)
             {
                 TComponentType component = (TComponentType)e.First;
+                component.UIDChanged += UIDChanged;
+
                 if (!string.IsNullOrEmpty(component.UID))
                     _Lookup[component.UID] = component;
             }
@@ -103,12 +91,28 @@ namespace DDay.iCal
             if (e.First is TComponentType)
             {
                 TComponentType component = (TComponentType)e.First;
+                component.UIDChanged -= UIDChanged;
+
                 if (!string.IsNullOrEmpty(component.UID) &&
                     _Lookup.ContainsKey(component.UID))
                 {
                     _Lookup.Remove(component.UID);
                 }
             }   
+        }
+
+        void UIDChanged(object sender, ObjectEventArgs<string, string> e)
+        {
+            if (e.First != null &&
+                _Lookup.ContainsKey(e.First))
+            {
+                _Lookup.Remove(e.First);
+            }
+
+            if (e.Second != null)
+            {
+                _Lookup[e.Second] = (TComponentType)sender;
+            }
         }
 
         #endregion
