@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DDay.Collections;
 
 namespace DDay.iCal
 {
     public interface IUniqueComponent :
         ICalendarComponent
     {
+        event EventHandler<ObjectEventArgs<string, string>> UIDChanged;
         string UID { get; set; }
 
         IList<IAttendee> Attendees { get; set; }

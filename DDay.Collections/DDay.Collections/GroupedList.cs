@@ -28,14 +28,14 @@ namespace DDay.Collections
         TItem SubscribeToKeyChanges(TItem item)
         {
             if (item != null)
-                item.GroupChanged += item_KeyChanged;
+                item.GroupChanged += item_GroupChanged;
             return item;
         }
 
         TItem UnsubscribeFromKeyChanges(TItem item)
         {
             if (item != null)
-                item.GroupChanged -= item_KeyChanged;
+                item.GroupChanged -= item_GroupChanged;
             return item;
         }
 
@@ -103,7 +103,7 @@ namespace DDay.Collections
 
         #region Event Handlers
 
-        void item_KeyChanged(object sender, ObjectEventArgs<TGroup, TGroup> e)
+        void item_GroupChanged(object sender, ObjectEventArgs<TGroup, TGroup> e)
         {
             TGroup oldValue = e.First;
             TGroup newValue = e.Second;
