@@ -115,7 +115,7 @@ namespace DDay.iCal
                 e.First.Name != null &&
                 string.Equals(e.First.Name.ToUpper(), "UID"))
             {
-                OnGroupChanged(e.First.Values.Cast<string>().FirstOrDefault(), null);
+                OnUIDChanged(e.First.Values.Cast<string>().FirstOrDefault(), null);
                 e.First.ValueChanged -= Object_ValueChanged;
             }
         }
@@ -126,7 +126,7 @@ namespace DDay.iCal
                 e.First.Name != null &&
                 string.Equals(e.First.Name.ToUpper(), "UID"))
             {
-                OnGroupChanged(null, e.First.Values.Cast<string>().FirstOrDefault());
+                OnUIDChanged(null, e.First.Values.Cast<string>().FirstOrDefault());
                 e.First.ValueChanged += Object_ValueChanged;
             }
         }
@@ -135,7 +135,7 @@ namespace DDay.iCal
         {
             string oldValue = e.RemovedValues.OfType<string>().FirstOrDefault();
             string newValue = e.AddedValues.OfType<string>().FirstOrDefault();
-            OnGroupChanged(oldValue, newValue);
+            OnUIDChanged(oldValue, newValue);
         }
 
         #endregion
@@ -179,6 +179,14 @@ namespace DDay.iCal
         #endregion
 
         #region IUniqueComponent Members
+
+        virtual public event EventHandler<ObjectEventArgs<string, string>> UIDChanged;
+
+        virtual protected void OnUIDChanged(string oldUID, string newUID)
+        {
+            if (UIDChanged != null)
+                UIDChanged(this, new ObjectEventArgs<string, string>(oldUID, newUID));
+        }
 
         virtual public string UID
         {
