@@ -100,8 +100,7 @@ namespace DDay.Collections
         {
             return Items
                 .Where(o => o.ValueCount > 0)
-                .SelectMany(o => o.Values)
-                .OfType<TNewValue>()
+                .SelectMany(o => o.Values.OfType<TNewValue>())
                 .GetEnumerator();
         }
 
