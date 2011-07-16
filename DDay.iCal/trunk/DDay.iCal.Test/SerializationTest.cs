@@ -94,7 +94,7 @@ namespace DDay.iCal.Test
                 // then simply ignore it!
                 if (!isMatch && p1.Value is ICollection && ((ICollection)p1.Value).Count == 0)
                     continue;
-                Assert.IsTrue(isMatch, "Could not find a matching property.");                    
+                Assert.IsTrue(isMatch, "Could not find a matching property - " + p1.Name + ":" + p1.Value.ToString());                    
             }
 
             Assert.AreEqual(cb1.Children.Count, cb2.Children.Count, "The number of children are not equal.");
