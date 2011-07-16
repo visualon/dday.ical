@@ -32,7 +32,9 @@ namespace DDay.iCal.Serialization.iCalendar
         public override string SerializeToString(object obj)
         {
             ICalendarProperty prop = obj as ICalendarProperty;
-            if (prop != null && !prop.Values.Any())
+            if (prop != null && 
+                prop.Values != null &&
+                prop.Values.Any())
             {
                 // Don't serialize the property if the value is null                
 
