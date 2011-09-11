@@ -52,7 +52,8 @@ namespace DDay.iCal.Serialization.iCalendar
                 IDateTime dt = (IDateTime)obj;
 
                 // Assign the TZID for the date/time value.
-                dt.Parameters.Set("TZID", dt.TZID);
+                if (dt.TZID != null)
+                    dt.Parameters.Set("TZID", dt.TZID);
 
                 // FIXME: what if DATE is the default value type for this?
                 // Also, what if the DATE-TIME value type is specified on something
