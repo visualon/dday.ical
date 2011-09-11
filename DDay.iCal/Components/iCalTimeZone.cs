@@ -82,7 +82,7 @@ namespace DDay.iCal
                 var dday_tzinfo_standard = new DDay.iCal.iCalTimeZoneInfo();
                 dday_tzinfo_standard.Name = "STANDARD";
                 dday_tzinfo_standard.TimeZoneName = tzinfo.StandardName;
-                dday_tzinfo_standard.Start = new iCalDateTime(adjustmentRule.DateStart);                
+                dday_tzinfo_standard.Start = new iCalDateTime(new DateTime(adjustmentRule.DateStart.Year, adjustmentRule.DaylightTransitionEnd.Month, adjustmentRule.DaylightTransitionEnd.Day, adjustmentRule.DaylightTransitionEnd.TimeOfDay.Hour, adjustmentRule.DaylightTransitionEnd.TimeOfDay.Minute, adjustmentRule.DaylightTransitionEnd.TimeOfDay.Second).AddDays(1));
                 if (dday_tzinfo_standard.Start.LessThan(earliest))
                     dday_tzinfo_standard.Start = dday_tzinfo_standard.Start.AddYears(earliest.Year - dday_tzinfo_standard.Start.Year);
                 dday_tzinfo_standard.OffsetFrom = new UTCOffset(utcOffset + delta);
@@ -97,7 +97,7 @@ namespace DDay.iCal
                     var dday_tzinfo_daylight = new DDay.iCal.iCalTimeZoneInfo();
                     dday_tzinfo_daylight.Name = "DAYLIGHT";
                     dday_tzinfo_daylight.TimeZoneName = tzinfo.DaylightName;
-                    dday_tzinfo_daylight.Start = new iCalDateTime(adjustmentRule.DateStart);
+                    dday_tzinfo_daylight.Start = new iCalDateTime(new DateTime(adjustmentRule.DateStart.Year, adjustmentRule.DaylightTransitionStart.Month, adjustmentRule.DaylightTransitionStart.Day, adjustmentRule.DaylightTransitionStart.TimeOfDay.Hour, adjustmentRule.DaylightTransitionStart.TimeOfDay.Minute, adjustmentRule.DaylightTransitionStart.TimeOfDay.Second));
                     if (dday_tzinfo_daylight.Start.LessThan(earliest))
                         dday_tzinfo_daylight.Start = dday_tzinfo_daylight.Start.AddYears(earliest.Year - dday_tzinfo_daylight.Start.Year);
                     dday_tzinfo_daylight.OffsetFrom = new UTCOffset(utcOffset);

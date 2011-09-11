@@ -48,7 +48,7 @@ namespace DDay.iCal.Serialization.iCalendar
                 // the property and parameter values
                 ISerializerFactory sf = GetService<ISerializerFactory>();
 
-                StringBuilder result = new StringBuilder();                               
+                StringBuilder result = new StringBuilder();
                 foreach (object v in prop.Values)
                 {
                     // Get a serializer to serialize the property's value.
