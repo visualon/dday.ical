@@ -66,6 +66,14 @@ namespace DDay.iCal
 
         #region ICalendarParameterCollection Members
 
+        virtual public void SetParent(ICalendarObject parent)
+        {
+            foreach (ICalendarParameter parameter in this)
+            {
+                parameter.Parent = parent;
+            }
+        }
+
         virtual public void Add(string name, string value)
         {
             Add(new CalendarParameter(name, value));
