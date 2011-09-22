@@ -28,7 +28,7 @@ namespace DDay.iCal.Serialization
         {
             AddPropertyMapping("ACTION", typeof(AlarmAction), false);
             AddPropertyMapping("ATTACH", typeof(IAttachment), false);
-            AddPropertyMapping("ATTENDEE", ResolveAttendeeProperty, false);
+            AddPropertyMapping("ATTENDEE", typeof(IAttendee), false);
             AddPropertyMapping("CATEGORIES", typeof(string), true);
             AddPropertyMapping("COMMENT", typeof(string), false);
             AddPropertyMapping("COMPLETED", typeof(IDateTime), false);
@@ -68,20 +68,6 @@ namespace DDay.iCal.Serialization
         #endregion
 
         #region Event Handlers
-
-        protected Type ResolveAttendeeProperty(object context)
-        {
-            ICalendarObject obj = context as ICalendarObject;
-            if (obj != null)
-            {
-                if (obj.Parent is IAlarm)
-                    return typeof(IAttendee);
-                else
-                    return typeof(IList<IAttendee>);
-            }
-
-            return null;
-        }
 
         protected Type ResolveStatusProperty(object context)
         {

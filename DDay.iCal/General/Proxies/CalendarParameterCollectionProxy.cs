@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using DDay.Collections;
+using System.Collections;
 
 namespace DDay.iCal
 {
@@ -10,6 +11,14 @@ namespace DDay.iCal
         GroupedCollectionProxy<string, ICalendarParameter, ICalendarParameter>,
         ICalendarParameterCollectionProxy
     {
+        protected IGroupedValueList<string, ICalendarParameter, CalendarParameter, string> Parameters
+        {
+            get
+            {
+                return RealObject as IGroupedValueList<string, ICalendarParameter, CalendarParameter, string>;
+            }
+        }
+
         public CalendarParameterCollectionProxy(IGroupedList<string, ICalendarParameter> realObject) :
             base(realObject)
         {
@@ -37,6 +46,14 @@ namespace DDay.iCal
             if (parameter != null)
                 return parameter.Value;
             return default(string);
+        }
+
+        virtual public IList<string> GetMany(string name)
+        {
+            return new GroupedValueListProxy<string, ICalendarParameter, CalendarParameter, string, string>(
+                Parameters, 
+                name
+            );
         }
 
         virtual public void Set(string name, string value)
@@ -71,48 +88,29 @@ namespace DDay.iCal
             }
         }
 
-        virtual public TType Get<TType>(string group)
-        {
-            var value = Get(group);
-            if (value is TType)
-                return (TType)(object)Get(group);
-            return default(TType);
-        }
-
-        virtual public IList<TType> GetMany<TType>(string group)
-        {
-            throw new NotSupportedException();
-        }
-
-        virtual public new System.Collections.IEnumerator GetEnumerator()
-        {
-            return RealObject.GetEnumerator();
-        }
-
         virtual public int IndexOf(ICalendarParameter obj)
         {
-            throw new NotImplementedException();
+            return Parameters.IndexOf(obj);
         }
 
         virtual public void Insert(int index, ICalendarParameter item)
         {
-            throw new NotImplementedException();
+            Parameters.Insert(index, item);
         }
 
         virtual public void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            Parameters.RemoveAt(index);
         }
 
         virtual public ICalendarParameter this[int index]
         {
             get
             {
-                throw new NotImplementedException();
+                return Parameters[index];
             }
             set
-            {
-                throw new NotImplementedException();
+            {                
             }
         }
     }
