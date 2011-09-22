@@ -53,6 +53,8 @@ namespace DDay.iCal
 
         #endregion
 
+        #region Overrides
+
         protected override string GroupModifier(string group)
         {
             if (m_CaseInsensitive && group != null)
@@ -60,11 +62,23 @@ namespace DDay.iCal
             return group;
         }
 
+        #endregion
+
         #region ICalendarParameterCollection Members
 
         virtual public void Add(string name, string value)
         {
             Add(new CalendarParameter(name, value));
+        }
+
+        virtual public string Get(string name)
+        {
+            return Get<string>(name);
+        }
+
+        virtual public IList<string> GetMany(string name)
+        {
+            return GetMany<string>(name);
         }
 
         #endregion
