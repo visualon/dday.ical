@@ -193,7 +193,7 @@ namespace DDay.iCal
 
         #endregion
 
-        #region ICalendarParameterListContainer Members
+        #region ICalendarParameterCollectionContainer Members
 
         virtual public ICalendarParameterCollection Parameters
         {
