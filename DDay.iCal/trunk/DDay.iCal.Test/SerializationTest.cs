@@ -90,11 +90,7 @@ namespace DDay.iCal.Test
                     catch { }
                 }
 
-                // If there was no match, and this is a collection property with no items,
-                // then simply ignore it!
-                if (!isMatch && p1.Value is ICollection && ((ICollection)p1.Value).Count == 0)
-                    continue;
-                Assert.IsTrue(isMatch, "Could not find a matching property - " + p1.Name + ":" + p1.Value.ToString());                    
+                Assert.IsTrue(isMatch, "Could not find a matching property - " + p1.Name + ":" + (p1.Value != null ? p1.Value.ToString() : string.Empty));                    
             }
 
             Assert.AreEqual(cb1.Children.Count, cb2.Children.Count, "The number of children are not equal.");
@@ -273,7 +269,7 @@ namespace DDay.iCal.Test
             
             IEvent evt = iCal.Events.First();
             // Ensure there are 2 attendees
-            Assert.AreEqual(2, evt.Attendees.Count);
+            Assert.AreEqual(2, evt.Attendees.Count);            
 
             IAttendee attendee1 = evt.Attendees[0];
             IAttendee attendee2 = evt.Attendees[1];
