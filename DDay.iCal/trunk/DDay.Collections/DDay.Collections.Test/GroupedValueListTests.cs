@@ -17,11 +17,28 @@ namespace DDay.Collections.Test
             _Properties = new GroupedValueList<string, Property, Property, string>();
         }
 
+        private IEnumerable<string> Categories
+        {
+            get                
+            {
+                return new string[] 
+                {
+                    "Work", "Personal", "A", "Few", "More"
+                };
+            }
+        }
+
         private IList<string> AddCategories()
         {
             var categories = _Properties.GetMany<string>("CATEGORIES");
             categories.Add("Work");
             categories.Add("Personal");
+
+            var property = new Property();
+            property.Group = "CATEGORIES";
+            property.SetValue(new string[] { "A", "Few", "More" });
+            _Properties.Add(property);
+            
             return categories;
         }
 
@@ -95,7 +112,13 @@ namespace DDay.Collections.Test
             Assert.AreEqual(1, proxy.Count);
             proxy.Add("Personal");
             Assert.AreEqual(2, proxy.Count);
-            Assert.IsTrue(new string[] { "Work", "Personal" }.SequenceEqual(_Properties.AllOf("CATEGORIES").SelectMany(p => p.Values)));
+            proxy.Add("A");
+            Assert.AreEqual(3, proxy.Count);
+            proxy.Add("Few");
+            Assert.AreEqual(4, proxy.Count);
+            proxy.Add("More");
+            Assert.AreEqual(5, proxy.Count);
+            Assert.IsTrue(Categories.SequenceEqual(_Properties.AllOf("CATEGORIES").SelectMany(p => p.Values)));
         }
 
         [Test]
@@ -108,13 +131,13 @@ namespace DDay.Collections.Test
             Assert.AreEqual(1, _Properties.GetMany<string>("Test").Count);
 
             // Get a proxy for categories, and add items to it, ensuring
-            // the items are added propertly afterward.
-            var items = new string[] { "Work", "Personal" };
+            // the items are added propertly afterward.            
             var proxy = _Properties.GetMany<string>("CATEGORIES");
 
-            foreach (var item in items)
-                proxy.Add(item);
-            Assert.IsTrue(items.SequenceEqual(proxy.ToArray()));
+            foreach (var category in Categories)
+                proxy.Add(category);
+
+            Assert.IsTrue(Categories.SequenceEqual(proxy.ToArray()));
 
             proxy.Clear();
             Assert.AreEqual(0, proxy.Count);
@@ -140,7 +163,7 @@ namespace DDay.Collections.Test
         {
             var categories = AddCategories();
 
-            string[] values = new string[2];
+            string[] values = new string[5];
             categories.CopyTo(values, 0);
             Assert.IsTrue(categories.ToArray().SequenceEqual(values));
         }
@@ -149,25 +172,34 @@ namespace DDay.Collections.Test
         public void CountProxy1()
         {
             var categories = AddCategories();
-            Assert.AreEqual(2, categories.Count);
+            Assert.AreEqual(5, categories.Count);
         }
 
         [Test]
         public void RemoveProxy1()
         {
             var categories = AddCategories();
-            Assert.AreEqual(2, categories.Count);
+            Assert.AreEqual(5, categories.Count);
 
             categories.Remove("Work");
-            Assert.AreEqual(1, categories.Count);
+            Assert.AreEqual(4, categories.Count);
 
             categories.Remove("Bla");
-            Assert.AreEqual(1, categories.Count);
+            Assert.AreEqual(4, categories.Count);
 
             categories.Remove(null);
-            Assert.AreEqual(1, categories.Count);
+            Assert.AreEqual(4, categories.Count);
 
             categories.Remove("Personal");
+            Assert.AreEqual(3, categories.Count);
+
+            categories.Remove("A");
+            Assert.AreEqual(2, categories.Count);
+
+            categories.Remove("Few");
+            Assert.AreEqual(1, categories.Count);
+
+            categories.Remove("More");
             Assert.AreEqual(0, categories.Count);
         }
 
@@ -177,6 +209,9 @@ namespace DDay.Collections.Test
             var categories = AddCategories();
             Assert.AreEqual(0, categories.IndexOf("Work"));
             Assert.AreEqual(1, categories.IndexOf("Personal"));
+            Assert.AreEqual(2, categories.IndexOf("A"));
+            Assert.AreEqual(3, categories.IndexOf("Few"));
+            Assert.AreEqual(4, categories.IndexOf("More"));
         }
 
         [Test]
@@ -184,14 +219,14 @@ namespace DDay.Collections.Test
         {
             var categories = AddCategories();
 
-            Assert.AreEqual(2, categories.Count);
+            Assert.AreEqual(5, categories.Count);
             Assert.AreEqual("Work", categories.First());
             categories.Insert(0, "Test");
-            Assert.AreEqual(3, categories.Count);
+            Assert.AreEqual(6, categories.Count);
             Assert.AreEqual("Test", categories.First());
 
             categories.Insert(2, "Bla!");
-            Assert.AreEqual(4, categories.Count);
+            Assert.AreEqual(7, categories.Count);
             Assert.AreEqual("Bla!", categories.Skip(2).First());
         }
 
@@ -200,6 +235,12 @@ namespace DDay.Collections.Test
         {
             var categories = AddCategories();
 
+            Assert.AreEqual(5, categories.Count);
+            categories.RemoveAt(0);
+            Assert.AreEqual(4, categories.Count);
+            categories.RemoveAt(0);
+            Assert.AreEqual(3, categories.Count);
+            categories.RemoveAt(0);
             Assert.AreEqual(2, categories.Count);
             categories.RemoveAt(0);
             Assert.AreEqual(1, categories.Count);
@@ -212,8 +253,14 @@ namespace DDay.Collections.Test
         {
             var categories = AddCategories();
 
-            Assert.AreEqual(2, categories.Count);
+            Assert.AreEqual(5, categories.Count);
             categories.RemoveAt(1);
+            Assert.AreEqual(4, categories.Count);
+            categories.RemoveAt(0);
+            Assert.AreEqual(3, categories.Count);
+            categories.RemoveAt(0);
+            Assert.AreEqual(2, categories.Count);
+            categories.RemoveAt(0);
             Assert.AreEqual(1, categories.Count);
             categories.RemoveAt(0);
             Assert.AreEqual(0, categories.Count);
@@ -225,16 +272,16 @@ namespace DDay.Collections.Test
             var categories = AddCategories();
 
             Assert.AreEqual("Work", categories[0]);
-            Assert.AreEqual(2, categories.Count);
+            Assert.AreEqual(5, categories.Count);
             
             categories[0] = "Test";
             Assert.AreEqual("Test", categories[0]);
-            Assert.AreEqual(2, categories.Count);
+            Assert.AreEqual(5, categories.Count);
 
             Assert.AreEqual("Personal", categories[1]);
             categories[1] = "Blah!";
             Assert.AreEqual("Blah!", categories[1]);
-            Assert.AreEqual(2, categories.Count);
+            Assert.AreEqual(5, categories.Count);
         }
     }
 }
