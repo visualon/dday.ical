@@ -11,6 +11,8 @@ namespace DDay.iCal
         GroupedCollectionProxy<string, ICalendarParameter, ICalendarParameter>,
         ICalendarParameterCollectionProxy
     {
+        #region Protected Properties
+
         protected IGroupedValueList<string, ICalendarParameter, CalendarParameter, string> Parameters
         {
             get
@@ -19,13 +21,21 @@ namespace DDay.iCal
             }
         }
 
+        #endregion
+
+        #region Constructors
+
         public CalendarParameterCollectionProxy(IGroupedList<string, ICalendarParameter> realObject) :
             base(realObject)
         {
         }
 
+        #endregion
+
+        #region ICalendarParameterCollection
+
         virtual public void SetParent(ICalendarObject parent)
-        {
+        {            
             foreach (ICalendarParameter parameter in this)
             {
                 parameter.Parent = parent;
@@ -113,5 +123,7 @@ namespace DDay.iCal
             {                
             }
         }
+
+        #endregion
     }
 }

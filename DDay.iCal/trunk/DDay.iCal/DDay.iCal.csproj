@@ -117,7 +117,6 @@
     <Compile Include="Evaluation\TodoEvaluator.cs" />
     <Compile Include="Exceptions\EvaluationEngineException.cs" />
     <Compile Include="ExtensionMethods\CalendarObjectExtensions.cs" />
-    <Compile Include="ExtensionMethods\CalendarParameterListExtensions.cs" />
     <Compile Include="ExtensionMethods\ListExtensions.cs" />
     <Compile Include="General\CalendarObjectList.cs" />
     <Compile Include="General\Proxies\CalendarObjectListProxy.cs" />
