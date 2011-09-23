@@ -127,9 +127,9 @@ namespace DDay.iCal
             foreach (object removed in e.RemovedValues)
                 AssociationUtil.DeassociateItem(removed);
 
-            // Associate the new values with the parent object
+            // Associate the new values with this object.
             foreach (object added in e.AddedValues)
-                AssociationUtil.AssociateItem(added, Parent);
+                AssociationUtil.AssociateItem(added, this);
         }
 
         #endregion
