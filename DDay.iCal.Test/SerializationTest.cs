@@ -819,28 +819,6 @@ END:VCALENDAR
         }
 
         /// <summary>
-        /// Tests that a Google calendar is correctly loaded and parsed.
-        /// </summary>
-        [Test, Category("Serialization")]
-        public void Google2()
-        {
-            IICalendar iCal = iCalendar.LoadFromUri(new Uri("http://www.google.com/calendar/ical/tvhot064q4p48frqdalgo3fb2k%40group.calendar.google.com/public/basic.ics"))[0];
-            Assert.IsNotNull(iCal);
-            Assert.AreEqual(1, iCal.Events.Count);
-            Assert.AreEqual(1, iCal.TimeZones.Count);
-
-            string tzid = iCal.TimeZones[0].TZID;
-            IList<Occurrence> occurrences = iCal.GetOccurrences(new iCalDateTime(2009, 8, 24, tzid), new iCalDateTime(2009, 9, 28, tzid));
-            Assert.AreEqual(5, occurrences.Count);
-            Assert.AreEqual(new iCalDateTime(2009, 8, 26, 8, 0, 0, tzid), occurrences[0].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 2, 8, 0, 0, tzid), occurrences[1].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 9, 8, 0, 0, tzid), occurrences[2].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 16, 8, 0, 0, tzid), occurrences[3].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 9, 23, 8, 0, 0, tzid), occurrences[4].Period.StartTime);
-            Assert.AreEqual(new iCalDateTime(2009, 8, 26, 10, 0, 0, tzid), occurrences[0].Period.EndTime);
-        }
-
-        /// <summary>
         /// Tests that valid RDATE properties are parsed correctly.
         /// </summary>
         [Test, Category("Serialization")]
