@@ -145,7 +145,8 @@ namespace DDay.iCal
 
         static public IICalendarCollection LoadFromFile(string filepath, Encoding encoding, ISerializer serializer)
         {
-            FileStream fs = new FileStream(filepath, FileMode.Open);
+            // NOTE: Fixes bug #3211934 - Bug in iCalendar.cs - UnauthorizedAccessException
+            FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
 
             IICalendarCollection calendars = LoadFromStream(fs, encoding, serializer);
             fs.Close();
