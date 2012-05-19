@@ -93,7 +93,6 @@ namespace DDay.iCal
         {
             _Values = new List<object>();
             _Parameters = new CalendarParameterList(this, true);
-            ValueChanged += new EventHandler<ValueChangedEventArgs<object>>(CalendarProperty_ValueChanged);
         }        
 
         #endregion
@@ -118,22 +117,7 @@ namespace DDay.iCal
         }
 
         #endregion
-
-        #region Event Handlers
-
-        void CalendarProperty_ValueChanged(object sender, ValueChangedEventArgs<object> e)
-        {
-            // Deassociate the old values
-            foreach (object removed in e.RemovedValues)
-                AssociationUtil.DeassociateItem(removed);
-
-            // Associate the new values with this object.
-            foreach (object added in e.AddedValues)
-                AssociationUtil.AssociateItem(added, this);
-        }
-
-        #endregion
-
+        
         #region Overrides
 
         protected override void OnDeserializing(StreamingContext context)
