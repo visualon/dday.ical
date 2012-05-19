@@ -102,7 +102,15 @@ namespace DDay.iCal
 
         public override int GetHashCode()
         {
-            return StartTime.GetHashCode() ^ EndTime.GetHashCode();
+            if (StartTime != null)
+            {
+                if (EndTime != null)
+                {
+                    return (StartTime.GetHashCode() * 23) + EndTime.GetHashCode();
+                }
+                return StartTime.GetHashCode();
+            }
+            return 0;
         }
 
         public override string ToString()
