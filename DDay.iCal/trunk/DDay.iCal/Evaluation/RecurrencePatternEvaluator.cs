@@ -228,6 +228,8 @@ namespace DDay.iCal
             if (pattern.Count == int.MinValue)
             {
                 DateTime incremented = seedCopy;
+                // FIXME: we can more aggresively increment here when
+                // the difference between dates is greater.
                 IncrementDate(ref incremented, pattern, pattern.Interval);
                 while (incremented < periodStart)
                 {
@@ -764,17 +766,15 @@ namespace DDay.iCal
             }
             else if (pattern.Frequency == FrequencyType.Weekly || pattern.ByWeekNo.Count > 0)
             {
-                int weekNo = Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, pattern.FirstDayOfWeek);
+                // Rewind to the first day of the week
+                while (date.DayOfWeek != pattern.FirstDayOfWeek)
+                    date = date.AddDays(-1);
 
-                // construct a list of possible week days..
+                // Step forward until we're on the day of week we're interested in
                 while (date.DayOfWeek != dayOfWeek)
                     date = date.AddDays(1);
                 
-                while (Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, pattern.FirstDayOfWeek) == weekNo)
-                {
-                    days.Add(date);
-                    date = date.AddDays(7);
-                }
+                days.Add(date);                   
             }
             else if (pattern.Frequency == FrequencyType.Monthly || pattern.ByMonth.Count > 0)
             {
@@ -794,7 +794,7 @@ namespace DDay.iCal
             else if (pattern.Frequency == FrequencyType.Yearly)
             {
                 int year = date.Year;
-                
+
                 // construct a list of possible year days..
                 date = date.AddDays(-date.DayOfYear + 1);
                 while (date.DayOfWeek != dayOfWeek)
