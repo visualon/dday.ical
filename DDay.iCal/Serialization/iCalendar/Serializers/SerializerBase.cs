@@ -74,7 +74,7 @@ namespace DDay.iCal.Serialization.iCalendar
             encodingStack.Push(encoding);
 
             sw.Write(SerializeToString(obj));
-
+            sw.Flush();
             // Pop the current encoding off the serialization stack
             encodingStack.Pop();
 
