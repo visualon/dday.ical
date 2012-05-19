@@ -223,6 +223,15 @@ namespace DDay.iCal
             if (includeReferenceDateInResults)
                 dates.Add(seedCopy);
 
+            // If the interval is set to zero, or our count prevents us
+            // from getting additional items, then return with the reference
+            // date only.
+            if (pattern.Interval == 0 ||
+                (pattern.Count != int.MinValue && pattern.Count <= dates.Count))
+            {
+                return dates;
+            }
+
             // optimize the start time for selecting candidates
             // (only applicable where a COUNT is not specified)
             if (pattern.Count == int.MinValue)
