@@ -115,7 +115,18 @@ namespace DDay.iCal.Test
             Uri uri = new Uri(path);
             IICalendar iCal = iCalendar.LoadFromUri(uri)[0];
             Assert.AreEqual(14, iCal.Events.Count);
-        }        
+        }
+
+        /// <summary>
+        /// Ensures that Period.GetHashCode() does not throw NullReferenceException, even
+        /// if its properties are null.
+        /// </summary>
+        [Test]
+        public void Bug3258032()
+        {
+            Period p = new Period();
+            p.GetHashCode();
+        }
 
         /// <summary>
         /// The following test is an aggregate of MonthlyCountByMonthDay3() and MonthlyByDay1() in the
