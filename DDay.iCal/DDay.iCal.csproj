@@ -254,7 +254,6 @@
     <Compile Include="Serialization\SerializationContext.cs" />
     <Compile Include="Serialization\SerializationSettings.cs" />
     <Compile Include="Structs\TimeZoneObservance.cs" />
-    <Compile Include="Utility\AssociationUtil.cs" />
     <Compile Include="Utility\DateUtil.cs" />
     <Compile Include="Utility\KnownTypeHelper.cs" />
     <Compile Include="Utility\RecurrenceUtil.cs" />
