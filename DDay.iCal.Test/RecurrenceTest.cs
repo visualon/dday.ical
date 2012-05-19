@@ -2661,6 +2661,18 @@ namespace DDay.iCal.Test
             }
         }
 
+        [Test, Category("Recurrence")]
+        public void Bug3312617()
+        {
+            IICalendar calendar = iCalendar.LoadFromFile(@"Calendars\Recurrence\Bug3312617.ics").First();
+            iCalDateTime from = new iCalDateTime(new DateTime(2013, 1, 1)) { HasTime = true };
+            iCalDateTime to = new iCalDateTime(new DateTime(2015, 12, 31)) { HasTime = true };
+
+            var occurrences = calendar.GetOccurrences(from, to);
+            var daysDifference = to.Subtract(from).Days;
+            Assert.AreEqual(daysDifference, occurrences.Count);
+        }
+
         /// <summary>
         /// Tests the iCal holidays downloaded from apple.com
         /// </summary>
