@@ -2674,6 +2674,22 @@ namespace DDay.iCal.Test
         }
 
         /// <summary>
+        /// Ensures that DURATION of zero, INTERVAL of zero, and COUNT of zero are all valid
+        /// and behave as expected.
+        /// </summary>
+        [Test, Category("Serialization")]
+        public void Bug3312618and3522651()
+        {
+            IICalendar calendar = iCalendar.LoadFromFile(@"Calendars\Recurrence\Bug3312618and3522651.ics").First();
+            iCalDateTime from = new iCalDateTime(new DateTime(2010, 1, 1)) { HasTime = true };
+            iCalDateTime to = new iCalDateTime(new DateTime(2011, 12, 31)) { HasTime = true };
+
+            var occurrences = calendar.GetOccurrences(from, to);
+            Assert.AreEqual(1, occurrences.Count);
+            Assert.AreEqual(0, occurrences[0].Period.Duration.Ticks);
+        }
+
+        /// <summary>
         /// Tests the iCal holidays downloaded from apple.com
         /// </summary>
         [Test, Category("Recurrence")]

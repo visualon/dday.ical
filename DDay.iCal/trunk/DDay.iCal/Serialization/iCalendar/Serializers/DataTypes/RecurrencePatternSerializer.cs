@@ -397,8 +397,8 @@ namespace DDay.iCal.Serialization.iCalendar
                 if (r != null)
                 {
                     CheckMutuallyExclusive("COUNT", "UNTIL", r.Count, r.Until);
-                    CheckRange("INTERVAL", r.Interval, 1, int.MaxValue);
-                    CheckRange("COUNT", r.Count, 1, int.MaxValue);
+                    CheckRange("INTERVAL", r.Interval, 0, int.MaxValue);
+                    CheckRange("COUNT", r.Count, 0, int.MaxValue);
                     CheckRange("BYSECOND", r.BySecond, 0, 59);
                     CheckRange("BYMINUTE", r.ByMinute, 0, 59);
                     CheckRange("BYHOUR", r.ByHour, 0, 23);
