@@ -2690,6 +2690,39 @@ namespace DDay.iCal.Test
         }
 
         /// <summary>
+        /// Ensures that weekly recurrences behave correctly given a proven 1.0 beta candidate
+        /// failure scenario.
+        /// </summary>
+        [Test, Category("Serialization")]
+        public void Bug3414862()
+        {
+            IICalendar iCal = new iCalendar();
+            Event evt = iCal.Create<Event>();
+            RecurrencePattern rPattern = new RecurrencePattern();
+            rPattern.Frequency = FrequencyType.Weekly;
+            FrequencyOccurrence frequencyOccurrence = FrequencyOccurrence.First;
+            rPattern.ByDay.Add(new WeekDay(DayOfWeek.Wednesday, frequencyOccurrence));
+
+            DateTime startDateTime = new DateTime(2011, 1, 5, 13, 0, 0);
+            DateTime endDateTime = new DateTime(2013, 4, 3, 13, 45, 0);
+            evt.Start = new iCalDateTime(startDateTime);
+
+            evt.Duration = new TimeSpan(0, 45, 0);
+            rPattern.Until = endDateTime;
+            evt.RecurrenceRules.Add(rPattern);
+
+            DateTime thruDateTime = new DateTime(2013, 3, 6);
+
+            IList<Occurrence> occurrences = iCal.GetOccurrences(startDateTime, thruDateTime.Date.AddDays(1).AddSeconds(-1));
+
+            // There should be exactly 114 occurrences 
+            Assert.AreEqual(114, occurrences.Count);
+
+            // The last occurrence should be on march 6th
+            Assert.AreEqual(new DateTime(2013, 3, 6), occurrences.Last().Period.StartTime.Date);
+        }
+
+        /// <summary>
         /// Tests the iCal holidays downloaded from apple.com
         /// </summary>
         [Test, Category("Recurrence")]
