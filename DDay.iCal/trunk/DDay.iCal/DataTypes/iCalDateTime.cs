@@ -86,8 +86,12 @@ namespace DDay.iCal
         }
         public iCalDateTime(int year, int month, int day)
             : this(year, month, day, 0, 0, 0) { }
+        public iCalDateTime(int year, int month, int day, bool hasTime)
+            : this(year, month, day, 0, 0, 0) { HasTime = hasTime; }
         public iCalDateTime(int year, int month, int day, string tzid)
             : this(year, month, day, 0, 0, 0, tzid) { }
+        public iCalDateTime(int year, int month, int day, string tzid, bool hasTime)
+            : this(year, month, day, 0, 0, 0, tzid) { HasTime = hasTime; }
 
         public iCalDateTime(string value)
         {

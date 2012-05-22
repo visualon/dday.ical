@@ -2665,8 +2665,8 @@ namespace DDay.iCal.Test
         public void Bug3312617()
         {
             IICalendar calendar = iCalendar.LoadFromFile(@"Calendars\Recurrence\Bug3312617.ics").First();
-            iCalDateTime from = new iCalDateTime(new DateTime(2013, 1, 1)) { HasTime = true };
-            iCalDateTime to = new iCalDateTime(new DateTime(2015, 12, 31)) { HasTime = true };
+            iCalDateTime from = new iCalDateTime(2013, 1, 1, true);
+            iCalDateTime to = new iCalDateTime(2015, 12, 31, true);
 
             var occurrences = calendar.GetOccurrences(from, to);
             var daysDifference = to.Subtract(from).Days;
@@ -2677,23 +2677,34 @@ namespace DDay.iCal.Test
         /// Ensures that DURATION of zero, INTERVAL of zero, and COUNT of zero are all valid
         /// and behave as expected.
         /// </summary>
-        [Test, Category("Serialization")]
+        [Test, Category("Recurrence")]
         public void Bug3312618and3522651()
         {
             IICalendar calendar = iCalendar.LoadFromFile(@"Calendars\Recurrence\Bug3312618and3522651.ics").First();
-            iCalDateTime from = new iCalDateTime(new DateTime(2010, 1, 1)) { HasTime = true };
-            iCalDateTime to = new iCalDateTime(new DateTime(2011, 12, 31)) { HasTime = true };
+            iCalDateTime from = new iCalDateTime(2010, 1, 1, true);
+            iCalDateTime to = new iCalDateTime(2011, 12, 31, true);
 
             var occurrences = calendar.GetOccurrences(from, to);
             Assert.AreEqual(1, occurrences.Count);
             Assert.AreEqual(0, occurrences[0].Period.Duration.Ticks);
         }
 
+        [Test, Category("Recurrence")]
+        public void Bug3312619()
+        {
+            IICalendar calendar = iCalendar.LoadFromFile(@"Calendars\Recurrence\Bug3312619.ics").First();
+            iCalDateTime from = new iCalDateTime(2011, 6, 1) { HasTime = true };
+            iCalDateTime to = new iCalDateTime(2012, 7, 1) { HasTime = true };
+
+            var occurrences = calendar.GetOccurrences(from, to);
+            Assert.AreEqual(59, occurrences.Count);
+        }
+
         /// <summary>
         /// Ensures that weekly recurrences behave correctly given a proven 1.0 beta candidate
         /// failure scenario.
         /// </summary>
-        [Test, Category("Serialization")]
+        [Test, Category("Recurrence")]
         public void Bug3414862()
         {
             IICalendar iCal = new iCalendar();
