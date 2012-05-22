@@ -438,6 +438,20 @@ namespace DDay.iCal.Test
         }
 
         [Test, Category("Serialization")]
+        public void Bug3373224()
+        {
+            var attendee = new Attendee();
+            var serializer = new AttendeeSerializer();
+
+            var serialized = serializer.SerializeToString(attendee);
+            Assert.IsNull(serialized);
+
+            attendee.Value = new Uri("mailto:test@test.com");
+            serialized = serializer.SerializeToString(attendee);
+            Assert.AreEqual("mailto:test@test.com", serialized);
+        }
+
+        [Test, Category("Serialization")]
         public void Calendar1()
         {
             SerializeTest("Calendar1.ics", typeof(iCalendarSerializer));
