@@ -174,7 +174,6 @@
     <Compile Include="Serialization\iCalendar\Serializers\DataTypes\RecurrencePatternSerializer.cs" />
     <Compile Include="Serialization\iCalendar\Serializers\Other\TimeSpanSerializer.cs" />
     <Compile Include="Serialization\iCalendar\Serializers\DataTypes\UTCOffsetSerializer.cs" />
-    <Compile Include="Serialization\iCalendar\Serializers\GenericListSerializer.cs" />
     <Compile Include="Serialization\iCalendar\Serializers\Other\StringSerializer.cs" />
     <Compile Include="Serialization\EncodingProvider.cs" />
     <Compile Include="Structs\AlarmOccurrence.cs" />

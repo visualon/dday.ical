@@ -200,7 +200,7 @@ v=value
 	object deserialized = dataMapSerializer.Deserialize(new StringReader(v));
     if (deserialized != null)
     {
-		// Try to determine if this is was deserialized as a *list*
+		// Try to determine if this was deserialized as a *list*
 		// of concrete types.
         Type targetType = dataMapSerializer.TargetType;
         Type listOfTargetType = typeof(IList<>).MakeGenericType(targetType);

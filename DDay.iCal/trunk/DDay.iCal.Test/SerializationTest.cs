@@ -437,6 +437,26 @@ namespace DDay.iCal.Test
             File.Delete(filename);
         }
 
+        /// <summary>
+        /// [from Jon Udell]:
+        /// 
+        /// The first thing I looked at was this Trumba feed 
+        /// -- http://www.trumba.com/calendars/seattlegov-city-wide.ics -- which was provoking an error.
+        /// I tracked it down to this antlr exception:
+        /// 
+        /// {"expecting \"EQUAL\", found 'YPE'"}
+        /// 
+        /// which I guess is coming from this property:
+        /// 
+        /// X-TRUMBA-CUSTOMFIELD;NAME="Event Type";ID=21;TYPE=number:Master Submissi
+        ///  on Form Template
+        /// </summary>
+        [Test, Category("Serialization")]
+        public void Bug3363485()
+        {
+            SerializeTest("Bug3363485.ics", typeof(iCalendarSerializer));
+        }
+
         [Test, Category("Serialization")]
         public void Bug3373224()
         {
@@ -449,6 +469,38 @@ namespace DDay.iCal.Test
             attendee.Value = new Uri("mailto:test@test.com");
             serialized = serializer.SerializeToString(attendee);
             Assert.AreEqual("mailto:test@test.com", serialized);
+        }
+
+        [Test, Category("Serialization")]
+        public void Bug3512192()
+        {
+            var iCal = new iCalendar();
+            iCal.Method = "PUBLISH";
+            var evt = iCal.Create<Event>();
+            evt.Summary = "Test Event";
+            evt.Start = new iCalDateTime(2012, 3, 27, 22, 00, 00);
+            evt.Duration = TimeSpan.FromHours(1);
+
+            var attendees = new List<IAttendee>();
+            var attendee = new Attendee("MAILTO:someid@test.com")
+            {
+                CommonName = "Test Name",
+                Role = "OPT-PARTICIPANT",
+                AssociatedObject = evt,
+                Members = new List<string>() { "Other", "Name" }
+            };
+            attendees.Add(attendee);
+            if (attendees != null && 
+                attendees.Count > 0)
+            {
+                evt.Attendees = attendees;
+            }
+
+            // Serialize (save) the iCalendar 
+            var serializer = new iCalendarSerializer(iCal);
+            var result = serializer.SerializeToString(iCal);
+
+            GC.KeepAlive(result);
         }
 
         [Test, Category("Serialization")]
