@@ -2733,6 +2733,19 @@ namespace DDay.iCal.Test
             Assert.AreEqual(new DateTime(2013, 3, 6), occurrences.Last().Period.StartTime.Date);
         }
 
+        [Test, Category("Recurrence")]
+        public void Bug3517553()
+        {
+            var calendars = iCalendar.LoadFromFile(@"Calendars\Recurrence\Bug3517553.ics");
+            
+            var from = new DateTime(2012, 4, 13);
+            var to = from.AddDays(365);
+            IList<Occurrence> occurrences = calendars.GetOccurrences(DateTime.Today, DateTime.Today.AddDays(365));
+
+            // There are exactly 19 events (no recurrences) in the test file.
+            Assert.AreEqual(19, occurrences.Count);
+        }
+
         /// <summary>
         /// Tests the iCal holidays downloaded from apple.com
         /// </summary>
