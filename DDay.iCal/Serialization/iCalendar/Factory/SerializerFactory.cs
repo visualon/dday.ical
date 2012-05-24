@@ -46,6 +46,8 @@ namespace DDay.iCal.Serialization.iCalendar
                 {
                     if (typeof(IEvent).IsAssignableFrom(objectType))
                         s = new EventSerializer();
+                    else if (typeof(IUniqueComponent).IsAssignableFrom(objectType))
+                        s = new UniqueComponentSerializer();
                     else
                         s = new ComponentSerializer();
                 }

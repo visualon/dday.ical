@@ -54,8 +54,12 @@ namespace DDay.iCal
                 // the iCalendar standard doesn't care at all about milliseconds.  Therefore, when comparing
                 // two calendars, one generated, and one loaded from file, they may be functionally identical,
                 // but be determined to be different due to millisecond differences.
-                DateTime now = DateTime.Now;
-                DTStamp = new iCalDateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);                
+                //
+                // NOTE: also ensure we're in UTC, so our CLR implementation closely matches the RFC.
+                // See bug #3485766.
+                DateTime now = DateTime.UtcNow;
+                DTStamp = new iCalDateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+                DTStamp.IsUniversalTime = true;
             }            
         }
 

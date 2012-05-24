@@ -472,6 +472,31 @@ namespace DDay.iCal.Test
         }
 
         [Test, Category("Serialization")]
+        public void Bug3485766()
+        {
+            IICalendar calendar = new iCalendar();
+            IEvent evt = calendar.Create<Event>();
+            evt.Start = new iCalDateTime(2012, 5, 23, 8, 0, 0);
+            evt.Duration = TimeSpan.FromMinutes(30);
+
+            // Ensure the DTStamp is in universal time to begin with
+            Assert.IsTrue(evt.DTStamp.IsUniversalTime);
+
+            // Convert to local time
+            evt.DTStamp = new iCalDateTime(evt.DTStamp.Local);
+
+            // Serialize the calendar
+            var serializer = new iCalendarSerializer();
+            var serialized = serializer.SerializeToString(calendar);
+            IICalendarCollection calendars = serializer.Deserialize(new StringReader(serialized)) as IICalendarCollection;
+            calendar = calendars.First();
+            evt = calendar.Events[0];
+
+            // Ensure the object was serialized as UTC
+            Assert.IsTrue(evt.DTStamp.IsUniversalTime);
+        }
+
+        [Test, Category("Serialization")]
         public void Bug3512192()
         {
             var iCal = new iCalendar();
