@@ -6,7 +6,7 @@ using System.IO;
 namespace DDay.iCal.Serialization.iCalendar
 {
     public class EventSerializer :
-        ComponentSerializer
+        UniqueComponentSerializer
     {
         #region Constructor
 
