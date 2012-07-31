@@ -117,11 +117,17 @@ namespace DDay.iCal
 
                         // FIXME: 5 years is an arbitrary number, to eliminate the need
                         // to recalculate time zone information as much as possible.
-                        DateTime offsetEnd = periodEnd.AddYears(5); 
+                        DateTime offsetEnd = periodEnd.AddYears(5);
+
+                        // Adjust our reference date to never fall out of bounds with
+                        // the time zone information
+                        var tziReferenceDate = referenceDate;
+                        if (tziReferenceDate.LessThan(curr.Start))
+                            tziReferenceDate = curr.Start;
 
                         // Determine the UTC occurrences of the Time Zone observances
                         IList<IPeriod> periods = evaluator.Evaluate(
-                            referenceDate,
+                            tziReferenceDate,
                             periodStart,
                             offsetEnd,
                             includeReferenceDateInResults);

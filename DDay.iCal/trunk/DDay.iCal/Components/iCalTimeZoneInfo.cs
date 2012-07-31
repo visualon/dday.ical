@@ -3,6 +3,7 @@ using System.Data;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace DDay.iCal
@@ -146,29 +147,37 @@ namespace DDay.iCal
         {
             if (Parent == null)
                 throw new Exception("Cannot call GetObservance() on a TimeZoneInfo whose Parent property is null.");
-
-            // Normalize date/time values within this time zone to a UTC value.
-            DateTime normalizedDt = dt.Value;
+                        
             if (string.Equals(dt.TZID, TZID))
             {
-                dt = new iCalDateTime(OffsetTo.ToUTC(dt.Value));
-                normalizedDt = OffsetTo.ToUTC(normalizedDt);
-            }
+                // Normalize date/time values within this time zone to a local value.
+                DateTime normalizedDt = dt.Value;
 
-            // Let's evaluate our time zone observances to find the 
-            // observance that applies to this date/time value.
-            IEvaluator parentEval = Parent.GetService(typeof(IEvaluator)) as IEvaluator;
-            if (parentEval != null)
-            {
-                // Evaluate the date/time in question.
-                parentEval.Evaluate(Start, DateUtil.GetSimpleDateTimeData(Start), normalizedDt, true);
-                foreach (IPeriod period in m_Evaluator.Periods)
+                // Let's evaluate our time zone observances to find the 
+                // observance that applies to this date/time value.
+                IEvaluator parentEval = Parent.GetService(typeof(IEvaluator)) as IEvaluator;
+                if (parentEval != null)
                 {
-                    if (period.Contains(dt))
+                    // Evaluate the date/time in question.
+                    parentEval.Evaluate(Start, DateUtil.GetSimpleDateTimeData(Start), normalizedDt, true);
+
+                    // NOTE: We avoid using period.Contains here, because we want to avoid
+                    // doing an inadvertent time zone lookup with it.
+                    var period = m_Evaluator
+                        .Periods
+                        .FirstOrDefault(p =>
+                            p.StartTime.Value <= normalizedDt &&
+                            p.EndTime.Value > normalizedDt
+                        );
+
+                    if (period != null)
+                    {
                         return new TimeZoneObservance(period, this);
+                    }
                 }
             }
-            return null;
+
+            return null;            
         }
 
         virtual public bool Contains(IDateTime dt)
