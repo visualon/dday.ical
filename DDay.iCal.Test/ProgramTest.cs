@@ -288,19 +288,17 @@ namespace DDay.iCal.Test
             Assert.IsNotNull(tzi);
 
             iCalendar iCal = new iCalendar();
-            iCalTimeZone tz = iCalTimeZone.FromSystemTimeZone(tzi, new DateTime(2000, 1, 1), false);
-            Assert.IsNotNull(tz);
-            iCal.AddChild(tz);
+            ITimeZone tz = iCal.AddTimeZone(tzi, new DateTime(2000, 1, 1), false);
 
             iCalendarSerializer serializer = new iCalendarSerializer();
             serializer.Serialize(iCal, @"Calendars\Serialization\SystemTimeZone1.ics");
 
             // Ensure the time zone transition works as expected
             // (i.e. it takes 1 hour and 1 second to transition from
-            // 2003-10-26 12:59:59 AM to
-            // 2003-10-26 01:00:00 AM)
-            iCalDateTime dt1 = new iCalDateTime(2003, 10, 26, 0, 59, 59, tz.TZID, iCal);
-            iCalDateTime dt2 = new iCalDateTime(2003, 10, 26, 1, 0, 0, tz.TZID, iCal);
+            // 2003-10-26 1:59:59 AM to
+            // 2003-10-26 2:00:00 AM)
+            iCalDateTime dt1 = new iCalDateTime(2003, 10, 26, 1, 59, 59, tz.TZID, iCal);
+            iCalDateTime dt2 = new iCalDateTime(2003, 10, 26, 2, 0, 0, tz.TZID, iCal);
 
             TimeSpan result = dt2 - dt1;
             Assert.AreEqual(TimeSpan.FromHours(1) + TimeSpan.FromSeconds(1), result);
@@ -309,6 +307,9 @@ namespace DDay.iCal.Test
             // (i.e. it takes negative 59 minutes and 59 seconds to transition from
             // 2004-04-04 01:59:59 AM to
             // 2004-04-04 02:00:00 AM)
+            
+            // NOTE: We have a negative difference between the two values
+            // because we 'spring ahead', and an hour is lost.
             dt1 = new iCalDateTime(2004, 4, 4, 1, 59, 59, tz.TZID, iCal);
             dt2 = new iCalDateTime(2004, 4, 4, 2, 0, 0, tz.TZID, iCal);
             result = dt2 - dt1;
@@ -333,17 +334,17 @@ namespace DDay.iCal.Test
 
             // Ensure the time zone transition works as expected
             // (i.e. it takes 1 hour and 1 second to transition from
-            // 2003-10-26 12:59:59 AM to
-            // 2003-10-26 01:00:00 AM)
-            iCalDateTime dt1 = new iCalDateTime(2003, 10, 26, 0, 59, 59, tz.TZID, iCal);
-            iCalDateTime dt2 = new iCalDateTime(2003, 10, 26, 1, 0, 0, tz.TZID, iCal);
+            // 2003-10-26 1:59:59 AM to
+            // 2003-10-26 2:00:00 AM)
+            iCalDateTime dt1 = new iCalDateTime(2003, 10, 26, 1, 59, 59, tz.TZID, iCal);
+            iCalDateTime dt2 = new iCalDateTime(2003, 10, 26, 2, 0, 0, tz.TZID, iCal);
             TimeSpan result = dt2 - dt1;
             Assert.AreEqual(TimeSpan.FromHours(1) + TimeSpan.FromSeconds(1), result);
 
             // Ensure another time zone transition works as expected
             // (i.e. it takes negative 59 minutes and 59 seconds to transition from
-            // 2004-04-04 01:59:59 AM to
-            // 2004-04-04 02:00:00 AM)
+            // 2004-04-04 1:59:59 AM to
+            // 2004-04-04 2:00:00 AM)
             dt1 = new iCalDateTime(2004, 4, 4, 1, 59, 59, tz.TZID, iCal);
             dt2 = new iCalDateTime(2004, 4, 4, 2, 0, 0, tz.TZID, iCal);
             result = dt2 - dt1;

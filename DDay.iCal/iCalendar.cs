@@ -641,7 +641,7 @@ namespace DDay.iCal
         {
             foreach (ITimeZone tz in TimeZones)
             {
-                if (tz.TZID.Equals(tzid))
+                if (object.Equals(tz.TZID, tzid))
                 {
                     return tz;
                 }
