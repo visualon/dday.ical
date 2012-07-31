@@ -144,7 +144,9 @@ namespace DDay.iCal
 
                 // Copy parameters
                 foreach (ICalendarParameter parm in p.Parameters)
-                    this.AddChild(parm.Copy<ICalendarParameter>());
+                {
+                    AddParameter(parm.Copy<ICalendarParameter>());
+                }
             }
         }
 
