@@ -133,6 +133,9 @@
     <None Include="Calendars\Serialization\Bug3363485.ics">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Calendars\Serialization\Bug3379920.ics">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\AssemblyInfo.cs.template" />
     <Compile Include="RecurrenceTest.cs" />
     <Compile Include="SerializationTest.cs" />
