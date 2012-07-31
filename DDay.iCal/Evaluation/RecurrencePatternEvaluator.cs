@@ -73,9 +73,17 @@ namespace DDay.iCal
             RecurrencePattern r = new RecurrencePattern();
             r.CopyFrom(Pattern);
 
-            // Convert the UNTIL value to one that matches the same time information as the reference date
+            // Convert the UNTIL value to a local date/time based on the time zone information that
+            // is in the reference date
             if (r.Until != DateTime.MinValue)
-                r.Until = DateUtil.MatchTimeZone(referenceDate, new iCalDateTime(r.Until)).Value;
+            {
+                // Build an iCalDateTime with the correct time zone & calendar
+                var until = new iCalDateTime(r.Until, referenceDate.TZID);
+                until.AssociatedObject = referenceDate.AssociatedObject;
+
+                // Convert back to local time so time zone comparisons match
+                r.Until = until.Local;
+            }
 
             if (r.Frequency > FrequencyType.Secondly &&
                 r.BySecond.Count == 0 &&
