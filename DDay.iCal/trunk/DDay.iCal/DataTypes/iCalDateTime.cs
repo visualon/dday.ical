@@ -216,7 +216,7 @@ namespace DDay.iCal
             }
             else if (obj is DateTime)
             {
-                iCalDateTime dt = (iCalDateTime)obj;
+                iCalDateTime dt = new iCalDateTime((DateTime)obj);
                 this.AssociateWith(dt);
                 return object.Equals(dt.UTC, UTC);
             }

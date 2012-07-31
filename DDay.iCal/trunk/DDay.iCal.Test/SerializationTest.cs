@@ -438,6 +438,17 @@ namespace DDay.iCal.Test
         }
 
         /// <summary>
+        /// https://sourceforge.net/tracker/?func=detail&aid=3354307&group_id=187422&atid=921236
+        /// </summary>
+        [Test, Category("Serialization")]
+        public void Bug3354307()
+        {
+            var now = DateTime.Now;
+            var dt = new iCalDateTime(now);
+            Assert.AreEqual(dt, (object)now);
+        }
+
+        /// <summary>
         /// [from Jon Udell]:
         /// 
         /// The first thing I looked at was this Trumba feed 
@@ -530,6 +541,31 @@ namespace DDay.iCal.Test
             Assert.AreEqual("Test Name", evt.Attendees[0].CommonName);
             Assert.AreEqual("OPT-PARTICIPANT", evt.Attendees[0].Role);
             Assert.AreEqual(1, evt.Attendees[0].Members.Count);
+        }
+
+        /// <summary>
+        /// See https://sourceforge.net/tracker/?func=detail&aid=3534283&group_id=187422&atid=921236
+        /// </summary>
+        [Test, Category("Serialization")]
+        public void Bug3534283()
+        {
+            IICalendar iCal = new iCalendar();
+            var start = new DateTime(2000, 1, 1);
+            Event evt = new Event();
+            evt.RecurrenceDates.Add(new PeriodList { new Period(new iCalDateTime(start), new iCalDateTime(new DateTime(2000, 1, 2))) });
+            evt.Summary = "Testing";
+            evt.Start = new iCalDateTime(2010, 3, 25);
+            evt.End = new iCalDateTime(2010, 3, 26);
+
+            iCal.Events.Add(evt);
+
+            Assert.That(((IEvent)iCal.Children[0]).RecurrenceDates[0][0].StartTime.Local, Is.EqualTo(start));
+
+            var bar = new iCalendarSerializer().SerializeToString(iCal);
+
+            var foobar = iCalendar.LoadFromStream(new StringReader(bar)).First().Events.First();
+
+            Assert.That(foobar.RecurrenceDates[0][0].StartTime.Local, Is.EqualTo(start));
         }
 
         /// <summary>
