@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -11,6 +12,13 @@ namespace DDay.iCal.Serialization.iCalendar
     public class DateTimeSerializer : 
         EncodableDataTypeSerializer
     {
+        #region Constants
+
+        private const string dateOnlyPattern = @"^((\d{4})(\d{2})(\d{2}))?$";
+        private const string fullPattern = @"^((\d{4})(\d{2})(\d{2}))T((\d{2})(\d{2})(\d{2})(Z)?)$";
+
+        #endregion
+
         #region Private Methods
 
         private DateTime CoerceDateTime(int year, int month, int day, int hour, int minute, int second, DateTimeKind kind)
@@ -94,10 +102,6 @@ namespace DDay.iCal.Serialization.iCalendar
             {
                 // Decode the value as necessary
                 value = Decode(dt, value);
-                string[] values = value.Split('T');
-
-                string dateOnlyPattern = @"^((\d{4})(\d{2})(\d{2}))?$";
-                string fullPattern = @"^((\d{4})(\d{2})(\d{2}))T((\d{2})(\d{2})(\d{2})(Z)?)$";
 
                 Match match = Regex.Match(value, fullPattern, RegexOptions.IgnoreCase);
                 if (!match.Success)
@@ -119,16 +123,33 @@ namespace DDay.iCal.Serialization.iCalendar
                     if (match.Groups[1].Success)
                     {
                         dt.HasDate = true;
+                        dt.HasTime = false;                
                         year = Convert.ToInt32(match.Groups[2].Value);
                         month = Convert.ToInt32(match.Groups[3].Value);
                         date = Convert.ToInt32(match.Groups[4].Value);
                     }
                     if (match.Groups.Count >= 6 && match.Groups[5].Success)
                     {
-                        dt.HasTime = true;
-                        hour = Convert.ToInt32(match.Groups[6].Value);
-                        minute = Convert.ToInt32(match.Groups[7].Value);
-                        second = Convert.ToInt32(match.Groups[8].Value);
+                        // If 'VALUE=DATE' is present, then
+                        // let's force dt.HasTime to false.
+                        // NOTE: Fixes bug #3534283 - DateTimeSerializer bug on deserializing dates without time
+                        if (dt.Parameters.ContainsKey("VALUE"))
+                        {
+                            var valueType = dt.Parameters.Get("VALUE");
+                            if (valueType != "DATE")
+                                dt.HasTime = true;
+                        }
+                        else
+                        {
+                            dt.HasTime = true;
+                        }
+
+                        if (dt.HasTime)
+                        {
+                            hour = Convert.ToInt32(match.Groups[6].Value);
+                            minute = Convert.ToInt32(match.Groups[7].Value);
+                            second = Convert.ToInt32(match.Groups[8].Value);
+                        }
                     }
 
                     if (match.Groups[9].Success)
