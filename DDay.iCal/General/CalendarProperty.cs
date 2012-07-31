@@ -105,7 +105,7 @@ namespace DDay.iCal
         virtual public void AddParameter(string name, string value)
         {            
             CalendarParameter p = new CalendarParameter(name, value);
-            Parameters.Add(p);
+            AddParameter(p);
         }
 
         /// <summary>
