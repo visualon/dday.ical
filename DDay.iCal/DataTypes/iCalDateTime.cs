@@ -38,7 +38,7 @@ namespace DDay.iCal
             get
             {
                 return new iCalDateTime(DateTime.Today);
-            }            
+            }
         }
 
         #endregion
@@ -60,8 +60,8 @@ namespace DDay.iCal
         {
             Initialize(value.Value, value.TZID, null);
         }
-        public iCalDateTime(DateTime value) : this(value, null) {}
-        public iCalDateTime(DateTime value, string tzid) 
+        public iCalDateTime(DateTime value) : this(value, null) { }
+        public iCalDateTime(DateTime value, string tzid)
         {
             Initialize(value, tzid, null);
         }
@@ -128,7 +128,7 @@ namespace DDay.iCal
             this.HasTime = (value.Second == 0 && value.Minute == 0 && value.Hour == 0) ? false : true;
             if (tzo.TimeZoneInfo != null)
                 this.TZID = tzo.TimeZoneInfo.TZID;
-            this.TimeZoneObservance = tzo;            
+            this.TimeZoneObservance = tzo;
             this.AssociatedObject = tzo.TimeZoneInfo;
         }
 
@@ -146,23 +146,23 @@ namespace DDay.iCal
                 if (year > 9999)
                     dt = DateTime.MaxValue;
                 else if (year > 0)
-                    dt = new DateTime(year, month, day, hour, minute, second, kind);                
+                    dt = new DateTime(year, month, day, hour, minute, second, kind);
             }
             catch
-            {                
+            {
             }
 
             return dt;
         }
-        
+
         #endregion
 
         #region Protected Methods
 
         protected TimeZoneObservance? GetTimeZoneObservance()
         {
-            if (_TimeZoneObservance == null && 
-                TZID != null && 
+            if (_TimeZoneObservance == null &&
+                TZID != null &&
                 Calendar != null)
             {
                 ITimeZone tz = Calendar.GetTimeZone(TZID);
@@ -199,14 +199,14 @@ namespace DDay.iCal
             if (dt != null)
             {
                 _Value = dt.Value;
-                _IsUniversalTime = dt.IsUniversalTime;                
+                _IsUniversalTime = dt.IsUniversalTime;
                 _HasDate = dt.HasDate;
                 _HasTime = dt.HasTime;
-                
+
                 AssociateWith(dt);
             }
         }
-        
+
         public override bool Equals(object obj)
         {
             if (obj is IDateTime)
@@ -220,7 +220,7 @@ namespace DDay.iCal
                 this.AssociateWith(dt);
                 return object.Equals(dt.UTC, UTC);
             }
-            return false;            
+            return false;
         }
 
         public override int GetHashCode()
@@ -298,7 +298,7 @@ namespace DDay.iCal
         }
 
         public static IDateTime operator -(iCalDateTime left, TimeSpan right)
-        {            
+        {
             IDateTime copy = left.Copy<IDateTime>();
             copy.Value -= right;
             return copy;
@@ -321,18 +321,30 @@ namespace DDay.iCal
         #region IDateTime Members
 
         /// <summary>
-        /// Converts the date/time to this computer's local date/time.
+        /// Converts the date/time to local time, according to the time
+        /// zone specified in the TZID property.
         /// </summary>
         public DateTime Local
         {
             get
             {
-                if (!HasTime)
-                    return DateTime.SpecifyKind(Value.Date, DateTimeKind.Local);
-                else if (IsUniversalTime)
-                    return Value.ToLocalTime();
-                else
-                    return UTC.ToLocalTime();
+                if (IsUniversalTime &&
+                    TZID != null)
+                {
+                    DateTime value = HasTime ? Value : Value.Date;
+
+                    // Get the Time Zone Observance, if possible
+                    TimeZoneObservance? tzi = TimeZoneObservance;
+                    if (tzi == null || !tzi.HasValue)
+                        tzi = GetTimeZoneObservance();
+
+                    if (tzi != null && tzi.HasValue)
+                    {
+                        Debug.Assert(tzi.Value.TimeZoneInfo.OffsetTo != null);
+                        return DateTime.SpecifyKind(tzi.Value.TimeZoneInfo.OffsetTo.ToLocal(value), DateTimeKind.Local);
+                    }
+                }
+                return DateTime.SpecifyKind(HasTime ? Value : Value.Date, DateTimeKind.Local);
             }
         }
 
@@ -360,7 +372,7 @@ namespace DDay.iCal
                         return DateTime.SpecifyKind(tzi.Value.TimeZoneInfo.OffsetTo.ToUTC(value), DateTimeKind.Utc);
                     }
                 }
-                 
+
                 // Fallback to the OS-conversion
                 return DateTime.SpecifyKind(Value, DateTimeKind.Local).ToUniversalTime();
             }
@@ -380,7 +392,7 @@ namespace DDay.iCal
             {
                 _TimeZoneObservance = value;
                 if (value != null &&
-                    value.HasValue &&                    
+                    value.HasValue &&
                     value.Value.TimeZoneInfo != null)
                 {
                     this.TZID = value.Value.TimeZoneInfo.TZID;
@@ -421,12 +433,12 @@ namespace DDay.iCal
 
                     // Reset the time zone info if the new date/time doesn't
                     // fall within this time zone observance.
-                    if (_TimeZoneObservance != null && 
+                    if (_TimeZoneObservance != null &&
                         _TimeZoneObservance.HasValue &&
                         !_TimeZoneObservance.Value.Contains(this))
                         _TimeZoneObservance = null;
                 }
-                    
+
             }
         }
 
@@ -450,10 +462,10 @@ namespace DDay.iCal
                 if (!object.Equals(TZID, value))
                 {
                     Parameters.Set("TZID", value);
-                    
+
                     // Set the time zone observance to null if the TZID
                     // doesn't match.
-                    if (value != null && 
+                    if (value != null &&
                         _TimeZoneObservance != null &&
                         _TimeZoneObservance.HasValue &&
                         _TimeZoneObservance.Value.TimeZoneInfo != null &&
@@ -518,7 +530,7 @@ namespace DDay.iCal
             get
             {
                 IDateTime dt = Copy<IDateTime>();
-                dt.Value = Value.AddDays(-Value.DayOfYear+1).Date;
+                dt.Value = Value.AddDays(-Value.DayOfYear + 1).Date;
                 return dt;
             }
         }
@@ -528,7 +540,7 @@ namespace DDay.iCal
             get
             {
                 IDateTime dt = Copy<IDateTime>();
-                dt.Value = Value.AddDays(-Value.Day+1).Date;
+                dt.Value = Value.AddDays(-Value.Day + 1).Date;
                 return dt;
             }
         }
@@ -575,7 +587,7 @@ namespace DDay.iCal
                     ITimeZone tz = Calendar.GetTimeZone(tzid);
                     if (tz != null)
                         return ToTimeZone(tz);
-                    
+
                     // FIXME: sometimes a calendar is perfectly valid but the time zone
                     // could not be resolved.  What should we do here?
                     //throw new Exception("The '" + tzid + "' time zone could not be resolved.");
@@ -671,7 +683,7 @@ namespace DDay.iCal
             dt.HasTime = true;
             dt.Value = Value.AddTicks(ticks);
             return dt;
-        }           
+        }
 
         public bool LessThan(IDateTime dt)
         {
@@ -745,10 +757,10 @@ namespace DDay.iCal
 
         public string ToString(string format, IFormatProvider formatProvider)
         {
-            string tz = TimeZoneName;            
+            string tz = TimeZoneName;
             if (!string.IsNullOrEmpty(tz))
                 tz = " " + tz;
-            
+
             if (format != null)
                 return Value.ToString(format, formatProvider) + tz;
             else if (HasTime && HasDate)
