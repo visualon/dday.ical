@@ -482,6 +482,15 @@ namespace DDay.iCal.Test
             Assert.AreEqual("mailto:test@test.com", serialized);
         }
 
+        /// <summary>
+        /// https://sourceforge.net/tracker/?func=detail&aid=3379920&group_id=187422&atid=921236
+        /// </summary>
+        [Test, Category("Serialization")]
+        public void Bug3379920()
+        {
+            SerializeTest("Bug3379920.ics", typeof(iCalendarSerializer));
+        }
+
         [Test, Category("Serialization")]
         public void Bug3485766()
         {
