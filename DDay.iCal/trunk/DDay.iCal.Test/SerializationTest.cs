@@ -499,9 +499,9 @@ namespace DDay.iCal.Test
         [Test, Category("Serialization")]
         public void Bug3512192()
         {
-            var iCal = new iCalendar();
-            iCal.Method = "PUBLISH";
-            var evt = iCal.Create<Event>();
+            IICalendar calendar = new iCalendar();
+            calendar.Method = "PUBLISH";
+            IEvent evt = calendar.Create<Event>();
             evt.Summary = "Test Event";
             evt.Start = new iCalDateTime(2012, 3, 27, 22, 00, 00);
             evt.Duration = TimeSpan.FromHours(1);
@@ -511,21 +511,50 @@ namespace DDay.iCal.Test
             {
                 CommonName = "Test Name",
                 Role = "OPT-PARTICIPANT",
-                AssociatedObject = evt,
                 Members = new List<string>() { "Other", "Name" }
             };
             attendees.Add(attendee);
-            if (attendees != null && 
-                attendees.Count > 0)
-            {
-                evt.Attendees = attendees;
-            }
+            
+            evt.Attendees = attendees;
 
             // Serialize (save) the iCalendar 
-            var serializer = new iCalendarSerializer(iCal);
-            var result = serializer.SerializeToString(iCal);
+            var serializer = new iCalendarSerializer(calendar);
+            var result = serializer.SerializeToString(calendar);
 
-            GC.KeepAlive(result);
+            var calendars = serializer.Deserialize(new StringReader(result)) as IICalendarCollection;
+            calendar = calendars.First();
+            evt = calendar.Events.First();
+
+            Assert.AreEqual(1, evt.Attendees.Count);
+            Assert.AreEqual(attendee, evt.Attendees[0]);
+            Assert.AreEqual("Test Name", evt.Attendees[0].CommonName);
+            Assert.AreEqual("OPT-PARTICIPANT", evt.Attendees[0].Role);
+            Assert.AreEqual(1, evt.Attendees[0].Members.Count);
+        }
+
+        /// <summary>
+        /// See https://sourceforge.net/projects/dday-ical/forums/forum/656447/topic/3355446/index/page/1
+        /// </summary>
+        [Test, Category("Serialization")]
+        public void BugFromForumTopic3355446()
+        {
+            var ical = new iCalendar();
+            var evt = ical.Create<Event>();
+            
+            var altDescProp = new CalendarProperty("X-ALT-DESC");
+            altDescProp.AddParameter("FMTTYPE", "text/html");
+            altDescProp.Value = "<a href=\"http://test.com\">some html</a>";
+            evt.AddProperty(altDescProp);
+
+            evt.Summary = "Test";
+            evt.Description = "Test";
+            evt.Start = new iCalDateTime(2012, 7, 30, 8, 0, 0);
+            evt.Duration = TimeSpan.FromHours(1);
+
+            var serializer = new iCalendarSerializer();
+            var serializedString = serializer.SerializeToString(ical);
+
+            Assert.IsTrue(serializedString.Contains("FMTTYPE=text/html"));
         }
 
         [Test, Category("Serialization")]
@@ -745,7 +774,8 @@ namespace DDay.iCal.Test
             EventSerializer eventSerializer = new EventSerializer();
             string evtString = eventSerializer.SerializeToString(evt);
 
-            Assert.IsTrue(evtString.Equals("BEGIN:VEVENT\r\nCREATED:20070319T000000Z\r\nDTEND;VALUE=DATE:20070320\r\nDTSTAMP:20070319T000000Z\r\nDTSTART;VALUE=DATE:20070319\r\nRRULE:FREQ=WEEKLY;INTERVAL=3;COUNT=4;BYDAY=TU,FR,SU\r\nSEQUENCE:0\r\nSUMMARY:Test event title\r\nUID:123456789\r\nEND:VEVENT\r\n"), "ComponentBaseSerializer.SerializeToString() serialized incorrectly");
+            var target = "BEGIN:VEVENT\r\nCREATED:20070319T000000Z\r\nDTEND;VALUE=DATE:20070320\r\nDTSTAMP:20070319T000000Z\r\nDTSTART;VALUE=DATE:20070319\r\nRRULE:FREQ=WEEKLY;INTERVAL=3;COUNT=4;BYDAY=TU,FR,SU\r\nSEQUENCE:0\r\nSUMMARY:Test event title\r\nUID:123456789\r\nEND:VEVENT\r\n";
+            Assert.AreEqual(target, evtString, "ComponentBaseSerializer.SerializeToString() serialized incorrectly");
 
             serializer.Serialize(iCal, @"Calendars\Serialization\Event5.ics");
             SerializeTest("Event5.ics", typeof(iCalendarSerializer));
@@ -1431,9 +1461,7 @@ Ticketmaster UK Limited Registration in England No 2662632, Registered Office, 4
         {
             IICalendar iCal = iCalendar.LoadFromFile(@"Calendars\Serialization\DateTime2.ics")[0];
             Assert.AreEqual(1, iCal.Events.Count);
-
-            Assert.IsNull(iCal.Events.First().Start);
-            Assert.AreEqual("19970412", iCal.Events.First().Properties["DTSTART"].Value);
+            Assert.AreEqual(new DateTime(1997, 4, 12), iCal.Events.First().Start.Local);
         }
 
         [Test, Category("Serialization")]

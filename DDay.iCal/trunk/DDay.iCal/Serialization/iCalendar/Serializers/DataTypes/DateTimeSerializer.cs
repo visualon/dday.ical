@@ -49,7 +49,7 @@ namespace DDay.iCal.Serialization.iCalendar
         {            
             if (obj is IDateTime)
             {
-                IDateTime dt = (IDateTime)obj;
+                IDateTime dt = ((IDateTime)obj).Copy<IDateTime>();
 
                 // Assign the TZID for the date/time value.
                 if (dt.TZID != null)
@@ -61,6 +61,15 @@ namespace DDay.iCal.Serialization.iCalendar
                 // during serialization, as it's redundant...
                 if (!dt.HasTime)
                     dt.SetValueType("DATE");
+                else 
+                {
+                    // Remove the 'VALUE' parameter, as it's already at
+                    // its default value
+                    if (dt.Parameters.ContainsKey("VALUE"))
+                    {
+                        dt.Parameters.Remove("VALUE");
+                    }
+                }
 
                 string value = string.Format("{0:0000}{1:00}{2:00}", dt.Year, dt.Month, dt.Day);
                 if (dt.HasTime)

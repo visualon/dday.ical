@@ -7,8 +7,7 @@ using System.Diagnostics;
 using DDay.Collections;
 
 namespace DDay.iCal
-{
-    [DebuggerDisplay("{Name}={string.Join(\",\", Values)}")]
+{   
 #if !SILVERLIGHT
     [Serializable]
 #endif
@@ -75,6 +74,18 @@ namespace DDay.iCal
             {
                 if (p.Values != null)
                     _Values = new List<string>(p.Values);
+            }
+        }
+
+        public override string ToString()
+        {
+            if (Values != null)
+            {
+                return string.Format("{0}={1}", Name, string.Join(",", Values.ToArray()));
+            }
+            else
+            {
+                return string.Format("{0}=", Name);
             }
         }
 

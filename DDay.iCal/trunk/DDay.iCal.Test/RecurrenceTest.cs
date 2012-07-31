@@ -2738,9 +2738,9 @@ namespace DDay.iCal.Test
         {
             var calendars = iCalendar.LoadFromFile(@"Calendars\Recurrence\Bug3517553.ics");
             
-            var from = new DateTime(2012, 4, 13);
+            var from = new DateTime(2012, 1, 1);
             var to = from.AddDays(365);
-            IList<Occurrence> occurrences = calendars.GetOccurrences(DateTime.Today, DateTime.Today.AddDays(365));
+            IList<Occurrence> occurrences = calendars.GetOccurrences(from, to);
 
             // There are exactly 19 events (no recurrences) in the test file.
             Assert.AreEqual(19, occurrences.Count);
