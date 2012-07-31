@@ -819,12 +819,7 @@ namespace DDay.iCal
             {
                 if (Name == null)
                     Name = c.Name;
-
-                Method = c.Method;
-                Version = c.Version;
-                ProductID = c.ProductID;
-                Scale = c.Scale;
-
+                
                 foreach (ICalendarProperty p in c.Properties)
                 {
                     if (!Properties.ContainsKey(p.Name))
@@ -834,8 +829,11 @@ namespace DDay.iCal
                 {
                     if (child is IUniqueComponent)
                     {
-                        if (!UniqueComponents.ContainsKey(((IUniqueComponent)child).UID))
+                        var component = UniqueComponents[((IUniqueComponent)child).UID];
+                        if (component == null)
+                        {
                             this.AddChild(child.Copy<ICalendarObject>());
+                        }
                     }
                     else if (child is ITimeZone)
                     {
