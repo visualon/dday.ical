@@ -88,9 +88,7 @@ namespace DDay.iCal.Serialization.iCalendar
         public override string SerializeToString(object obj)
         {
             ICalendarProperty prop = obj as ICalendarProperty;
-            if (prop != null && 
-                prop.Values != null &&
-                prop.Values.Any())
+            if (prop != null)
             {
                 // Don't serialize the property if the value is null                
 
@@ -105,34 +103,43 @@ namespace DDay.iCal.Serialization.iCalendar
                 ISerializerFactory sf = GetService<ISerializerFactory>();
 
                 StringBuilder result = new StringBuilder();
-                foreach (object v in prop.Values)
+                if (prop.Values != null &&
+                    prop.Values.Any())
                 {
-                    // Only serialize the value to a string if it
-                    // is non-null.
-                    if (v != null)
+                    foreach (object v in prop.Values)
                     {
-                        var valueType = v.GetType();
-
-                        // Use the determined type of the value if the property
-                        // mapping didn't yield any results.
-                        if (serializedType == null)
-                            serializedType = valueType;
-
-                        var genericListOfSerializedType = typeof(IEnumerable<>).MakeGenericType(new Type[] { serializedType });
-                        if (genericListOfSerializedType.IsAssignableFrom(valueType))
+                        // Only serialize the value to a string if it
+                        // is non-null.
+                        if (v != null)
                         {
-                            // Serialize an enumerable list of properties
-                            foreach (object value in (IEnumerable)v)
+                            var valueType = v.GetType();
+
+                            // Use the determined type of the value if the property
+                            // mapping didn't yield any results.
+                            if (serializedType == null)
+                                serializedType = valueType;
+
+                            var genericListOfSerializedType = typeof(IEnumerable<>).MakeGenericType(new Type[] { serializedType });
+                            if (genericListOfSerializedType.IsAssignableFrom(valueType))
                             {
-                                SerializeValue(sf, prop, serializedType, value, result);
+                                // Serialize an enumerable list of properties
+                                foreach (object value in (IEnumerable)v)
+                                {
+                                    SerializeValue(sf, prop, serializedType, value, result);
+                                }
+                            }
+                            else
+                            {
+                                // Serialize an individual value
+                                SerializeValue(sf, prop, valueType, v, result);
                             }
                         }
-                        else
-                        {
-                            // Serialize an individual value
-                            SerializeValue(sf, prop, valueType, v, result);
-                        }
                     }
+                }
+                else
+                {
+                    // If there was no value, then we need to preserve an 'empty' value                    
+                    result.Append(TextUtil.WrapLines(prop.Name + ":"));
                 }
 
                 // Pop the object off the serialization context.
