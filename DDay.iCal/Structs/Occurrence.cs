@@ -83,6 +83,12 @@ namespace DDay.iCal
 
         public int CompareTo(Occurrence other)
         {
+            if (Period == null || Period.StartTime == null)
+                return -1;
+        
+            if (other.Period == null || other.Period.StartTime == null)
+                return 1;
+
             return Period.CompareTo(other.Period);
         }
 

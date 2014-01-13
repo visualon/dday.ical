@@ -222,14 +222,14 @@ namespace DDay.iCal
          * Wed, Mar 23, 12:19PM, but the recurrence is Mon - Fri, 9:00AM - 5:00PM, the start dates returned should all be at
          * 9:00AM, and not 12:19PM.
          */
-        private List<DateTime> GetDates(IDateTime seed, DateTime periodStart, DateTime periodEnd, int maxCount, IRecurrencePattern pattern, bool includeReferenceDateInResults)
-        {            
-            List<DateTime> dates = new List<DateTime>();
+        private IList<DateTime> GetDates(IDateTime seed, DateTime periodStart, DateTime periodEnd, int maxCount, IRecurrencePattern pattern, bool includeReferenceDateInResults)
+        {
+            SortedList<DateTime, DateTime> dates = new SortedList<DateTime, DateTime>();
             DateTime originalDate = DateUtil.GetSimpleDateTimeData(seed);
             DateTime seedCopy = DateUtil.GetSimpleDateTimeData(seed);
 
             if (includeReferenceDateInResults)
-                dates.Add(seedCopy);
+                dates.Add(seedCopy, seedCopy);
 
             // If the interval is set to zero, or our count prevents us
             // from getting additional items, then return with the reference
@@ -237,7 +237,7 @@ namespace DDay.iCal
             if (pattern.Interval == 0 ||
                 (pattern.Count != int.MinValue && pattern.Count <= dates.Count))
             {
-                return dates;
+                return dates.Values;
             }
 
             // optimize the start time for selecting candidates
@@ -301,8 +301,8 @@ namespace DDay.iCal
                             }
                             else if (pattern.Until == DateTime.MinValue || candidate <= pattern.Until)
                             {
-                                if (!dates.Contains(candidate))
-                                    dates.Add(candidate);                                
+                                if (!dates.ContainsKey(candidate))
+                                    dates.Add(candidate, candidate);                                
                             }
                         }
                     }
@@ -317,94 +317,92 @@ namespace DDay.iCal
                 IncrementDate(ref seedCopy, pattern, pattern.Interval);
             }
 
-            // sort final list..
-            dates.Sort();
-            return dates;
+            return dates.Values;
         }
-        
-        ///**
-        // * Returns the the next date of this recurrence given a seed date
-        // * and start date.  The seed date indicates the start of the fist 
-        // * occurrence of this recurrence. The start date is the
-        // * starting date to search for the next recurrence.  Return null
-        // * if there is no occurrence date after start date.
-        // * @return the next date in the recurrence series after startDate
-        // * @param seed the start date of this Recurrence's first instance
-        // * @param startDate the date to start the search
-        // */
-        //private DateTime? GetNextDate(IDateTime referenceDate, DateTime periodStart, IRecurrencePattern pattern)
-        //{            
-        //    DateTime seedCopy = DateUtil.GetSimpleDateTimeData(referenceDate);
-        //    // optimize the start time for selecting candidates
-        //    // (only applicable where a COUNT is not specified)
-        //    if (Pattern.Count == int.MinValue)
-        //    {
-        //        DateTime incremented = seedCopy;
-        //        IncrementDate(ref incremented, pattern, pattern.Interval);
-        //        while (incremented < periodStart)
-        //        {
-        //            seedCopy = incremented;
-        //            IncrementDate(ref incremented, pattern, pattern.Interval);
-        //        }
-        //    }
-                        
-        //    bool?[] expandBehaviors = RecurrenceUtil.GetExpandBehaviorList(pattern);
 
-        //    int invalidCandidateCount = 0;
-        //    int noCandidateIncrementCount = 0;
-        //    DateTime candidate = DateTime.MinValue;            
-            
-        //    while (true)
-        //    {
-        //        if (pattern.Until != DateTime.MinValue && candidate != DateTime.MinValue && candidate > pattern.Until)
-        //            break;
+        /**
+         * Returns the the next date of this recurrence given a seed date
+         * and start date.  The seed date indicates the start of the fist 
+         * occurrence of this recurrence. The start date is the
+         * starting date to search for the next recurrence.  Return null
+         * if there is no occurrence date after start date.
+         * @return the next date in the recurrence series after startDate
+         * @param seed the start date of this Recurrence's first instance
+         * @param startDate the date to start the search
+         */
+        private DateTime? GetNextDate(IDateTime referenceDate, DateTime periodStart, IRecurrencePattern pattern)
+        {
+            DateTime seedCopy = DateUtil.GetSimpleDateTimeData(referenceDate);
+            // optimize the start time for selecting candidates
+            // (only applicable where a COUNT is not specified)
+            if (Pattern.Count == int.MinValue)
+            {
+                DateTime incremented = seedCopy;
+                IncrementDate(ref incremented, pattern, pattern.Interval);
+                while (incremented < periodStart)
+                {
+                    seedCopy = incremented;
+                    IncrementDate(ref incremented, pattern, pattern.Interval);
+                }
+            }
 
-        //        if (pattern.Count > 0 && invalidCandidateCount >= pattern.Count)
-        //            break;
+            bool?[] expandBehaviors = RecurrenceUtil.GetExpandBehaviorList(pattern);
 
-        //        List<DateTime> candidates = GetCandidates(seedCopy, pattern, expandBehaviors);
-        //        if (candidates.Count > 0)
-        //        {
-        //            noCandidateIncrementCount = 0;
+            int invalidCandidateCount = 0;
+            int noCandidateIncrementCount = 0;
+            DateTime candidate = DateTime.MinValue;
 
-        //            // sort candidates for identifying when UNTIL date is exceeded..
-        //            candidates.Sort();
+            while (true)
+            {
+                if (pattern.Until != DateTime.MinValue && candidate != DateTime.MinValue && candidate > pattern.Until)
+                    break;
 
-        //            for (int i = 0; i < candidates.Count; i++)
-        //            {
-        //                candidate = candidates[i];
+                if (pattern.Count > 0 && invalidCandidateCount >= pattern.Count)
+                    break;
 
-        //                // don't count candidates that occur before the seed date..
-        //                if (candidate >= seedCopy)
-        //                {
-        //                    // Candidate must be after startDate because
-        //                    // we want the NEXT occurrence
-        //                    if (candidate >= periodStart)
-        //                    {
-        //                        invalidCandidateCount++;
-        //                    }
-        //                    else if (pattern.Count > 0 && invalidCandidateCount >= pattern.Count)
-        //                    {
-        //                        break;
-        //                    }
-        //                    else if (pattern.Until == DateTime.MinValue || candidate <= pattern.Until)
-        //                    {
-        //                        return candidate;
-        //                    }
-        //                }
-        //            }
-        //        } 
-        //        else 
-        //        {
-        //            noCandidateIncrementCount++;
-        //            if ((maxIncrementCount > 0) && (noCandidateIncrementCount > maxIncrementCount)) 
-        //                break;
-        //        }
+                List<DateTime> candidates = GetCandidates(seedCopy, pattern, expandBehaviors);
+                if (candidates.Count > 0)
+                {
+                    noCandidateIncrementCount = 0;
 
-        //        IncrementDate(ref seedCopy, pattern, pattern.Interval);
-        //    }
-        //    return null;
-        //}
+                    // sort candidates for identifying when UNTIL date is exceeded..
+                    candidates.Sort();
+
+                    for (int i = 0; i < candidates.Count; i++)
+                    {
+                        candidate = candidates[i];
+
+                        // don't count candidates that occur before the seed date..
+                        if (candidate >= seedCopy)
+                        {
+                            // Candidate must be after startDate because
+                            // we want the NEXT occurrence
+                            if (candidate <= periodStart)
+                            {
+                                invalidCandidateCount++;
+                            }
+                            else if (pattern.Count > 0 && invalidCandidateCount >= pattern.Count)
+                            {
+                                break;
+                            }
+                            else if (pattern.Until == DateTime.MinValue || candidate <= pattern.Until)
+                            {
+                                return candidate;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    noCandidateIncrementCount++;
+                    if ((maxIncrementCount > 0) && (noCandidateIncrementCount > maxIncrementCount))
+                        break;
+                }
+
+                IncrementDate(ref seedCopy, pattern, pattern.Interval);
+            }
+            return null;
+        }
 
         /**
          * Returns a list of possible dates generated from the applicable BY* rules, using the specified date as a seed.
@@ -836,7 +834,7 @@ namespace DDay.iCal
          */
         private List<DateTime> GetOffsetDates(List<DateTime> dates, int offset)
         {
-            if (offset == int.MinValue) 
+            if (offset == int.MinValue || offset == 0) 
                 return dates;
             
             List<DateTime> offsetDates = new List<DateTime>();
@@ -1016,19 +1014,19 @@ namespace DDay.iCal
 
         #region Public Methods
 
-        //virtual public IPeriod GetNext(IDateTime referenceDate)
-        //{
-        //    DateTime? dt = GetNextDate(referenceDate, referenceDate.Value, Pattern);
-        //    if (dt != null)
-        //    {
-        //        // Create a period from the date/time.
-        //        IPeriod p = CreatePeriod(dt.Value, referenceDate);
+        virtual public IPeriod GetNext(IDateTime referenceDate)
+        {
+            DateTime? dt = GetNextDate(referenceDate, referenceDate.Value, Pattern);
+            if (dt != null)
+            {
+                // Create a period from the date/time.
+                IPeriod p = CreatePeriod(dt.Value, referenceDate);
 
-        //        if (!Periods.Contains(p))
-        //            Periods.Add(p);
-        //    }
-        //    return null;
-        //}
+                if (!Periods.Contains(p))
+                    Periods.Add(p);
+            }
+            return null;
+        }
 
         #endregion
 
@@ -1042,15 +1040,20 @@ namespace DDay.iCal
             // Enforce evaluation restrictions on the pattern.
             EnforceEvaluationRestrictions(pattern);
 
-            Periods.Clear();
+            SortedList<IPeriod , IPeriod> periods = new SortedList<IPeriod, IPeriod>();
             foreach (DateTime dt in GetDates(referenceDate, periodStart, periodEnd, -1, pattern, includeReferenceDateInResults))
             {                
                 // Create a period from the date/time.
                 IPeriod p = CreatePeriod(dt, referenceDate);
-                
-                if (!Periods.Contains(p))
-                    Periods.Add(p);
+
+                if (!periods.ContainsKey(p))
+                    periods.Add(p,p);
             }
+
+
+            Periods.Clear();
+
+            Periods.AddRange(periods.Values);
 
             return Periods;
         }

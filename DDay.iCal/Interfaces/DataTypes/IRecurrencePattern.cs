@@ -25,6 +25,6 @@ namespace DDay.iCal
         RecurrenceRestrictionType RestrictionType { get; set; }
         RecurrenceEvaluationModeType EvaluationMode { get; set; }
 
-        //IPeriod GetNextOccurrence(IDateTime dt);
+        IPeriod GetNextOccurrence(IDateTime dt);
     }
 }

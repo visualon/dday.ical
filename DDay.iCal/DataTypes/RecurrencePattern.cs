@@ -166,23 +166,23 @@ namespace DDay.iCal
             set { _EvaluationMode = value; }
         }
 
-        ///// <summary>
-        ///// Returns the next occurrence of the pattern,
-        ///// given a valid previous occurrence, <paramref name="lastOccurrence"/>.
-        ///// As long as the recurrence pattern is valid, and
-        ///// <paramref name="lastOccurrence"/> is a valid previous 
-        ///// occurrence within the pattern, this will return the
-        ///// next occurrence.  NOTE: This will not give accurate results
-        ///// when COUNT or BYSETVAL are used.
-        ///// </summary>
-        //virtual public IPeriod GetNextOccurrence(IDateTime lastOccurrence)
-        //{
-        //    RecurrencePatternEvaluator evaluator = GetService<RecurrencePatternEvaluator>();
-        //    if (evaluator != null)
-        //        return evaluator.GetNext(lastOccurrence);
+        /// <summary>
+        /// Returns the next occurrence of the pattern,
+        /// given a valid previous occurrence, <paramref name="lastOccurrence"/>.
+        /// As long as the recurrence pattern is valid, and
+        /// <paramref name="lastOccurrence"/> is a valid previous 
+        /// occurrence within the pattern, this will return the
+        /// next occurrence.  NOTE: This will not give accurate results
+        /// when COUNT or BYSETVAL are used.
+        /// </summary>
+        virtual public IPeriod GetNextOccurrence(IDateTime lastOccurrence)
+        {
+            RecurrencePatternEvaluator evaluator = GetService<RecurrencePatternEvaluator>();
+            if (evaluator != null)
+                return evaluator.GetNext(lastOccurrence);
 
-        //    return null;
-        //}
+            return null;
+        }
 
         #endregion
 
