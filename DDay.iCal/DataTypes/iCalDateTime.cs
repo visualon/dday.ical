@@ -714,7 +714,7 @@ namespace DDay.iCal
 
             // If these share the same TZID, then let's see if we
             // can share the time zone observance also!
-            if (TZID != null && string.Equals(TZID, dt.TZID))
+            if (TimeZoneName != null && string.Equals(TimeZoneName, dt.TimeZoneName))
             {
                 if (TimeZoneObservance != null && dt.TimeZoneObservance == null)
                 {
