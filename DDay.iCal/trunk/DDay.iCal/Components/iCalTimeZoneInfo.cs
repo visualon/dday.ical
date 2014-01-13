@@ -167,7 +167,7 @@ namespace DDay.iCal
                         .Periods
                         .FirstOrDefault(p =>
                             p.StartTime.Value <= normalizedDt &&
-                            p.EndTime.Value > normalizedDt
+                            (p.EndTime == null || p.EndTime.Value > normalizedDt)
                         );
 
                     if (period != null)
