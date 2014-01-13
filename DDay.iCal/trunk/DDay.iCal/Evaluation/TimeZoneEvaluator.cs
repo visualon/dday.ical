@@ -10,7 +10,7 @@ namespace DDay.iCal
     {
         #region Private Fields
 
-        private List<Occurrence> m_Occurrences;        
+        private SortedList<Occurrence , Occurrence> m_Occurrences;        
 
         #endregion
 
@@ -20,22 +20,12 @@ namespace DDay.iCal
 
         #endregion
 
-        #region Public Properties
-
-        virtual public List<Occurrence> Occurrences
-        {
-            get { return m_Occurrences; }
-            set { m_Occurrences = value; }
-        }
-
-        #endregion
-
         #region Constructors
 
         public TimeZoneEvaluator(ITimeZone tz)
         {
             TimeZone = tz;
-            m_Occurrences = new List<Occurrence>();
+            m_Occurrences = new SortedList<Occurrence, Occurrence>();
         }
 
         #endregion
@@ -44,22 +34,22 @@ namespace DDay.iCal
 
         void ProcessOccurrences(IDateTime referenceDate)
         {
-            // Sort the occurrences by start time
-            m_Occurrences.Sort(
-                delegate(Occurrence o1, Occurrence o2)
-                {
-                    if (o1.Period == null || o1.Period.StartTime == null)
-                        return -1;
-                    else if (o2.Period == null || o2.Period.StartTime == null)
-                        return 1;
-                    else return o1.Period.StartTime.CompareTo(o2.Period.StartTime);
-                }
-            );
+            //// Sort the occurrences by start time
+            //m_Occurrences.Sort(
+            //    delegate(Occurrence o1, Occurrence o2)
+            //    {
+            //        if (o1.Period == null || o1.Period.StartTime == null)
+            //            return -1;
+            //        else if (o2.Period == null || o2.Period.StartTime == null)
+            //            return 1;
+            //        else return o1.Period.StartTime.CompareTo(o2.Period.StartTime);
+            //    }
+            //);
 
             for (int i = 0; i < m_Occurrences.Count; i++)
             {
-                Occurrence curr = m_Occurrences[i];
-                Occurrence? next = i < m_Occurrences.Count - 1 ? (Occurrence?)m_Occurrences[i + 1] : null;
+                Occurrence curr = m_Occurrences.Values[i];
+                Occurrence? next = i < m_Occurrences.Count - 1 ? (Occurrence?)m_Occurrences.Values[i + 1] : null;
 
                 // Determine end times for our periods, overwriting previously calculated end times.
                 // This is important because we don't want to overcalculate our time zone information,
@@ -135,11 +125,14 @@ namespace DDay.iCal
                         foreach (IPeriod period in periods)
                         {
                             if (!Periods.Contains(period))
+                            {
                                 Periods.Add(period);
 
-                            Occurrence o = new Occurrence(curr, period);
-                            if (!m_Occurrences.Contains(o))
-                                m_Occurrences.Add(o);
+                                Occurrence o = new Occurrence(curr, period);
+
+                                if (!m_Occurrences.ContainsKey(o))
+                                    m_Occurrences.Add(o, o);
+                            }
                         }
 
                         if (EvaluationEndBounds == DateTime.MinValue || EvaluationEndBounds < offsetEnd)
