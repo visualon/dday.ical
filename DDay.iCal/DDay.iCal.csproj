@@ -65,7 +65,7 @@
   <ItemGroup>
     <Reference Include="antlr.runtime, Version=2.7.6.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\antlr.runtime.dll</HintPath>
+      <HintPath>..\antlr\antlr.runtime\bin\antlr.runtime.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
