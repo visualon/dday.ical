@@ -78,13 +78,13 @@ switch($Target)
     'Push'
     {
         & nuget push ((Join-Path $dir bin) + "\*.$Version.nupkg")
-        & git push origin v$Version
+        & git push origin v$Version -f
     }
     'Pack'
     {
         Invoke-BuildProject -proj build.proj -tgt $Target -props "Configuration=$Configuration;Version=$Version"
         & nuget pack DDay.iCal.nuspec -Version $Version -Properties "id=$id;Configuration=$Configuration" -OutputDirectory (Join-Path $dir bin)
-        & git tag v$Version
+        & git tag v$Version -f
     }
 }
 
