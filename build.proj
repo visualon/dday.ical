@@ -19,7 +19,7 @@
         <Message Text="Running msbuild..." Importance="high" />
         <MSBuild Projects="antlr\antlr.runtime\antlr.runtime.csproj" Targets="Clean;Build" BuildInParallel="true" Properties="TargetFrameworkVersion=v3.5;Configuration=$(Configuration);AssemblyOriginatorKeyFile=$(MSBuildProjectDirectory)\DDay.iCal.snk" />
         <MSBuild Projects="DDay.iCal.sln" Targets="Clean;Build" BuildInParallel="true" Properties="Configuration=$(Configuration)" />
-        <Exec Command="$(ILMerge) /internalize /keyfile:DDay.iCal.snk /out:$(OutputDirectory)\DDay.iCal.dll $(ILMergeFiles)" />
+        <Exec Command="$(ILMerge) /internalize:ilmerge.excludes.txt /keyfile:DDay.iCal.snk /out:$(OutputDirectory)\DDay.iCal.dll $(ILMergeFiles)" />
         <Copy SourceFiles="DDay.iCal\bin\$(Configuration)\DDay.iCal.xml" DestinationFolder="$(OutputDirectory)" />
         <Message Text="  finished!" Importance="high" />
     </Target>
