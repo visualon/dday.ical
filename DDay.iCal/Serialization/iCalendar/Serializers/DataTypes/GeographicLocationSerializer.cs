@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.IO;
 
@@ -40,8 +41,8 @@ namespace DDay.iCal.Serialization.iCalendar
 
                 double lat;
                 double lon;
-                double.TryParse(values[0], out lat);
-                double.TryParse(values[1], out lon);
+                double.TryParse(values[0], NumberStyles.Integer | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out lat);
+                double.TryParse(values[1], NumberStyles.Integer | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out lon);
                 g.Latitude = lat;
                 g.Longitude = lon;
 
