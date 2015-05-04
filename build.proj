@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Pack" ToolsVersion="12.0">
+
+    <PropertyGroup>
+        <OutputDirectory>$(MSBuildProjectDirectory)\bin</OutputDirectory>
+        <ILMerge>$(MSBuildProjectDirectory)\packages\ilmerge.2.14.1208\tools\ILMerge.exe</ILMerge>
+        <ILMergeFiles>DDay.iCal\bin\$(Configuration)\DDay.iCal.dll DDay.Collections\DDay.Collections\bin\$(Configuration)\DDay.Collections.dll antlr\antlr.runtime\bin\antlr.runtime.dll</ILMergeFiles>
+    </PropertyGroup>
+
+    <Target Name="Init" BeforeTargets="Pack">
+        <Message Text="Running nuget restore ..." Importance="high" />
+        <Exec Command="nuget restore -Verbosity quiet" />
+        <RemoveDir Directories="$(OutputDirectory)" />
+        <MakeDir Directories="$(OutputDirectory)"/>
+        <Message Text="  finished!" Importance="high" />
+    </Target>
+
+    <Target Name="Pack">
+        <Message Text="Running msbuild..." Importance="high" />
+        <MSBuild Projects="antlr\antlr.runtime\antlr.runtime.csproj" Targets="Clean;Build" BuildInParallel="true" Properties="Configuration=$(Configuration);AssemblyOriginatorKeyFile=$(MSBuildProjectDirectory)\DDay.iCal.snk" />
+        <MSBuild Projects="DDay.iCal.sln" Targets="Clean;Build" BuildInParallel="true" Properties="Configuration=$(Configuration)" />
+        <Exec Command="$(ILMerge) /internalize /keyfile:DDay.iCal.snk /out:$(OutputDirectory)\DDay.iCal.dll $(ILMergeFiles)" />
+        <Copy SourceFiles="DDay.iCal\bin\$(Configuration)\DDay.iCal.xml" DestinationFolder="$(OutputDirectory)" />
+        <Message Text="  finished!" Importance="high" />
+    </Target>
+
+</Project>

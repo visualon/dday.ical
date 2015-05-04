@@ -11,7 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDay.Collections", "DDay.Co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "other", "other", "{50CDE5C8-4039-4F07-B9AB-7C5A7BD79FED}"
 	ProjectSection(SolutionItems) = preProject
+		build.proj = build.proj
+		DDay.iCal.nuspec = DDay.iCal.nuspec
 		DDay.iCal.snk = DDay.iCal.snk
+		release.ps1 = release.ps1
+		Version.txt = Version.txt
 	EndProjectSection
 EndProject
 Global

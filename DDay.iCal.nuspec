@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>$id$</id>
+        <version>$version$</version>
+        <title>DDay.iCal</title>
+        <authors>Doug Day,DDay Software</authors>
+        <owners>VisualOn GmbH</owners>
+        <licenseUrl>https://github.com/VisualOn/dday.ical/blob/master/License.txt</licenseUrl>
+        <projectUrl>http://www.ddaysoftware.com/Pages/Projects/DDay.iCal/</projectUrl>
+        <iconUrl>http://www.ddaysoftware.com/images/logo_medium.gif</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>DDay.iCal is an iCal (RFC 5545) class library for .NET 2.0 and above, Silverlight. It aims at being as RFC 5545 compliant as possible, while targeting compatibility with popular calendaring applications, like Apple iCal, Outlook 2007, etc.</description>
+        <summary>DDay.iCal is an iCal (RFC 5545) class library for .NET 2.0 and above, Silverlight. It aims at being as RFC 5545 compliant as possible, while targeting compatibility with popular calendaring applicatio</summary>
+        <tags>iCal, Calendar, ics, outlook, events</tags>
+    </metadata>
+    <files>
+        <file src="bin\DDay.iCal.dll" target="lib\" />
+        <file src="bin\DDay.iCal.pdb" target="lib\" />
+        <file src="bin\DDay.iCal.xml" target="lib\" />
+        <file src="License.txt" target="content\License.DDay.iCal.txt" />
+    </files>
+</package>
