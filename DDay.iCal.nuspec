@@ -18,6 +18,6 @@
         <file src="bin\DDay.iCal.dll" target="lib\net35\" />
         <file src="bin\DDay.iCal.pdb" target="lib\net35\" />
         <file src="bin\DDay.iCal.xml" target="lib\net35\" />
-        <file src="License.txt" target="content\License.DDay.iCal.txt" />
+        <file src="License.txt" target="content\Licenses\DDay.iCal.txt" />
     </files>
 </package>
