@@ -15,9 +15,9 @@
         <tags>iCal, Calendar, ics, outlook, events</tags>
     </metadata>
     <files>
-        <file src="bin\DDay.iCal.dll" target="lib\" />
-        <file src="bin\DDay.iCal.pdb" target="lib\" />
-        <file src="bin\DDay.iCal.xml" target="lib\" />
+        <file src="bin\DDay.iCal.dll" target="lib\net35\" />
+        <file src="bin\DDay.iCal.pdb" target="lib\net35\" />
+        <file src="bin\DDay.iCal.xml" target="lib\net35\" />
         <file src="License.txt" target="content\License.DDay.iCal.txt" />
     </files>
 </package>
