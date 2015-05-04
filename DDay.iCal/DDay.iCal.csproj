@@ -239,6 +239,7 @@
     <Compile Include="Interfaces\General\IMergeable.cs" />
     <Compile Include="Interfaces\IICalendar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="packages.config" />
     <None Include="Serialization\iCalendar\iCal.g" />
     <Compile Include="Serialization\DataTypeMapper.cs" />
     <Compile Include="Serialization\iCalendar\Serializers\DataMapSerializer.cs" />
